@@ -1,2 +1,4 @@
 backend/.python-version
 backend/uv.lock
+backend/.env
+backend/app/__pycache__/
