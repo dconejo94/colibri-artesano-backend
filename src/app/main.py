@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 
 app = FastAPI(
-    title=settings.app_name,
+    title=settings.APP_NAME,
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -22,7 +22,7 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {
-        "app": settings.app_name,
+        "app": settings.APP_NAME,
         "status": "ok",
     }
 
