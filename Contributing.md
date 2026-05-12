@@ -1,44 +1,45 @@
 # Git Conventions — Colibrí Artesano
 
-Este documento define las convenciones de ramas, commits y flujo de trabajo para mantener consistencia en el desarrollo del proyecto.
+This document defines the conventions for branches, commits, and workflow to maintain consistency in project development.
 
 ---
 
-## Flujo de trabajo
+## Workflow
 
-- Nunca hacer push directo a `main`
-- Todo cambio debe pasar por Pull Request
-- Al menos 1 revisión antes de merge
-- Resolver conflictos localmente antes de subir
-- Mantener ramas pequeñas y enfocadas
+- Never push directly to `main`
+- All changes must go through a Pull Request
+- At least 1 review before merging
+- Resolve conflicts locally before pushing
+- Keep branches small and focused
 
 ---
 
-## Ramas
+## Branches
 
-Formato:
+Format:
 
 ```bash
-<tipo>/<id>-<descripcion>
+<type>/<id>-<description>
 ```
 
-### Tipos permitidos
+### Allowed types
 
-| Tipo | Uso | Ejemplo |
-|------|-----|---------|
-| feature | Nueva funcionalidad | `feature/12-login-screen` |
-| fix | Corrección de errores | `fix/25-navbar-bug` |
-| hotfix | Corrección urgente en producción | `hotfix/78-auth-crash` |
-| refactor | Mejora interna sin cambiar comportamiento | `refactor/33-auth-service` |
-| test | Agregar o mejorar pruebas | `test/44-auth-endpoints` |
-| docs | Documentación | `docs/15-api-readme` |
-| chore | Configuración o mantenimiento | `chore/50-eslint-config` |
+| Type     | Usage                                         | Example                    |
+| -------- | --------------------------------------------- | -------------------------- |
+| feature  | New functionality                             | `feature/12-login-screen`  |
+| fix      | Bug fixes                                     | `fix/25-navbar-bug`        |
+| hotfix   | Urgent production fix                         | `hotfix/78-auth-crash`     |
+| refactor | Internal improvement without behavior changes | `refactor/33-auth-service` |
+| test     | Add or improve tests                          | `test/44-auth-endpoints`   |
+| docs     | Documentation                                 | `docs/15-api-readme`       |
+| chore    | Configuration or maintenance tasks            | `chore/50-eslint-config`   |
 
-## Reglas
 
-- Usar kebab-case `palabras-separadas-por-guiones`
-- Descripciones cortas
-- Siempre asociar al issue cuando exista
+## Rules
+
+- Use kebab-case (words-separated-by-dashes)
+- Keep descriptions short
+- Always associate with an issue when it exists
 
 Correcto:
 
@@ -51,40 +52,41 @@ test/22-auth-api
 Incorrecto:
 
 ```bash
-NuevaRama
+NewBranch
 product-test
 feature-login
 ```
 
 ---
 
-## Convención de commits
+## Commit Convention
 
-Formato:
+Format:
 
 ```bash
-<tipo>: <descripcion>
+<type>: <description>
 ```
 
-## Prefijos
+## Prefixes
 
-| Prefijo | Uso | Ejemplo |
-|---------|-----|---------|
-| feat: | Nueva funcionalidad | `feat: add login endpoint` |
-| fix: | Corrección de error | `fix: resolve token validation bug` |
-| test: | Tests | `test: add auth endpoint tests` |
-| docs: | Documentación | `docs: update setup guide` |
-| chore: | Configuración | `chore: update github actions` |
-| refactor: | Mejora interna | `refactor: simplify auth service` |
-| style: | Formato/UI sin lógica | `style: adjust login spacing` |
+| Prefix    | Usage                               | Example                             |
+| --------- | ----------------------------------- | ----------------------------------- |
+| feat:     | New feature                         | `feat: add login endpoint`          |
+| fix:      | Bug fix                             | `fix: resolve token validation bug` |
+| test:     | Tests                               | `test: add auth endpoint tests`     |
+| docs:     | Documentation                       | `docs: update setup guide`          |
+| chore:    | Configuration                       | `chore: update github actions`      |
+| refactor: | Internal improvement                | `refactor: simplify auth service`   |
+| style:    | Formatting/UI without logic changes | `style: adjust login spacing`       |
+
 
 ---
 
-# Buenas prácticas de commits
+# Good commit practices
 
-## Hacer commits pequeños y específicos
+## Make small and specific commits
 
-Correcto:
+Correct:
 
 ```bash
 feat: create login endpoint
@@ -105,10 +107,10 @@ many updates
 
 ## Pull Requests
 
-Formato del título:
+Title format
 
 ```bash
-[<tipo>] #<id> descripcion
+[<type>] #<id> description
 ```
 
 Ejemplo:
@@ -117,20 +119,19 @@ Ejemplo:
 [feature] #12 implement login screen
 ```
 
-### Debe incluir
+### Must include
 
-- Qué se hizo
-- Issue relacionado
-- Evidencia visual si aplica
-- Checklist de pruebas realizadas
+- What was done
+- Related issue
+- Visual evidence if applicable
 
 ---
 
 ## Issues
 
-Todo trabajo debe nacer de un Issue.
+All work must start from an Issue.
 
-Formato:
+Format:
 
 ```bash
 [Frontend] Login Screen
@@ -138,23 +139,22 @@ Formato:
 [Testing] Auth API Tests
 ```
 
-Debe incluir:
+Must include
 
-- Descripción
-- Criterios de aceptación
-- Responsable
-- Labels
+- Description
+- Acceptance criteria
+- Responsible person
 
 ---
 
-## Definición de Done
+## Definition of Done
 
-Una tarea se considera terminada cuando:
+A task is considered complete when:
 
-- Código implementado
-- Tests pasan
-- No rompe build
-- Revisado por al menos 1 compañero
-- Merge aprobado
-- Issue cerrado
+- Code implemented
+- Tests pass
+- No build breaks
+- Reviewed by at least 1 teammate
+- Merge approved
+- Issue closed
 
