@@ -9,21 +9,54 @@
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### 2. Install dependencies
-```bash
-uv sync
-```
+## Run locally
 
-### 3. Set up environment
 ```bash
 cp .env.example .env
-```
-
-### 4. Run the app
-```bash
+chmod +x scripts/run_local.sh
 ./scripts/run_local.sh
 ```
 
-### 5. Verify
-- API: http://localhost:8000
-- Docs: http://localhost:8000/docs
+API:
+http://localhost:8000
+
+Swagger:
+http://localhost:8000/docs
+
+Health:
+http://localhost:8000/health
+
+---
+
+## Stop services
+
+```bash
+docker compose down
+```
+
+---
+
+## Reset database
+
+```bash
+docker compose down -v
+```
+
+---
+
+## Create migration
+
+```bash
+docker compose exec backend uv run alembic revision --autogenerate -m "message"
+```
+
+---
+
+## Apply migrations
+
+```bash
+docker compose exec backend uv run alembic upgrade head
+```
+
+Hot reload is enabled automatically.
+
