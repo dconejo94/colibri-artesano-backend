@@ -1,2 +1,7 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
 .env
-src/app/__pycache__/
+.pytest_cache/
