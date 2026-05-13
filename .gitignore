@@ -2,6 +2,14 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+
 .venv/
 .env
+
 .pytest_cache/
+.coverage
+htmlcov/
+
+.vscode/
+
+postgres_data/
