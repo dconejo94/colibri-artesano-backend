@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
+    SQL_ECHO: bool = False
 
     BACKEND_PORT: int = 8000
 

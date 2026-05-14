@@ -14,6 +14,8 @@ class SQLAlchemyProductRepository(ProductRepository):
         if category:
             query = query.filter(Product.category == category)
 
-        offset = (page - 1) * limit
+        total = query.count()
 
-        return query.offset(offset).limit(limit).all()
+        items = query.offset((page - 1) * limit).limit(limit).all()
+
+        return items, total
