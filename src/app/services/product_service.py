@@ -1,4 +1,5 @@
 from app.domain.schemas.paginated_response import PaginatedProductsResponseDTO
+from app.core.exceptions import ProductNotFoundException
 from app.repositories.product_repository import ProductRepository
 
 
@@ -11,3 +12,11 @@ class ProductService:
         return PaginatedProductsResponseDTO(
             items=items, page=page, limit=limit, total=total
         )
+
+    def get_product_by_id(self, id: int):
+        product = self.repository.get_product_by_id(id=id)
+
+        if not product:
+            raise ProductNotFoundException()
+
+        return product

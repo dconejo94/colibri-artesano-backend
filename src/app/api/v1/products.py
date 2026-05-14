@@ -1,9 +1,14 @@
 from fastapi import APIRouter, Depends, Query
+from fastapi import HTTPException
+
 
 from app.services.product_service import ProductService
 from app.api.deps import get_product_service
 
 from app.domain.schemas.paginated_response import PaginatedProductsResponseDTO
+from app.domain.schemas.product import ProductResponseDTO
+
+from app.core.exceptions import ProductNotFoundException
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
@@ -16,3 +21,16 @@ def get_all_products(
     service: ProductService = Depends(get_product_service),
 ):
     return service.get_all_products(page=page, limit=limit, category=category)
+
+
+@router.get("/{id}", response_model=ProductResponseDTO)
+def get_product_by_id(
+    id: int,
+    service: ProductService = Depends(get_product_service),
+):
+    try:
+        product = service.get_product_by_id(id)
+        return ProductResponseDTO.model_validate(product)
+
+    except ProductNotFoundException:
+        raise HTTPException(status_code=404, detail="Product not found")
