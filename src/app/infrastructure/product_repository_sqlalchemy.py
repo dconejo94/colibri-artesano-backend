@@ -19,3 +19,6 @@ class SQLAlchemyProductRepository(ProductRepository):
         items = query.offset((page - 1) * limit).limit(limit).all()
 
         return items, total
+
+    def get_product_by_id(self, id: int):
+        return self.db.query(Product).filter(Product.id == id).first()
