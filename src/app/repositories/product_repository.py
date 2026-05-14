@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from app.domain.models import Product
 
 
 class ProductRepository(ABC):
@@ -8,5 +9,5 @@ class ProductRepository(ABC):
         page: int,
         limit: int,
         category: str | None = None,
-    ):
+    ) -> tuple[list[Product], int]:
         pass

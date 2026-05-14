@@ -1,8 +1,8 @@
-"""initial schema
+"""initial_version
 
-Revision ID: b50b395ceb05
+Revision ID: f29a6d5c9177
 Revises:
-Create Date: 2026-05-14 01:27:00.288823
+Create Date: 2026-05-14 04:03:24.956478
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "b50b395ceb05"
+revision: str = "f29a6d5c9177"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -65,7 +65,7 @@ def upgrade() -> None:
         sa.Column("store_id", sa.Integer(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("description", sa.String(), nullable=True),
-        sa.Column("price", sa.Float(), nullable=False),
+        sa.Column("price", sa.Numeric(precision=10, scale=2), nullable=False),
         sa.Column("stock", sa.Integer(), nullable=True),
         sa.Column("image_url", sa.String(), nullable=True),
         sa.Column("category", sa.String(), nullable=True),

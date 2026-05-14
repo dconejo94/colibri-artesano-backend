@@ -3,7 +3,7 @@ from sqlalchemy import (
     Integer,
     String,
     Boolean,
-    Float,
+    Numeric,
     ForeignKey,
     DateTime,
 )
@@ -19,7 +19,7 @@ class Product(Base):
     store_id = Column(Integer, ForeignKey("stores.id"), nullable=False)
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
-    price = Column(Float, nullable=False)
+    price = Column(Numeric(10, 2), nullable=False)
     stock = Column(Integer, default=0)
     image_url = Column(String, nullable=True)
     category = Column(String, nullable=True)

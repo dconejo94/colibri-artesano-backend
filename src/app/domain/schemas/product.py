@@ -1,11 +1,13 @@
 from pydantic import BaseModel
 
+from decimal import Decimal
+
 
 class ProductResponseDTO(BaseModel):
     id: int
     name: str
     description: str | None
-    price: float
+    price: Decimal
     stock: int
     image_url: str | None
     category: str | None

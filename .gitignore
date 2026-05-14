@@ -13,3 +13,8 @@ htmlcov/
 .vscode/
 
 postgres_data/
+
+# databases
+*.db
+*.sqlite
+*.sqlite3
