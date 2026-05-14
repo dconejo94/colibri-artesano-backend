@@ -10,12 +10,14 @@ class Settings(BaseSettings):
 
     APP_NAME: str = "Colibri Artesano API"
 
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_DB: str
-    POSTGRES_HOST: str = "localhost"
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
+    POSTGRES_DB: str = "colibri"
+    POSTGRES_HOST: str = "db"
     POSTGRES_PORT: int = 5432
+    SQL_ECHO: bool = False
 
+    ALLOWED_ORIGINS: list[str] = "http://localhost:8081"
     BACKEND_PORT: int = 8000
 
     @property
