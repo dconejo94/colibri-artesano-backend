@@ -6,6 +6,8 @@ from sqlalchemy.orm import sessionmaker
 from app.main import app
 from app.core.database import get_db, Base
 
+from tests.factories.product_factory import seed_products
+
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
 engine = create_engine(
@@ -32,6 +34,10 @@ def client():
             db.close()
 
     app.dependency_overrides[get_db] = override_get_db
+
+    db = TestingSessionLocal()
+    seed_products(db)
+    db.close()
 
     with TestClient(app) as c:
         yield c
