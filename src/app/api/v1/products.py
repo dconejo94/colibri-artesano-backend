@@ -14,22 +14,22 @@ router = APIRouter(prefix="/products", tags=["Products"])
 
 
 @router.get("/", response_model=PaginatedProductsResponseDTO)
-def get_all_products(
+async def get_all_products(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     category: str | None = None,
     service: ProductService = Depends(get_product_service),
 ):
-    return service.get_all_products(page=page, limit=limit, category=category)
+    return await service.get_all_products(page=page, limit=limit, category=category)
 
 
 @router.get("/{id}", response_model=ProductResponseDTO)
-def get_product_by_id(
+async def get_product_by_id(
     id: int,
     service: ProductService = Depends(get_product_service),
 ):
     try:
-        product = service.get_product_by_id(id)
+        product = await service.get_product_by_id(id)
         return ProductResponseDTO.model_validate(product)
 
     except ProductNotFoundException:
