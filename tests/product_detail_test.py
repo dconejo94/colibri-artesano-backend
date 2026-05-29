@@ -1,5 +1,5 @@
-def test_get_product_by_id_success(client):
-    response = client.get("/api/v1/products/1")
+async def test_get_product_by_id_success(client):
+    response = await client.get("/api/v1/products/1")
 
     # Assert status
     assert response.status_code == 200
@@ -13,8 +13,8 @@ def test_get_product_by_id_success(client):
     assert "stock" in data
 
 
-def test_get_product_by_id_not_found(client):
-    response = client.get("/api/v1/products/999999")
+async def test_get_product_by_id_not_found(client):
+    response = await client.get("/api/v1/products/999999")
 
     assert response.status_code == 404
 
@@ -22,8 +22,8 @@ def test_get_product_by_id_not_found(client):
     assert data["detail"] == "Product not found"
 
 
-def test_get_product_by_id_response_schema(client):
-    response = client.get("/api/v1/products/1")
+async def test_get_product_by_id_response_schema(client):
+    response = await client.get("/api/v1/products/1")
 
     assert response.status_code == 200
 
