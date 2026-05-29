@@ -15,7 +15,9 @@ class SQLAlchemyProductRepository(ProductRepository):
         if category:
             stmt = stmt.where(Product.category == category)
 
-        count_result = await self.db.execute(select(func.count()).select_from(stmt.subquery()))
+        count_result = await self.db.execute(
+            select(func.count()).select_from(stmt.subquery())
+        )
         total = count_result.scalar()
 
         result = await self.db.execute(stmt.offset((page - 1) * limit).limit(limit))

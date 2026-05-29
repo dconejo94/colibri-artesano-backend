@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int = 5432
     SQL_ECHO: bool = False
 
-    ALLOWED_ORIGINS: list[str] = "http://localhost:8081"
+    ALLOWED_ORIGINS: list[str] = ["http://localhost:8081"]
     BACKEND_PORT: int = 8000
 
     @property

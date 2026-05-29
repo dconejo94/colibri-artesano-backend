@@ -29,12 +29,11 @@ async def client():
         async with TestingSessionLocal() as session:
             try:
                 yield session
-                await session.commit()
+                if session.new or session.dirty or session.deleted:
+                    await session.commit()
             except Exception:
                 await session.rollback()
                 raise
-            finally:
-                await session.close()
 
     app.dependency_overrides[get_db] = override_get_db
 
