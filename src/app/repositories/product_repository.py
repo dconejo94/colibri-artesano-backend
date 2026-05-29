@@ -6,7 +6,7 @@ from typing import Optional
 
 class ProductRepository(ABC):
     @abstractmethod
-    def list_products(
+    async def list_products(
         self,
         page: int,
         limit: int,
@@ -15,5 +15,5 @@ class ProductRepository(ABC):
         pass
 
     @abstractmethod
-    def get_product_by_id(self, id: int) -> Optional[Product]:
+    async def get_product_by_id(self, id: int) -> Optional[Product]:
         pass
