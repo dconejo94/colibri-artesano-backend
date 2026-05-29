@@ -21,9 +21,20 @@ class Settings(BaseSettings):
     BACKEND_PORT: int = 8000
 
     @property
-    def DATABASE_URL(self) -> str:
+    def SYNC_DATABASE_URL(self) -> str:
         return (
             f"postgresql://"
+            f"{self.POSTGRES_USER}:"
+            f"{self.POSTGRES_PASSWORD}@"
+            f"{self.POSTGRES_HOST}:"
+            f"{self.POSTGRES_PORT}/"
+            f"{self.POSTGRES_DB}"
+        )
+
+    @property
+    def ASYNC_DATABASE_URL(self) -> str:
+        return (
+            f"postgresql+asyncpg://"
             f"{self.POSTGRES_USER}:"
             f"{self.POSTGRES_PASSWORD}@"
             f"{self.POSTGRES_HOST}:"
