@@ -1,7 +1,7 @@
 from app.domain.models.product import Product
 
 
-def seed_products(db):
+async def seed_products(db):
     product = Product(
         id=1,
         store_id=1,
@@ -14,7 +14,7 @@ def seed_products(db):
     )
 
     db.add(product)
-    db.commit()
-    db.refresh(product)
+    await db.commit()
+    await db.refresh(product)
 
     return product
