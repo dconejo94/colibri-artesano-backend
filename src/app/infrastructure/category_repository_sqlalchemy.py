@@ -28,9 +28,7 @@ class SQLAlchemyCategoryRepository(CategoryRepository):
         return result.scalars().first()
 
     async def get_by_slug(self, slug: str):
-        result = await self.db.execute(
-            select(Category).where(Category.slug == slug)
-        )
+        result = await self.db.execute(select(Category).where(Category.slug == slug))
         return result.scalars().first()
 
     async def update(self, category: Category) -> Category:
@@ -39,7 +37,5 @@ class SQLAlchemyCategoryRepository(CategoryRepository):
         return category
 
     async def delete(self, category_id: UUID) -> None:
-        await self.db.execute(
-            delete(Category).where(Category.id == category_id)
-        )
+        await self.db.execute(delete(Category).where(Category.id == category_id))
         await self.db.flush()

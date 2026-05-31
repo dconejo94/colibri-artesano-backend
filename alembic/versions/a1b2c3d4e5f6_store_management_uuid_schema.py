@@ -35,7 +35,9 @@ def upgrade() -> None:
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("email", sa.String(length=255), nullable=False),
         sa.Column("password_hash", sa.String(), nullable=False),
-        sa.Column("is_admin", sa.Boolean(), nullable=True, server_default=sa.text("false")),
+        sa.Column(
+            "is_admin", sa.Boolean(), nullable=True, server_default=sa.text("false")
+        ),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -84,7 +86,9 @@ def upgrade() -> None:
         sa.Column("name", sa.String(length=200), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("base_price", sa.Numeric(precision=10, scale=2), nullable=False),
-        sa.Column("is_active", sa.Boolean(), nullable=True, server_default=sa.text("true")),
+        sa.Column(
+            "is_active", sa.Boolean(), nullable=True, server_default=sa.text("true")
+        ),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -102,7 +106,9 @@ def upgrade() -> None:
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("product_id", sa.Uuid(), nullable=False),
         sa.Column("image_url", sa.String(), nullable=False),
-        sa.Column("is_primary", sa.Boolean(), nullable=True, server_default=sa.text("false")),
+        sa.Column(
+            "is_primary", sa.Boolean(), nullable=True, server_default=sa.text("false")
+        ),
         sa.ForeignKeyConstraint(["product_id"], ["products.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -114,8 +120,15 @@ def upgrade() -> None:
         sa.Column("product_id", sa.Uuid(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("value", sa.String(), nullable=False),
-        sa.Column("price_modifier", sa.Numeric(precision=10, scale=2), nullable=True, server_default=sa.text("0")),
-        sa.Column("stock_quantity", sa.Integer(), nullable=True, server_default=sa.text("0")),
+        sa.Column(
+            "price_modifier",
+            sa.Numeric(precision=10, scale=2),
+            nullable=True,
+            server_default=sa.text("0"),
+        ),
+        sa.Column(
+            "stock_quantity", sa.Integer(), nullable=True, server_default=sa.text("0")
+        ),
         sa.ForeignKeyConstraint(["product_id"], ["products.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -126,7 +139,9 @@ def upgrade() -> None:
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("buyer_id", sa.Uuid(), nullable=False),
         sa.Column("total_amount", sa.Numeric(precision=10, scale=2), nullable=False),
-        sa.Column("status", sa.String(), nullable=True, server_default=sa.text("'pending'")),
+        sa.Column(
+            "status", sa.String(), nullable=True, server_default=sa.text("'pending'")
+        ),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -143,7 +158,12 @@ def upgrade() -> None:
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("main_order_id", sa.Uuid(), nullable=False),
         sa.Column("store_id", sa.Uuid(), nullable=False),
-        sa.Column("seller_status", sa.String(), nullable=True, server_default=sa.text("'pending'")),
+        sa.Column(
+            "seller_status",
+            sa.String(),
+            nullable=True,
+            server_default=sa.text("'pending'"),
+        ),
         sa.Column("subtotal_amount", sa.Numeric(precision=10, scale=2), nullable=False),
         sa.Column(
             "created_at",
@@ -202,8 +222,18 @@ def downgrade() -> None:
         sa.Column("logo_url", sa.String(), nullable=True),
         sa.Column("location", sa.String(), nullable=True),
         sa.Column("is_verified", sa.Boolean(), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=True,
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=True,
+        ),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"]),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("user_id"),
@@ -220,8 +250,18 @@ def downgrade() -> None:
         sa.Column("image_url", sa.String(), nullable=True),
         sa.Column("category", sa.String(), nullable=True),
         sa.Column("is_active", sa.Boolean(), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=True,
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=True,
+        ),
         sa.ForeignKeyConstraint(["store_id"], ["stores.id"]),
         sa.PrimaryKeyConstraint("id"),
     )

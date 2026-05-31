@@ -1,5 +1,6 @@
 from tests.factories.product_factory import TEST_CATEGORY_ID
 
+
 async def test_get_products_returns_200(client):
     response = await client.get("/api/v1/products")
 

@@ -112,9 +112,7 @@ async def list_store_orders(
     limit: int = Query(10, ge=1, le=100),
     service: OrderService = Depends(get_order_service),
 ):
-    return await service.list_store_orders(
-        store_id=store_id, page=page, limit=limit
-    )
+    return await service.list_store_orders(store_id=store_id, page=page, limit=limit)
 
 
 @router.patch(

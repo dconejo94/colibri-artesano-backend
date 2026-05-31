@@ -81,9 +81,7 @@ class OrderService:
         items, total = await self.order_repo.list_main_orders_by_buyer(
             buyer_id, page, limit
         )
-        return PaginatedResponse(
-            items=items, page=page, limit=limit, total=total
-        )
+        return PaginatedResponse(items=items, page=page, limit=limit, total=total)
 
     async def list_store_orders(
         self, store_id: UUID, page: int, limit: int
@@ -91,16 +89,12 @@ class OrderService:
         items, total = await self.order_repo.list_store_orders_by_store(
             store_id, page, limit
         )
-        return PaginatedResponse(
-            items=items, page=page, limit=limit, total=total
-        )
+        return PaginatedResponse(items=items, page=page, limit=limit, total=total)
 
     async def update_store_order_status(
         self, store_order_id: UUID, dto: StoreOrderStatusUpdateDTO
     ) -> StoreOrder:
-        store_order = await self.order_repo.get_store_order_by_id(
-            store_order_id
-        )
+        store_order = await self.order_repo.get_store_order_by_id(store_order_id)
         if not store_order:
             raise NotFoundException("StoreOrder", str(store_order_id))
         store_order.seller_status = dto.seller_status

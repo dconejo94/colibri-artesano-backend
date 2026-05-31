@@ -12,9 +12,7 @@ class ProductService:
     def __init__(self, repository: ProductRepository):
         self.repository = repository
 
-    async def create_product(
-        self, store_id: UUID, dto: ProductCreateDTO
-    ) -> Product:
+    async def create_product(self, store_id: UUID, dto: ProductCreateDTO) -> Product:
         product = Product(
             store_id=store_id,
             category_id=dto.category_id,
@@ -36,9 +34,7 @@ class ProductService:
         items, total = await self.repository.list_products(
             page, limit, store_id=store_id, category_id=category_id, is_active=is_active
         )
-        return PaginatedResponse(
-            items=items, page=page, limit=limit, total=total
-        )
+        return PaginatedResponse(items=items, page=page, limit=limit, total=total)
 
     async def get_product_by_id(self, product_id: UUID) -> Product:
         product = await self.repository.get_by_id(product_id)
@@ -46,9 +42,7 @@ class ProductService:
             raise NotFoundException("Product", str(product_id))
         return product
 
-    async def update_product(
-        self, product_id: UUID, dto: ProductUpdateDTO
-    ) -> Product:
+    async def update_product(self, product_id: UUID, dto: ProductUpdateDTO) -> Product:
         product = await self.repository.get_by_id(product_id)
         if not product:
             raise NotFoundException("Product", str(product_id))

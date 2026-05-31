@@ -19,9 +19,7 @@ class SQLAlchemyProductVariantRepository(ProductVariantRepository):
 
     async def list_by_product(self, product_id: UUID) -> list[ProductVariant]:
         result = await self.db.execute(
-            select(ProductVariant).where(
-                ProductVariant.product_id == product_id
-            )
+            select(ProductVariant).where(ProductVariant.product_id == product_id)
         )
         return list(result.scalars().all())
 

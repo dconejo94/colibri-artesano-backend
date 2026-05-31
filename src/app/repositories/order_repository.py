@@ -28,13 +28,9 @@ class OrderRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_store_order_by_id(
-        self, store_order_id: UUID
-    ) -> Optional[StoreOrder]:
+    async def get_store_order_by_id(self, store_order_id: UUID) -> Optional[StoreOrder]:
         pass
 
     @abstractmethod
-    async def update_store_order_status(
-        self, store_order: StoreOrder
-    ) -> StoreOrder:
+    async def update_store_order_status(self, store_order: StoreOrder) -> StoreOrder:
         pass

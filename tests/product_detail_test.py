@@ -1,6 +1,7 @@
 from tests.factories.product_factory import TEST_PRODUCT_ID
 import uuid
 
+
 async def test_get_product_by_id_success(client):
     response = await client.get(f"/api/v1/products/{TEST_PRODUCT_ID}")
 
@@ -43,7 +44,7 @@ async def test_get_product_by_id_response_schema(client):
         "is_active",
         "created_at",
         "images",
-        "variants"
+        "variants",
     }
 
     assert expected_fields.issubset(set(data.keys()))

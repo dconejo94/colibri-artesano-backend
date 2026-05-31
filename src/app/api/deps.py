@@ -3,11 +3,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 
-from app.infrastructure.category_repository_sqlalchemy import SQLAlchemyCategoryRepository
+from app.infrastructure.category_repository_sqlalchemy import (
+    SQLAlchemyCategoryRepository,
+)
 from app.infrastructure.store_repository_sqlalchemy import SQLAlchemyStoreRepository
 from app.infrastructure.product_repository_sqlalchemy import SQLAlchemyProductRepository
-from app.infrastructure.product_image_repository_sqlalchemy import SQLAlchemyProductImageRepository
-from app.infrastructure.product_variant_repository_sqlalchemy import SQLAlchemyProductVariantRepository
+from app.infrastructure.product_image_repository_sqlalchemy import (
+    SQLAlchemyProductImageRepository,
+)
+from app.infrastructure.product_variant_repository_sqlalchemy import (
+    SQLAlchemyProductVariantRepository,
+)
 from app.infrastructure.order_repository_sqlalchemy import SQLAlchemyOrderRepository
 
 from app.services.category_service import CategoryService

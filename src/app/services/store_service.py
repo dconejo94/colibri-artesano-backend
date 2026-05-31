@@ -29,9 +29,7 @@ class StoreService:
         self, page: int, limit: int
     ) -> PaginatedResponse[StoreResponseDTO]:
         items, total = await self.repository.list_stores(page, limit)
-        return PaginatedResponse(
-            items=items, page=page, limit=limit, total=total
-        )
+        return PaginatedResponse(items=items, page=page, limit=limit, total=total)
 
     async def get_store_by_id(self, store_id: UUID) -> Store:
         store = await self.repository.get_by_id(store_id)
@@ -39,9 +37,7 @@ class StoreService:
             raise NotFoundException("Store", str(store_id))
         return store
 
-    async def update_store(
-        self, store_id: UUID, dto: StoreUpdateDTO
-    ) -> Store:
+    async def update_store(self, store_id: UUID, dto: StoreUpdateDTO) -> Store:
         store = await self.repository.get_by_id(store_id)
         if not store:
             raise NotFoundException("Store", str(store_id))

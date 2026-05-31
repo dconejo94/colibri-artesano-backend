@@ -34,15 +34,11 @@ class SQLAlchemyStoreRepository(StoreRepository):
         return items, total
 
     async def get_by_id(self, store_id: UUID):
-        result = await self.db.execute(
-            select(Store).where(Store.id == store_id)
-        )
+        result = await self.db.execute(select(Store).where(Store.id == store_id))
         return result.scalars().first()
 
     async def get_by_owner_id(self, owner_id: UUID):
-        result = await self.db.execute(
-            select(Store).where(Store.owner_id == owner_id)
-        )
+        result = await self.db.execute(select(Store).where(Store.owner_id == owner_id))
         return result.scalars().first()
 
     async def update(self, store: Store) -> Store:

@@ -32,9 +32,7 @@ async def list_buyer_orders(
     limit: int = Query(10, ge=1, le=100),
     service: OrderService = Depends(get_order_service),
 ):
-    return await service.list_buyer_orders(
-        buyer_id=buyer_id, page=page, limit=limit
-    )
+    return await service.list_buyer_orders(buyer_id=buyer_id, page=page, limit=limit)
 
 
 @router.get("/{order_id}", response_model=MainOrderResponseDTO)

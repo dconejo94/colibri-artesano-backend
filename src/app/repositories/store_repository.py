@@ -11,9 +11,7 @@ class StoreRepository(ABC):
         pass
 
     @abstractmethod
-    async def list_stores(
-        self, page: int, limit: int
-    ) -> tuple[list[Store], int]:
+    async def list_stores(self, page: int, limit: int) -> tuple[list[Store], int]:
         pass
 
     @abstractmethod

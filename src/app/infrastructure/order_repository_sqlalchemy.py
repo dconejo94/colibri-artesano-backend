@@ -24,16 +24,12 @@ class SQLAlchemyOrderRepository(OrderRepository):
             select(MainOrder)
             .where(MainOrder.id == order_id)
             .options(
-                selectinload(MainOrder.store_orders).selectinload(
-                    StoreOrder.items
-                )
+                selectinload(MainOrder.store_orders).selectinload(StoreOrder.items)
             )
         )
         return result.scalars().first()
 
-    async def list_main_orders_by_buyer(
-        self, buyer_id: UUID, page: int, limit: int
-    ):
+    async def list_main_orders_by_buyer(self, buyer_id: UUID, page: int, limit: int):
         stmt = select(MainOrder).where(MainOrder.buyer_id == buyer_id)
 
         count_result = await self.db.execute(
@@ -43,9 +39,7 @@ class SQLAlchemyOrderRepository(OrderRepository):
 
         result = await self.db.execute(
             stmt.options(
-                selectinload(MainOrder.store_orders).selectinload(
-                    StoreOrder.items
-                )
+                selectinload(MainOrder.store_orders).selectinload(StoreOrder.items)
             )
             .order_by(MainOrder.created_at.desc())
             .offset((page - 1) * limit)
@@ -54,9 +48,7 @@ class SQLAlchemyOrderRepository(OrderRepository):
         items = list(result.scalars().all())
         return items, total
 
-    async def list_store_orders_by_store(
-        self, store_id: UUID, page: int, limit: int
-    ):
+    async def list_store_orders_by_store(self, store_id: UUID, page: int, limit: int):
         stmt = select(StoreOrder).where(StoreOrder.store_id == store_id)
 
         count_result = await self.db.execute(

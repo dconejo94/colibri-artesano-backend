@@ -30,9 +30,7 @@ class SQLAlchemyProductImageRepository(ProductImageRepository):
         return result.scalars().first()
 
     async def delete(self, image_id: UUID) -> None:
-        await self.db.execute(
-            delete(ProductImage).where(ProductImage.id == image_id)
-        )
+        await self.db.execute(delete(ProductImage).where(ProductImage.id == image_id))
         await self.db.flush()
 
     async def clear_primary(self, product_id: UUID) -> None:

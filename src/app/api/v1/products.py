@@ -32,6 +32,7 @@ router = APIRouter(prefix="/products", tags=["Products"])
 
 # ── Product CRUD ──────────────────────────────────────────────────
 
+
 @router.get("/", response_model=PaginatedResponse[ProductResponseDTO])
 async def list_products(
     page: int = Query(1, ge=1),
@@ -80,6 +81,7 @@ async def delete_product(
 
 
 # ── Product Images ────────────────────────────────────────────────
+
 
 @router.post(
     "/{product_id}/images",
@@ -131,6 +133,7 @@ async def set_primary_image(
 
 
 # ── Product Variants ──────────────────────────────────────────────
+
 
 @router.post(
     "/{product_id}/variants",
