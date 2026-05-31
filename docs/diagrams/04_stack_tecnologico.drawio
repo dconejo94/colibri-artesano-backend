@@ -1,0 +1,144 @@
+<mxfile host="app.diagrams.net" modified="2026-05-14T00:00:00.000Z" agent="draw.io" version="24.0.0" type="device">
+  <diagram id="stack" name="Stack Tecnológico">
+    <mxGraphModel dx="1422" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="title" value="&lt;font style=&quot;font-size:18px;&quot;&gt;&lt;b&gt;Colibrí Artesano — Stack Tecnológico Real&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;i&gt;Monolito por Capas · Python · Azure · Estado actual del MVP (solo deps en pyproject.toml)&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="200" y="10" width="900" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- ROW 1: CLIENT -->
+        <!-- ============================================================ -->
+        <mxCell id="row1" value="&lt;b&gt;CLIENTE MÓVIL&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="160" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="rn" value="&lt;b&gt;React Native&lt;/b&gt;&lt;br&gt;App Móvil&lt;br&gt;iOS + Android" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673A6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="220" y="80" width="180" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="expo" value="&lt;b&gt;Expo&lt;/b&gt;&lt;br&gt;Expo Router&lt;br&gt;Build toolchain" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673A6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="420" y="80" width="180" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="typescript" value="&lt;b&gt;TypeScript&lt;/b&gt;&lt;br&gt;Lenguaje del cliente&lt;br&gt;Tipado estático" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673A6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="620" y="80" width="180" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="axios" value="&lt;b&gt;Axios&lt;/b&gt;&lt;br&gt;Cliente HTTP&lt;br&gt;Llamadas a la API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673A6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="820" y="80" width="180" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- PROTOCOL ARROW -->
+        <!-- ============================================================ -->
+        <mxCell id="proto1" value="&lt;b&gt;HTTPS / REST (JSON) · TLS 1.2+&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fillColor=#F0F0F0;strokeColor=#CCCCCC;strokeWidth=1;fontSize=11;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="1100" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- ROW 2: BACKEND FRAMEWORK -->
+        <!-- ============================================================ -->
+        <mxCell id="row2" value="&lt;b&gt;FRAMEWORK&lt;br&gt;BACKEND&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="250" width="160" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="python" value="&lt;b&gt;Python 3.12+&lt;/b&gt;&lt;br&gt;Lenguaje principal&lt;br&gt;async/await nativo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6C8EBF;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="220" y="250" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="fastapi" value="&lt;b&gt;FastAPI ≥0.136&lt;/b&gt;&lt;br&gt;Framework API (ASGI)&lt;br&gt;OpenAPI auto-docs&lt;br&gt;OAuth2 built-in" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6C8EBF;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="420" y="250" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="uvicorn" value="&lt;b&gt;Uvicorn ≥0.46&lt;/b&gt;&lt;br&gt;Servidor ASGI&lt;br&gt;uvloop + httptools&lt;br&gt;Hot reload (dev)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6C8EBF;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="620" y="250" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="pydantic" value="&lt;b&gt;Pydantic ≥2.13&lt;/b&gt;&lt;br&gt;Validación de datos&lt;br&gt;Serialización JSON&lt;br&gt;pydantic-settings (.env)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6C8EBF;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="820" y="250" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="httpx" value="&lt;b&gt;HTTPX ≥0.28&lt;/b&gt;&lt;br&gt;Cliente HTTP async&lt;br&gt;(dependencia instalada,&lt;br&gt;sin uso activo aún)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#AAAAAA;strokeWidth=1;fontSize=11;fontColor=#888888;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="250" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="multipart" value="&lt;b&gt;python-multipart&lt;/b&gt;&lt;br&gt;≥0.0.27&lt;br&gt;Upload de archivos&lt;br&gt;Form data parsing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6C8EBF;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="250" width="160" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- ROW 3: ORM / DATA ACCESS -->
+        <!-- ============================================================ -->
+        <mxCell id="row3" value="&lt;b&gt;ORM /&lt;br&gt;ACCESO A&lt;br&gt;DATOS&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="380" width="160" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="sqla" value="&lt;b&gt;SQLAlchemy ≥2.0&lt;/b&gt;&lt;br&gt;ORM Async&lt;br&gt;DeclarativeBase&lt;br&gt;Patrón Repository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D6B656;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="220" y="380" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="asyncpg_box" value="&lt;b&gt;asyncpg ≥0.31&lt;/b&gt;&lt;br&gt;Driver PostgreSQL&lt;br&gt;Async nativo&lt;br&gt;Connection pooling" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D6B656;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="420" y="380" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="psycopg" value="&lt;b&gt;psycopg2-binary&lt;/b&gt;&lt;br&gt;≥2.9&lt;br&gt;Driver sync (Alembic)&lt;br&gt;Migraciones offline" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D6B656;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="620" y="380" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="alembic_box" value="&lt;b&gt;Alembic ≥1.18&lt;/b&gt;&lt;br&gt;Migraciones de esquema&lt;br&gt;Versionado incremental&lt;br&gt;Auto-generate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D6B656;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="820" y="380" width="180" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- ROW 4: DATABASES / STORAGE -->
+        <!-- ============================================================ -->
+        <mxCell id="row4" value="&lt;b&gt;BASES DE&lt;br&gt;DATOS Y&lt;br&gt;ALMACENA-&lt;br&gt;MIENTO&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="510" width="160" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="pg_box" value="&lt;b&gt;🐘 PostgreSQL&lt;/b&gt;&lt;br&gt;Azure Database for PostgreSQL&lt;br&gt;Flexible Server&lt;br&gt;&lt;i&gt;BD principal · ACID · SSL&lt;br&gt;Migraciones con Alembic&lt;/i&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=2;fontSize=10;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="510" width="280" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- ROW 5: AUTH (skeleton only) -->
+        <!-- ============================================================ -->
+        <mxCell id="row5" value="&lt;b&gt;AUTENTI-&lt;br&gt;CACIÓN&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#AAAAAA;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=middle;fontColor=#888888;" vertex="1" parent="1">
+          <mxGeometry x="40" y="640" width="160" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="jwt_note" value="&lt;b&gt;JWT / OAuth2&lt;/b&gt;&lt;br&gt;&lt;i&gt;core/security.py existe&lt;br&gt;pero está vacío.&lt;br&gt;Pendiente de implementar.&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFEFEF;strokeColor=#AAAAAA;strokeWidth=1;fontSize=11;fontColor=#888888;" vertex="1" parent="1">
+          <mxGeometry x="220" y="640" width="300" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- ROW 6: INFRA / DEPLOY -->
+        <!-- ============================================================ -->
+        <mxCell id="row6" value="&lt;b&gt;INFRA Y&lt;br&gt;DESPLIEGUE&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E6F3FF;strokeColor=#4A90D9;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="750" width="160" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="appservice_box" value="&lt;b&gt;Azure App Service&lt;/b&gt;&lt;br&gt;Deploy del backend&lt;br&gt;Contenedor Docker" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4A90D9;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="220" y="750" width="200" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="docker_box" value="&lt;b&gt;Docker&lt;/b&gt;&lt;br&gt;Contenedor del backend&lt;br&gt;Dockerfile + compose&lt;br&gt;Reproducibilidad" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4A90D9;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="440" y="750" width="200" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="ghactions" value="&lt;b&gt;GitHub Actions&lt;/b&gt;&lt;br&gt;CI/CD Pipeline&lt;br&gt;Tests + Lint + Deploy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4A90D9;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="660" y="750" width="200" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="uv_box" value="&lt;b&gt;uv (Astral)&lt;/b&gt;&lt;br&gt;Gestor de paquetes&lt;br&gt;Escrito en Rust&lt;br&gt;uv.lock determinístico" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4A90D9;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="880" y="750" width="200" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- ROW 7: TESTING -->
+        <!-- ============================================================ -->
+        <mxCell id="row8" value="&lt;b&gt;TESTING Y&lt;br&gt;CALIDAD&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="870" width="160" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="pytest_box" value="&lt;b&gt;Pytest ≥9.0&lt;/b&gt;&lt;br&gt;Framework de testing&lt;br&gt;asyncio_mode = auto" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D79B00;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="220" y="870" width="200" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="pytest_async" value="&lt;b&gt;pytest-asyncio ≥1.3&lt;/b&gt;&lt;br&gt;Tests asíncronos&lt;br&gt;Async fixtures" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D79B00;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="440" y="870" width="200" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="pytest_cov" value="&lt;b&gt;pytest-cov ≥7.1&lt;/b&gt;&lt;br&gt;Cobertura de código&lt;br&gt;Reports de coverage" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D79B00;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="660" y="870" width="200" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="ruff_box" value="&lt;b&gt;Ruff ≥0.15&lt;/b&gt;&lt;br&gt;Linter + Formatter&lt;br&gt;Escrito en Rust (ultra-rápido)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D79B00;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="880" y="870" width="200" height="85" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
