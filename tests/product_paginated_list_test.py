@@ -1,3 +1,5 @@
+from tests.factories.product_factory import TEST_CATEGORY_ID
+
 async def test_get_products_returns_200(client):
     response = await client.get("/api/v1/products")
 
@@ -47,6 +49,6 @@ async def test_get_products_invalid_page(client):
 
 
 async def test_get_products_category_filter(client):
-    response = await client.get("/api/v1/products?category=home")
+    response = await client.get(f"/api/v1/products?category_id={TEST_CATEGORY_ID}")
 
     assert response.status_code == 200

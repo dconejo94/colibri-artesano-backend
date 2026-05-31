@@ -6,7 +6,6 @@ from sqlalchemy.orm import selectinload
 
 from app.domain.models.main_order import MainOrder
 from app.domain.models.store_order import StoreOrder
-from app.domain.models.order_item import OrderItem
 from app.repositories.order_repository import OrderRepository
 
 

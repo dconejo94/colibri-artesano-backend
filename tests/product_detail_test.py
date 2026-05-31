@@ -1,5 +1,8 @@
+from tests.factories.product_factory import TEST_PRODUCT_ID
+import uuid
+
 async def test_get_product_by_id_success(client):
-    response = await client.get("/api/v1/products/1")
+    response = await client.get(f"/api/v1/products/{TEST_PRODUCT_ID}")
 
     # Assert status
     assert response.status_code == 200
@@ -9,12 +12,13 @@ async def test_get_product_by_id_success(client):
     # Assert structure
     assert "id" in data
     assert "name" in data
-    assert "price" in data
-    assert "stock" in data
+    assert "base_price" in data
+    assert "is_active" in data
 
 
 async def test_get_product_by_id_not_found(client):
-    response = await client.get("/api/v1/products/999999")
+    fake_id = uuid.uuid4()
+    response = await client.get(f"/api/v1/products/{fake_id}")
 
     assert response.status_code == 404
 
@@ -23,7 +27,7 @@ async def test_get_product_by_id_not_found(client):
 
 
 async def test_get_product_by_id_response_schema(client):
-    response = await client.get("/api/v1/products/1")
+    response = await client.get(f"/api/v1/products/{TEST_PRODUCT_ID}")
 
     assert response.status_code == 200
 
@@ -31,12 +35,15 @@ async def test_get_product_by_id_response_schema(client):
 
     expected_fields = {
         "id",
+        "store_id",
+        "category_id",
         "name",
         "description",
-        "price",
-        "stock",
-        "image_url",
-        "category",
+        "base_price",
+        "is_active",
+        "created_at",
+        "images",
+        "variants"
     }
 
     assert expected_fields.issubset(set(data.keys()))

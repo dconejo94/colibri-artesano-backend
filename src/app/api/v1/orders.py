@@ -3,8 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, HTTPException
 
 from app.services.order_service import OrderService
-from app.services.product_service import ProductService
-from app.api.deps import get_order_service, get_product_service
+from app.api.deps import get_order_service
 from app.domain.schemas.order import (
     MainOrderCreateDTO,
     MainOrderResponseDTO,

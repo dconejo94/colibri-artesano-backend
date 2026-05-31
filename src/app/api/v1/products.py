@@ -11,7 +11,6 @@ from app.api.deps import (
     get_product_variant_service,
 )
 from app.domain.schemas.product import (
-    ProductCreateDTO,
     ProductUpdateDTO,
     ProductResponseDTO,
     ProductDetailResponseDTO,
