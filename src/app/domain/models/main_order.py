@@ -18,5 +18,8 @@ class MainOrder(Base):
 
     buyer = relationship("User", back_populates="orders")
     store_orders = relationship(
-        "StoreOrder", back_populates="main_order", cascade="all, delete-orphan"
+        "StoreOrder",
+        back_populates="main_order",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )

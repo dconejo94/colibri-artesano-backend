@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from uuid import UUID
 from decimal import Decimal
 from datetime import datetime
@@ -7,8 +7,7 @@ from datetime import datetime
 class OrderItemCreateDTO(BaseModel):
     product_id: UUID
     variant_id: UUID | None = None
-    quantity: int
-    unit_price: Decimal
+    quantity: int = Field(..., gt=0)
 
 
 class OrderItemResponseDTO(BaseModel):
@@ -40,7 +39,7 @@ class StoreOrderStatusUpdateDTO(BaseModel):
 
 class MainOrderCreateDTO(BaseModel):
     buyer_id: UUID
-    items: list[OrderItemCreateDTO]
+    items: list[OrderItemCreateDTO] = Field(..., min_length=1)
 
 
 class MainOrderResponseDTO(BaseModel):

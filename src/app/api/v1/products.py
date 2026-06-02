@@ -37,12 +37,17 @@ router = APIRouter(prefix="/products", tags=["Products"])
 async def list_products(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
-    category_id: UUID | None = None,
-    is_active: bool | None = None,
+    store_id: UUID | None = Query(None),
+    category_id: UUID | None = Query(None),
+    is_active: bool | None = Query(None),
     service: ProductService = Depends(get_product_service),
 ):
     return await service.list_products(
-        page=page, limit=limit, category_id=category_id, is_active=is_active
+        page=page,
+        limit=limit,
+        store_id=store_id,
+        category_id=category_id,
+        is_active=is_active,
     )
 
 
@@ -114,7 +119,7 @@ async def delete_product_image(
     service: ProductImageService = Depends(get_product_image_service),
 ):
     try:
-        await service.delete_image(image_id)
+        await service.delete_image(product_id, image_id)
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Image not found")
 
@@ -170,7 +175,7 @@ async def update_product_variant(
     service: ProductVariantService = Depends(get_product_variant_service),
 ):
     try:
-        return await service.update_variant(variant_id, dto)
+        return await service.update_variant(product_id, variant_id, dto)
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Variant not found")
 
@@ -182,6 +187,6 @@ async def delete_product_variant(
     service: ProductVariantService = Depends(get_product_variant_service),
 ):
     try:
-        await service.delete_variant(variant_id)
+        await service.delete_variant(product_id, variant_id)
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Variant not found")

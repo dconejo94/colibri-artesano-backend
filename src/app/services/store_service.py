@@ -26,15 +26,21 @@ class StoreService:
         return await self.repository.create(store)
 
     async def list_stores(
-        self, page: int, limit: int
+        self, page: int, limit: int, owner_id: UUID | None = None
     ) -> PaginatedResponse[StoreResponseDTO]:
-        items, total = await self.repository.list_stores(page, limit)
+        items, total = await self.repository.list_stores(page, limit, owner_id)
         return PaginatedResponse(items=items, page=page, limit=limit, total=total)
 
     async def get_store_by_id(self, store_id: UUID) -> Store:
         store = await self.repository.get_by_id(store_id)
         if not store:
             raise NotFoundException("Store", str(store_id))
+        return store
+
+    async def get_store_by_owner_id(self, owner_id: UUID) -> Store:
+        store = await self.repository.get_by_owner_id(owner_id)
+        if not store:
+            raise NotFoundException("Store for Owner", str(owner_id))
         return store
 
     async def update_store(self, store_id: UUID, dto: StoreUpdateDTO) -> Store:
@@ -52,4 +58,4 @@ class StoreService:
         store = await self.repository.get_by_id(store_id)
         if not store:
             raise NotFoundException("Store", str(store_id))
-        await self.repository.delete(store_id)
+        await self.repository.delete(store)

@@ -19,6 +19,9 @@ class Store(Base):
 
     owner = relationship("User", back_populates="store")
     products = relationship(
-        "Product", back_populates="store", cascade="all, delete-orphan"
+        "Product",
+        back_populates="store",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     store_orders = relationship("StoreOrder", back_populates="store")

@@ -5,14 +5,24 @@ from app.domain.schemas.product import ProductCreateDTO, ProductUpdateDTO
 from app.domain.schemas.paginated_response import PaginatedResponse
 from app.domain.schemas.product import ProductResponseDTO
 from app.repositories.product_repository import ProductRepository
+from app.repositories.category_repository import CategoryRepository
 from app.core.exceptions import NotFoundException
 
 
 class ProductService:
-    def __init__(self, repository: ProductRepository):
+    def __init__(
+        self,
+        repository: ProductRepository,
+        category_repository: CategoryRepository,
+    ):
         self.repository = repository
+        self.category_repo = category_repository
 
     async def create_product(self, store_id: UUID, dto: ProductCreateDTO) -> Product:
+        category = await self.category_repo.get_by_id(dto.category_id)
+        if not category:
+            raise NotFoundException("Category", str(dto.category_id))
+
         product = Product(
             store_id=store_id,
             category_id=dto.category_id,
@@ -47,6 +57,11 @@ class ProductService:
         if not product:
             raise NotFoundException("Product", str(product_id))
 
+        if dto.category_id is not None:
+            category = await self.category_repo.get_by_id(dto.category_id)
+            if not category:
+                raise NotFoundException("Category", str(dto.category_id))
+
         update_data = dto.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(product, field, value)
@@ -57,4 +72,4 @@ class ProductService:
         product = await self.repository.get_by_id(product_id)
         if not product:
             raise NotFoundException("Product", str(product_id))
-        await self.repository.delete(product_id)
+        await self.repository.delete(product)

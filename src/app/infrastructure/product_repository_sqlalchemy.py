@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select, func, delete
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -61,6 +61,6 @@ class SQLAlchemyProductRepository(ProductRepository):
         await self.db.refresh(product)
         return product
 
-    async def delete(self, product_id: UUID) -> None:
-        await self.db.execute(delete(Product).where(Product.id == product_id))
+    async def delete(self, product: Product) -> None:
+        await self.db.delete(product)
         await self.db.flush()

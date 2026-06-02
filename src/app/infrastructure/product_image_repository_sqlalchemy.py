@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.models.product_image import ProductImage
@@ -29,8 +29,8 @@ class SQLAlchemyProductImageRepository(ProductImageRepository):
         )
         return result.scalars().first()
 
-    async def delete(self, image_id: UUID) -> None:
-        await self.db.execute(delete(ProductImage).where(ProductImage.id == image_id))
+    async def delete(self, image: ProductImage) -> None:
+        await self.db.delete(image)
         await self.db.flush()
 
     async def clear_primary(self, product_id: UUID) -> None:

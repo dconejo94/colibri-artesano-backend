@@ -11,7 +11,9 @@ class StoreRepository(ABC):
         pass
 
     @abstractmethod
-    async def list_stores(self, page: int, limit: int) -> tuple[list[Store], int]:
+    async def list_stores(
+        self, page: int, limit: int, owner_id: UUID | None = None
+    ) -> tuple[list[Store], int]:
         pass
 
     @abstractmethod
@@ -27,5 +29,5 @@ class StoreRepository(ABC):
         pass
 
     @abstractmethod
-    async def delete(self, store_id: UUID) -> None:
+    async def delete(self, store: Store) -> None:
         pass

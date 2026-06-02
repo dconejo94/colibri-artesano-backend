@@ -26,7 +26,7 @@ class ProductUpdateDTO(BaseModel):
 class ProductResponseDTO(BaseModel):
     id: UUID
     store_id: UUID
-    category_id: UUID
+    category_id: UUID | None
     name: str
     description: str | None
     base_price: Decimal

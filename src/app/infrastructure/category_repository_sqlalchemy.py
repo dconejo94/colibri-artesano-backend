@@ -1,9 +1,11 @@
 from uuid import UUID
 
-from sqlalchemy import select, delete
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.domain.models.category import Category
+from app.domain.models.product import Product
 from app.repositories.category_repository import CategoryRepository
 
 
@@ -23,7 +25,9 @@ class SQLAlchemyCategoryRepository(CategoryRepository):
 
     async def get_by_id(self, category_id: UUID):
         result = await self.db.execute(
-            select(Category).where(Category.id == category_id)
+            select(Category)
+            .where(Category.id == category_id)
+            .options(selectinload(Category.products).selectinload(Product.images))
         )
         return result.scalars().first()
 
@@ -36,6 +40,6 @@ class SQLAlchemyCategoryRepository(CategoryRepository):
         await self.db.refresh(category)
         return category
 
-    async def delete(self, category_id: UUID) -> None:
-        await self.db.execute(delete(Category).where(Category.id == category_id))
+    async def delete(self, category: Category) -> None:
+        await self.db.delete(category)
         await self.db.flush()

@@ -1,9 +1,11 @@
 from uuid import UUID
 
-from sqlalchemy import select, func, delete
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.domain.models.store import Store
+from app.domain.models.product import Product
 from app.repositories.store_repository import StoreRepository
 
 
@@ -17,8 +19,11 @@ class SQLAlchemyStoreRepository(StoreRepository):
         await self.db.refresh(store)
         return store
 
-    async def list_stores(self, page: int, limit: int):
+    async def list_stores(self, page: int, limit: int, owner_id: UUID | None = None):
         stmt = select(Store)
+
+        if owner_id:
+            stmt = stmt.where(Store.owner_id == owner_id)
 
         count_result = await self.db.execute(
             select(func.count()).select_from(stmt.subquery())
@@ -34,7 +39,11 @@ class SQLAlchemyStoreRepository(StoreRepository):
         return items, total
 
     async def get_by_id(self, store_id: UUID):
-        result = await self.db.execute(select(Store).where(Store.id == store_id))
+        result = await self.db.execute(
+            select(Store)
+            .where(Store.id == store_id)
+            .options(selectinload(Store.products).selectinload(Product.images))
+        )
         return result.scalars().first()
 
     async def get_by_owner_id(self, owner_id: UUID):
@@ -46,6 +55,6 @@ class SQLAlchemyStoreRepository(StoreRepository):
         await self.db.refresh(store)
         return store
 
-    async def delete(self, store_id: UUID) -> None:
-        await self.db.execute(delete(Store).where(Store.id == store_id))
+    async def delete(self, store: Store) -> None:
+        await self.db.delete(store)
         await self.db.flush()

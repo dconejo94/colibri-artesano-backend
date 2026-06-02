@@ -29,10 +29,10 @@ class ProductVariantService:
         return await self.repository.list_by_product(product_id)
 
     async def update_variant(
-        self, variant_id: UUID, dto: ProductVariantUpdateDTO
+        self, product_id: UUID, variant_id: UUID, dto: ProductVariantUpdateDTO
     ) -> ProductVariant:
         variant = await self.repository.get_by_id(variant_id)
-        if not variant:
+        if not variant or variant.product_id != product_id:
             raise NotFoundException("ProductVariant", str(variant_id))
 
         update_data = dto.model_dump(exclude_unset=True)
@@ -41,8 +41,8 @@ class ProductVariantService:
 
         return await self.repository.update(variant)
 
-    async def delete_variant(self, variant_id: UUID) -> None:
+    async def delete_variant(self, product_id: UUID, variant_id: UUID) -> None:
         variant = await self.repository.get_by_id(variant_id)
-        if not variant:
+        if not variant or variant.product_id != product_id:
             raise NotFoundException("ProductVariant", str(variant_id))
-        await self.repository.delete(variant_id)
+        await self.repository.delete(variant)

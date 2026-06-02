@@ -4,6 +4,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.domain.models.user import User
 from app.domain.models.main_order import MainOrder
 from app.domain.models.store_order import StoreOrder
 from app.repositories.order_repository import OrderRepository
@@ -77,3 +78,7 @@ class SQLAlchemyOrderRepository(OrderRepository):
         await self.db.flush()
         await self.db.refresh(store_order)
         return store_order
+
+    async def buyer_exists(self, buyer_id: UUID) -> bool:
+        result = await self.db.execute(select(func.count()).where(User.id == buyer_id))
+        return (result.scalar() or 0) > 0

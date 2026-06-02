@@ -39,7 +39,10 @@ async def get_store_service(
 async def get_product_service(
     db: AsyncSession = Depends(get_db),
 ) -> ProductService:
-    return ProductService(SQLAlchemyProductRepository(db))
+    return ProductService(
+        repository=SQLAlchemyProductRepository(db),
+        category_repository=SQLAlchemyCategoryRepository(db),
+    )
 
 
 async def get_product_image_service(
@@ -60,4 +63,5 @@ async def get_order_service(
     return OrderService(
         order_repository=SQLAlchemyOrderRepository(db),
         product_repository=SQLAlchemyProductRepository(db),
+        variant_repository=SQLAlchemyProductVariantRepository(db),
     )

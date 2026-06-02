@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select, delete
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.models.product_variant import ProductVariant
@@ -34,8 +34,6 @@ class SQLAlchemyProductVariantRepository(ProductVariantRepository):
         await self.db.refresh(variant)
         return variant
 
-    async def delete(self, variant_id: UUID) -> None:
-        await self.db.execute(
-            delete(ProductVariant).where(ProductVariant.id == variant_id)
-        )
+    async def delete(self, variant: ProductVariant) -> None:
+        await self.db.delete(variant)
         await self.db.flush()

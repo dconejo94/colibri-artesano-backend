@@ -50,4 +50,4 @@ class CategoryService:
         category = await self.repository.get_by_id(category_id)
         if not category:
             raise NotFoundException("Category", str(category_id))
-        await self.repository.delete(category_id)
+        await self.repository.delete(category)

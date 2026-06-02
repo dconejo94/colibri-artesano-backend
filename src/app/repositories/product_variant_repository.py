@@ -23,5 +23,5 @@ class ProductVariantRepository(ABC):
         pass
 
     @abstractmethod
-    async def delete(self, variant_id: UUID) -> None:
+    async def delete(self, variant: ProductVariant) -> None:
         pass

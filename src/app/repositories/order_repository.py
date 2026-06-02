@@ -34,3 +34,7 @@ class OrderRepository(ABC):
     @abstractmethod
     async def update_store_order_status(self, store_order: StoreOrder) -> StoreOrder:
         pass
+
+    @abstractmethod
+    async def buyer_exists(self, buyer_id: UUID) -> bool:
+        pass

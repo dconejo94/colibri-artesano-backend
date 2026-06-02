@@ -27,5 +27,5 @@ class CategoryRepository(ABC):
         pass
 
     @abstractmethod
-    async def delete(self, category_id: UUID) -> None:
+    async def delete(self, category: Category) -> None:
         pass

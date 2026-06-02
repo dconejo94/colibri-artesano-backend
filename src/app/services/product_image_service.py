@@ -25,15 +25,15 @@ class ProductImageService:
     async def list_images(self, product_id: UUID) -> list[ProductImage]:
         return await self.repository.list_by_product(product_id)
 
-    async def delete_image(self, image_id: UUID) -> None:
+    async def delete_image(self, product_id: UUID, image_id: UUID) -> None:
         image = await self.repository.get_by_id(image_id)
-        if not image:
+        if not image or image.product_id != product_id:
             raise NotFoundException("ProductImage", str(image_id))
-        await self.repository.delete(image_id)
+        await self.repository.delete(image)
 
     async def set_primary(self, product_id: UUID, image_id: UUID) -> None:
         image = await self.repository.get_by_id(image_id)
-        if not image:
+        if not image or image.product_id != product_id:
             raise NotFoundException("ProductImage", str(image_id))
         await self.repository.clear_primary(product_id)
         await self.repository.set_primary(image_id)

@@ -19,7 +19,7 @@ class ProductImageRepository(ABC):
         pass
 
     @abstractmethod
-    async def delete(self, image_id: UUID) -> None:
+    async def delete(self, image: ProductImage) -> None:
         pass
 
     @abstractmethod

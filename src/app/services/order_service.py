@@ -12,6 +12,7 @@ from app.domain.schemas.paginated_response import PaginatedResponse
 from app.domain.schemas.order import MainOrderResponseDTO, StoreOrderResponseDTO
 from app.repositories.order_repository import OrderRepository
 from app.repositories.product_repository import ProductRepository
+from app.repositories.product_variant_repository import ProductVariantRepository
 from app.core.exceptions import NotFoundException
 
 
@@ -20,35 +21,50 @@ class OrderService:
         self,
         order_repository: OrderRepository,
         product_repository: ProductRepository,
+        variant_repository: ProductVariantRepository,
     ):
         self.order_repo = order_repository
         self.product_repo = product_repository
+        self.variant_repo = variant_repository
 
     async def create_order(self, dto: MainOrderCreateDTO) -> MainOrder:
+        if not await self.order_repo.buyer_exists(dto.buyer_id):
+            raise NotFoundException("User", str(dto.buyer_id))
+
         store_groups: dict[UUID, list] = {}
+
         for item_dto in dto.items:
             product = await self.product_repo.get_by_id(item_dto.product_id)
             if not product:
                 raise NotFoundException("Product", str(item_dto.product_id))
+
+            unit_price = Decimal(str(product.base_price))
+
+            if item_dto.variant_id:
+                variant = await self.variant_repo.get_by_id(item_dto.variant_id)
+                if not variant or variant.product_id != product.id:
+                    raise NotFoundException("ProductVariant", str(item_dto.variant_id))
+                unit_price += Decimal(str(variant.price_modifier))
+
             store_id = product.store_id
-            store_groups.setdefault(store_id, []).append(item_dto)
+            store_groups.setdefault(store_id, []).append((item_dto, unit_price))
 
         total_amount = Decimal("0")
         store_orders = []
 
-        for store_id, items in store_groups.items():
+        for store_id, grouped_items in store_groups.items():
             subtotal = Decimal("0")
             order_items = []
 
-            for item_dto in items:
-                line_total = item_dto.unit_price * item_dto.quantity
+            for item_dto, unit_price in grouped_items:
+                line_total = unit_price * item_dto.quantity
                 subtotal += line_total
                 order_items.append(
                     OrderItem(
                         product_id=item_dto.product_id,
                         variant_id=item_dto.variant_id,
                         quantity=item_dto.quantity,
-                        unit_price=item_dto.unit_price,
+                        unit_price=unit_price,
                     )
                 )
 

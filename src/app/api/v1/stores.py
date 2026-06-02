@@ -34,9 +34,21 @@ async def create_store(
 async def list_stores(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
+    owner_id: UUID | None = Query(None),
     service: StoreService = Depends(get_store_service),
 ):
-    return await service.list_stores(page=page, limit=limit)
+    return await service.list_stores(page=page, limit=limit, owner_id=owner_id)
+
+
+@router.get("/owner/{owner_id}", response_model=StoreResponseDTO)
+async def get_store_by_owner(
+    owner_id: UUID,
+    service: StoreService = Depends(get_store_service),
+):
+    try:
+        return await service.get_store_by_owner_id(owner_id)
+    except NotFoundException:
+        raise HTTPException(status_code=404, detail="Store not found for owner")
 
 
 @router.get("/{store_id}", response_model=StoreResponseDTO)
@@ -83,7 +95,13 @@ async def list_store_products(
     limit: int = Query(10, ge=1, le=100),
     category_id: UUID | None = None,
     service: ProductService = Depends(get_product_service),
+    store_service: StoreService = Depends(get_store_service),
 ):
+    try:
+        await store_service.get_store_by_id(store_id)
+    except NotFoundException:
+        raise HTTPException(status_code=404, detail="Store not found")
+
     return await service.list_products(
         page=page, limit=limit, store_id=store_id, category_id=category_id
     )
@@ -98,8 +116,13 @@ async def create_store_product(
     store_id: UUID,
     dto: ProductCreateDTO,
     service: ProductService = Depends(get_product_service),
+    store_service: StoreService = Depends(get_store_service),
 ):
-    return await service.create_product(store_id=store_id, dto=dto)
+    try:
+        await store_service.get_store_by_id(store_id)
+        return await service.create_product(store_id=store_id, dto=dto)
+    except NotFoundException as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 @router.get(
@@ -111,7 +134,13 @@ async def list_store_orders(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     service: OrderService = Depends(get_order_service),
+    store_service: StoreService = Depends(get_store_service),
 ):
+    try:
+        await store_service.get_store_by_id(store_id)
+    except NotFoundException:
+        raise HTTPException(status_code=404, detail="Store not found")
+
     return await service.list_store_orders(store_id=store_id, page=page, limit=limit)
 
 
