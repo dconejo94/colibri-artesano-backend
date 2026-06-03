@@ -1,4 +1,5 @@
 import pytest
+from sqlalchemy import event
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
@@ -13,6 +14,15 @@ engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False},
 )
+
+
+@event.listens_for(engine.sync_engine, "connect")
+def _enable_sqlite_fks(dbapi_connection, connection_record):
+    """Enable FK enforcement in SQLite so cascade/FK bugs surface in tests."""
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
 
 TestingSessionLocal = async_sessionmaker(
     engine,
@@ -29,8 +39,7 @@ async def client():
         async with TestingSessionLocal() as session:
             try:
                 yield session
-                if session.new or session.dirty or session.deleted:
-                    await session.commit()
+                await session.commit()
             except Exception:
                 await session.rollback()
                 raise
@@ -41,7 +50,9 @@ async def client():
         await seed_products(db)
 
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test", follow_redirects=True
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+        follow_redirects=True,
     ) as c:
         yield c
 

@@ -1,5 +1,8 @@
+from uuid import UUID
+
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.domain.models.product import Product
 from app.repositories.product_repository import ProductRepository
@@ -9,22 +12,55 @@ class SQLAlchemyProductRepository(ProductRepository):
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def list_products(self, page: int, limit: int, category: str | None = None):
+    async def create(self, product: Product) -> Product:
+        self.db.add(product)
+        await self.db.flush()
+        await self.db.refresh(product)
+        return product
+
+    async def list_products(
+        self,
+        page: int,
+        limit: int,
+        store_id: UUID | None = None,
+        category_id: UUID | None = None,
+        is_active: bool | None = None,
+    ):
         stmt = select(Product)
 
-        if category:
-            stmt = stmt.where(Product.category == category)
+        if store_id:
+            stmt = stmt.where(Product.store_id == store_id)
+        if category_id:
+            stmt = stmt.where(Product.category_id == category_id)
+        if is_active is not None:
+            stmt = stmt.where(Product.is_active == is_active)
 
         count_result = await self.db.execute(
             select(func.count()).select_from(stmt.subquery())
         )
         total = count_result.scalar()
 
-        result = await self.db.execute(stmt.offset((page - 1) * limit).limit(limit))
-        items = result.scalars().all()
-
+        result = await self.db.execute(
+            stmt.order_by(Product.created_at.desc())
+            .offset((page - 1) * limit)
+            .limit(limit)
+        )
+        items = list(result.scalars().all())
         return items, total
 
-    async def get_product_by_id(self, id: int):
-        result = await self.db.execute(select(Product).where(Product.id == id))
+    async def get_by_id(self, product_id: UUID):
+        result = await self.db.execute(
+            select(Product)
+            .where(Product.id == product_id)
+            .options(selectinload(Product.images), selectinload(Product.variants))
+        )
         return result.scalars().first()
+
+    async def update(self, product: Product) -> Product:
+        await self.db.flush()
+        await self.db.refresh(product)
+        return product
+
+    async def delete(self, product: Product) -> None:
+        await self.db.delete(product)
+        await self.db.flush()
