@@ -30,9 +30,6 @@ from app.core.exceptions import NotFoundException
 router = APIRouter(prefix="/products", tags=["Products"])
 
 
-# ── Product CRUD ──────────────────────────────────────────────────
-
-
 @router.get("/", response_model=PaginatedResponse[ProductResponseDTO])
 async def list_products(
     page: int = Query(1, ge=1),
@@ -85,9 +82,6 @@ async def delete_product(
         raise HTTPException(status_code=404, detail="Product not found")
 
 
-# ── Product Images ────────────────────────────────────────────────
-
-
 @router.post(
     "/{product_id}/images",
     response_model=ProductImageResponseDTO,
@@ -135,9 +129,6 @@ async def set_primary_image(
         return {"detail": "Primary image updated"}
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Image not found")
-
-
-# ── Product Variants ──────────────────────────────────────────────
 
 
 @router.post(
