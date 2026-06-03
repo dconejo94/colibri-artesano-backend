@@ -38,13 +38,18 @@ Copy the example environment file:
 cp .env.example .env
 ```
 
-### 2. Running with Docker (Recommended)
+### 2. Running the Application (Quickstart)
 
-The easiest way to run the project is using Docker Compose, which spins up both the FastAPI application and the PostgreSQL database.
+The easiest way to run the project is using the included `run_local.sh` script, which will orchestrate Docker Compose to spin up both the FastAPI application and the PostgreSQL database, run Alembic migrations, and seed the initial data.
+
+> **Note for Windows Users:** The `run_local.sh` script requires a bash environment. You will need to run it from **Git Bash** or **WSL**. Alternatively, you can run the Docker commands inside the script manually in PowerShell.
 
 ```bash
-# Build and start the services in the background
-docker compose up -d --build
+# Make the script executable (macOS/Linux/Git Bash)
+chmod +x scripts/run_local.sh
+
+# Run the services, migrations, and seed data
+./scripts/run_local.sh
 ```
 
 **Available Endpoints:**
@@ -61,7 +66,7 @@ docker compose down
 docker compose down -v
 ```
 
-### 3. Database Management & Migrations
+### 3. Database Management & Migrations (Reference)
 
 Migrations are handled by Alembic. When running inside Docker, execute these commands against the `backend` container:
 
@@ -70,9 +75,14 @@ Migrations are handled by Alembic. When running inside Docker, execute these com
 docker compose exec backend uv run alembic revision --autogenerate -m "describe_your_changes_here"
 ```
 
-**Apply migrations to the database:**
+**Apply migrations to the database manually:**
 ```bash
 docker compose exec backend uv run alembic upgrade head
+```
+
+**Run database seed manually:**
+```bash
+docker compose exec -T db psql -U "postgres" -d "colibri" < scripts/seed.sql
 ```
 
 ### 4. Running Tests

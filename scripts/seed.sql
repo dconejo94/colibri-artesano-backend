@@ -20,7 +20,8 @@ INSERT INTO users (id, email, password_hash, is_admin) VALUES
   ('c2aade11-be2d-5aa0-dd8f-8dd1df502c33', 'jose@barro.cr',            '$2b$12$placeholder_hash_jose',     false),
   ('d3bbef22-cf3e-6bb1-ee9a-9ee2ea613d44', 'lucia@textiles.cr',        '$2b$12$placeholder_hash_lucia',    false),
   ('e4ccfa33-da4f-7cc2-ffa0-aff3fb724e55', 'carlos@madera.cr',         '$2b$12$placeholder_hash_carlos',   false),
-  ('f5ddab44-eb5a-8dd3-aab1-baa4ac835f66', 'ana.compradora@gmail.com', '$2b$12$placeholder_hash_ana',      false);
+  ('f5ddab44-eb5a-8dd3-aab1-baa4ac835f66', 'ana.compradora@gmail.com', '$2b$12$placeholder_hash_ana',      false)
+ON CONFLICT (id) DO NOTHING;
 
 -- ── Categories ───────────────────────────────────────────────────────────────
 
@@ -32,7 +33,8 @@ INSERT INTO categories (id, name, slug) VALUES
   ('ca000000-0000-0000-0000-000000000005', 'Cuero',         'cuero'),
   ('ca000000-0000-0000-0000-000000000006', 'Pintura',       'pintura'),
   ('ca000000-0000-0000-0000-000000000007', 'Cestería',      'cesteria'),
-  ('ca000000-0000-0000-0000-000000000008', 'Piedra',        'piedra');
+  ('ca000000-0000-0000-0000-000000000008', 'Piedra',        'piedra')
+ON CONFLICT (id) DO NOTHING;
 
 -- ── Stores ───────────────────────────────────────────────────────────────────
 
@@ -41,7 +43,8 @@ INSERT INTO stores (id, owner_id, name, description) VALUES
   ('10000000-0000-0000-0000-000000000002', 'b1ffcd00-ad1c-4ff9-cc7e-7cc0ce491b22', 'Tejidos de María',         'Textiles artesanales tejidos a mano con tintes naturales del Valle Central.'),
   ('10000000-0000-0000-0000-000000000003', 'c2aade11-be2d-5aa0-dd8f-8dd1df502c33', 'Taller del Barro',         'Piezas funcionales y decorativas de barro rojo y negro hechas con técnicas ancestrales.'),
   ('10000000-0000-0000-0000-000000000004', 'd3bbef22-cf3e-6bb1-ee9a-9ee2ea613d44', 'Hilos de Lucía',           'Bordados, hamacas y bolsos hechos con fibras naturales de la zona de Sarchí.'),
-  ('10000000-0000-0000-0000-000000000005', 'e4ccfa33-da4f-7cc2-ffa0-aff3fb724e55', 'Maderas del Bosque',       'Artículos decorativos y utensilios tallados a mano en maderas sostenibles.');
+  ('10000000-0000-0000-0000-000000000005', 'e4ccfa33-da4f-7cc2-ffa0-aff3fb724e55', 'Maderas del Bosque',       'Artículos decorativos y utensilios tallados a mano en maderas sostenibles.')
+ON CONFLICT (id) DO NOTHING;
 
 -- ── Products ─────────────────────────────────────────────────────────────────
 -- Store 1: Artesanías Chorotega (YOUR store — Daniel)
@@ -51,7 +54,8 @@ INSERT INTO products (id, store_id, category_id, name, description, base_price) 
   ('aa000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', 'ca000000-0000-0000-0000-000000000001', 'Plato Decorativo Sol',         'Plato de cerámica con diseño solar en colores tierra.',                                18000.00),
   ('aa000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', 'ca000000-0000-0000-0000-000000000006', 'Máscara Ceremonial',           'Máscara pintada a mano representando deidades indígenas.',                             35000.00),
   ('aa000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000001', 'ca000000-0000-0000-0000-000000000003', 'Collar de Jade Artesanal',     'Collar hecho con cuentas de jade y cordón de algodón natural.',                        42000.00),
-  ('aa000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000001', 'ca000000-0000-0000-0000-000000000008', 'Escultura en Piedra Volcánica','Escultura tallada en piedra volcánica con forma de quetzal.',                          55000.00);
+  ('aa000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000001', 'ca000000-0000-0000-0000-000000000008', 'Escultura en Piedra Volcánica','Escultura tallada en piedra volcánica con forma de quetzal.',                          55000.00)
+ON CONFLICT (id) DO NOTHING;
 
 -- Store 2: Tejidos de María
 
@@ -60,7 +64,8 @@ INSERT INTO products (id, store_id, category_id, name, description, base_price) 
   ('bb000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000002', 'ca000000-0000-0000-0000-000000000002', 'Mantel Bordado Flores',        'Mantel de algodón con bordado floral multicolor.',                                     22000.00),
   ('bb000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000002', 'ca000000-0000-0000-0000-000000000002', 'Bolso Tejido Macramé',         'Bolso de macramé con asas de madera y cierre magnético.',                               15000.00),
   ('bb000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000002', 'ca000000-0000-0000-0000-000000000005', 'Cinturón de Cuero Trenzado',   'Cinturón artesanal de cuero curtido a mano con hebilla de bronce.',                    12000.00),
-  ('bb000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000002', 'ca000000-0000-0000-0000-000000000002', 'Hamaca Familiar',              'Hamaca doble tejida en algodón orgánico con franjas de colores.',                      65000.00);
+  ('bb000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000002', 'ca000000-0000-0000-0000-000000000002', 'Hamaca Familiar',              'Hamaca doble tejida en algodón orgánico con franjas de colores.',                      65000.00)
+ON CONFLICT (id) DO NOTHING;
 
 -- Store 3: Taller del Barro
 
@@ -69,7 +74,8 @@ INSERT INTO products (id, store_id, category_id, name, description, base_price) 
   ('cc000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000003', 'ca000000-0000-0000-0000-000000000001', 'Set de Tazas Rústicas',        'Set de 4 tazas de barro rojo esmaltadas para café.',                                   16000.00),
   ('cc000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000003', 'ca000000-0000-0000-0000-000000000001', 'Maceta Decorativa Grande',     'Maceta de barro con diseños geométricos para exteriores.',                              30000.00),
   ('cc000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000003', 'ca000000-0000-0000-0000-000000000006', 'Mural en Cerámica',            'Panel decorativo de cerámica pintada con escenas de la naturaleza.',                   48000.00),
-  ('cc000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000003', 'ca000000-0000-0000-0000-000000000001', 'Comal Artesanal',              'Comal tradicional de barro para tortillas, cocción lenta.',                            14000.00);
+  ('cc000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000003', 'ca000000-0000-0000-0000-000000000001', 'Comal Artesanal',              'Comal tradicional de barro para tortillas, cocción lenta.',                            14000.00)
+ON CONFLICT (id) DO NOTHING;
 
 -- Store 4: Hilos de Lucía
 
@@ -78,7 +84,8 @@ INSERT INTO products (id, store_id, category_id, name, description, base_price) 
   ('dd000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000004', 'ca000000-0000-0000-0000-000000000007', 'Canasta de Palma Tejida',      'Canasta redonda tejida en palma con tapa y asa.',                                      9500.00),
   ('dd000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000004', 'ca000000-0000-0000-0000-000000000002', 'Cojín Bordado Étnico',         'Cojín decorativo con bordado étnico en colores cálidos.',                              11000.00),
   ('dd000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000004', 'ca000000-0000-0000-0000-000000000003', 'Pulsera Hilo de Plata',        'Pulsera de plata 925 tejida con hilo de seda natural.',                                19000.00),
-  ('dd000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000004', 'ca000000-0000-0000-0000-000000000002', 'Mochila Wayúu',                'Mochila tejida artesanalmente con diseño geométrico en algodón.',                      32000.00);
+  ('dd000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000004', 'ca000000-0000-0000-0000-000000000002', 'Mochila Wayúu',                'Mochila tejida artesanalmente con diseño geométrico en algodón.',                      32000.00)
+ON CONFLICT (id) DO NOTHING;
 
 -- Store 5: Maderas del Bosque
 
@@ -87,7 +94,8 @@ INSERT INTO products (id, store_id, category_id, name, description, base_price) 
   ('ee000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000005', 'ca000000-0000-0000-0000-000000000004', 'Caja Musical Tallada',         'Caja musical con talla de colibrí en madera de cedro.',                                24000.00),
   ('ee000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000005', 'ca000000-0000-0000-0000-000000000004', 'Marco de Espejo Rústico',      'Marco de espejo tallado en madera reciclada con detalles florales.',                   21000.00),
   ('ee000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000005', 'ca000000-0000-0000-0000-000000000004', 'Set de Cucharas Artesanales',  'Set de 6 cucharas de cocina talladas en madera de laurel.',                            13000.00),
-  ('ee000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000005', 'ca000000-0000-0000-0000-000000000004', 'Reloj de Pared en Teca',       'Reloj de pared minimalista hecho con madera de teca recuperada.',                      29000.00);
+  ('ee000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000005', 'ca000000-0000-0000-0000-000000000004', 'Reloj de Pared en Teca',       'Reloj de pared minimalista hecho con madera de teca recuperada.',                      29000.00)
+ON CONFLICT (id) DO NOTHING;
 
 -- ── Product Images ───────────────────────────────────────────────────────────
 -- Using picsum.photos for realistic placeholder images
