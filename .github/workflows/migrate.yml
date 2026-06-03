@@ -1,0 +1,34 @@
+name: Apply Alembic Migration
+
+# Manually runs an Alembic command (e.g. "upgrade head") against the hosted
+# Azure PostgreSQL database. Triggered by hand from the Actions tab so a human
+# stays in control of when schema changes hit the database.
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'Alembic command to run'
+        required: true
+        default: 'upgrade head'
+
+jobs:
+  migrate:
+    name: Run Alembic
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v6
+
+      - run: uv sync
+
+      - name: Run Alembic migration
+        env:
+          DATABASE_URL: ${{ secrets.MIGRATION_DATABASE_URL }}
+        run: uv run alembic ${{ inputs.command }}
