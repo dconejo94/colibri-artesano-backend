@@ -1,0 +1,124 @@
+<mxfile host="app.diagrams.net" modified="2026-05-14T00:00:00.000Z" agent="draw.io" version="24.0.0" type="device">
+  <diagram id="sys-arch" name="Arquitectura del Sistema">
+    <mxGraphModel dx="1422" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ============================================================ -->
+        <!-- TITLE -->
+        <!-- ============================================================ -->
+        <mxCell id="title" value="&lt;font style=&quot;font-size:20px;&quot;&gt;&lt;b&gt;Colibrí Artesano — Diagrama de Arquitectura del Sistema&lt;/b&gt;&lt;/font&gt;&lt;br&gt;Monolito por Capas · REST API · Azure Cloud · Estado actual del MVP" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="200" y="10" width="900" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- MOBILE CLIENT -->
+        <!-- ============================================================ -->
+        <mxCell id="mobile" value="&lt;b&gt;📱 App Móvil&lt;/b&gt;&lt;br&gt;React Native + Expo&lt;br&gt;&lt;i&gt;TypeScript · Expo Router · Axios&lt;br&gt;iOS / Android&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;strokeWidth=2;fontSize=12;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="80" width="320" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- AZURE CLOUD BOUNDARY -->
+        <!-- ============================================================ -->
+        <mxCell id="cloud" value="&lt;font style=&quot;font-size:15px;&quot;&gt;&lt;b&gt;☁️ Microsoft Azure&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;container=1;collapsible=0;fillColor=#E6F3FF;strokeColor=#4A90D9;strokeWidth=3;dashed=0;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=8;shadow=1;opacity=60;" vertex="1" parent="1">
+          <mxGeometry x="40" y="220" width="1300" height="600" as="geometry"/>
+        </mxCell>
+
+        <!-- ======= APP SERVICE CONTAINER ======= -->
+        <mxCell id="appservice" value="&lt;b&gt;Azure App Service&lt;/b&gt;&lt;br&gt;&lt;i&gt;PaaS · Contenedor Docker&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;container=1;collapsible=0;fillColor=#DCEEFB;strokeColor=#3B7DD8;strokeWidth=2;dashed=1;dashPattern=8 4;fontSize=12;verticalAlign=top;spacingTop=8;opacity=70;" vertex="1" parent="cloud">
+          <mxGeometry x="30" y="50" width="700" height="510" as="geometry"/>
+        </mxCell>
+
+        <!-- ======= MONOLITH CONTAINER ======= -->
+        <mxCell id="monolith" value="&lt;b&gt;Monolito Backend&lt;/b&gt;&lt;br&gt;&lt;i&gt;Python 3.12 · FastAPI · Uvicorn (ASGI)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;container=1;collapsible=0;fillColor=#F5F9FF;strokeColor=#2C6CC4;strokeWidth=2;fontSize=11;verticalAlign=top;spacingTop=8;opacity=80;" vertex="1" parent="appservice">
+          <mxGeometry x="20" y="55" width="660" height="430" as="geometry"/>
+        </mxCell>
+
+        <!-- API / Presentation Layer -->
+        <mxCell id="api_layer" value="&lt;b&gt;🔵 Capa de Presentación (API)&lt;/b&gt;&lt;br&gt;&lt;code&gt;src/app/api/v1/&lt;/code&gt; — FastAPI Routers&lt;br&gt;&lt;code&gt;src/app/api/deps.py&lt;/code&gt; — Inyección de Dependencias&lt;br&gt;&lt;code&gt;src/app/main.py&lt;/code&gt; — Punto de entrada + CORS Middleware" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=2;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="monolith">
+          <mxGeometry x="15" y="45" width="630" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- Business Logic / Service Layer -->
+        <mxCell id="svc_layer" value="&lt;b&gt;🟢 Capa de Lógica de Negocio&lt;/b&gt;&lt;br&gt;&lt;code&gt;src/app/services/&lt;/code&gt; — product_service&lt;br&gt;&lt;code&gt;src/app/core/&lt;/code&gt; — database.py (implementado)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=2;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="monolith">
+          <mxGeometry x="15" y="155" width="630" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Data Access / Repository Layer -->
+        <mxCell id="repo_layer" value="&lt;b&gt;🟡 Capa de Acceso a Datos&lt;/b&gt;&lt;br&gt;&lt;code&gt;src/app/repositories/&lt;/code&gt; — product_repository (interfaz + SQLAlchemy impl)&lt;br&gt;&lt;code&gt;src/app/infrastructure/database.py&lt;/code&gt; — SQLAlchemy AsyncEngine + AsyncSession" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;strokeWidth=2;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="monolith">
+          <mxGeometry x="15" y="255" width="630" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Domain Layer -->
+        <mxCell id="domain_layer" value="&lt;b&gt;🟠 Capa de Dominio&lt;/b&gt;&lt;br&gt;&lt;code&gt;src/app/domain/models/&lt;/code&gt; — Product, Store, User (SQLAlchemy DeclarativeBase)&lt;br&gt;&lt;code&gt;src/app/domain/schemas/&lt;/code&gt; — ProductResponse, PaginatedResponse (Pydantic)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;strokeWidth=2;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="monolith">
+          <mxGeometry x="15" y="355" width="630" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Direction arrows between layers (internal) -->
+        <mxCell id="arr1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#999999;strokeWidth=1;dashed=1;endArrow=block;endFill=1;" edge="1" source="api_layer" target="svc_layer" parent="monolith">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="arr2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#999999;strokeWidth=1;dashed=1;endArrow=block;endFill=1;" edge="1" source="svc_layer" target="repo_layer" parent="monolith">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="arr3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#999999;strokeWidth=1;dashed=1;endArrow=block;endFill=1;" edge="1" source="repo_layer" target="domain_layer" parent="monolith">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- DATA TIER -->
+        <!-- ============================================================ -->
+        <mxCell id="datatier" value="&lt;b&gt;🗄️ Capa de Datos&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;container=1;collapsible=0;fillColor=#F0F4F8;strokeColor=#7A8A9E;strokeWidth=2;dashed=1;dashPattern=5 5;fontSize=13;verticalAlign=top;spacingTop=8;opacity=60;" vertex="1" parent="cloud">
+          <mxGeometry x="790" y="50" width="470" height="230" as="geometry"/>
+        </mxCell>
+
+        <!-- PostgreSQL -->
+        <mxCell id="postgres" value="&lt;b&gt;🐘 PostgreSQL&lt;/b&gt;&lt;br&gt;Azure Database for PostgreSQL&lt;br&gt;Flexible Server&lt;br&gt;&lt;i&gt;Base de datos principal · ACID&lt;br&gt;Migraciones via Alembic&lt;/i&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=2;fontSize=11;" vertex="1" parent="datatier">
+          <mxGeometry x="50" y="50" width="360" height="140" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- DEPLOY / INFRA NOTE -->
+        <!-- ============================================================ -->
+        <mxCell id="infra_tier" value="&lt;b&gt;🔧 Infraestructura de Despliegue&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;container=1;collapsible=0;fillColor=#F0F4F8;strokeColor=#7A8A9E;strokeWidth=2;dashed=1;dashPattern=5 5;fontSize=13;verticalAlign=top;spacingTop=8;opacity=60;" vertex="1" parent="cloud">
+          <mxGeometry x="790" y="330" width="470" height="200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="docker_node" value="&lt;b&gt;🐳 Docker&lt;/b&gt;&lt;br&gt;Contenedor del backend&lt;br&gt;Dockerfile + docker-compose" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCEEFB;strokeColor=#3B7DD8;strokeWidth=1;fontSize=11;" vertex="1" parent="infra_tier">
+          <mxGeometry x="30" y="50" width="180" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ghactions_node" value="&lt;b&gt;⚙️ GitHub Actions&lt;/b&gt;&lt;br&gt;CI/CD Pipeline&lt;br&gt;Tests + Lint + Deploy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCEEFB;strokeColor=#3B7DD8;strokeWidth=1;fontSize=11;" vertex="1" parent="infra_tier">
+          <mxGeometry x="250" y="50" width="180" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- EDGES — Communication Flows -->
+        <!-- ============================================================ -->
+
+        <!-- E1: Mobile App → API Layer — HTTPS/REST -->
+        <mxCell id="e1" value="&lt;b&gt;HTTPS / REST&lt;/b&gt;&lt;br&gt;JSON · TLS 1.2+" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;strokeColor=#2C6CC4;strokeWidth=2;endArrow=block;endFill=1;startArrow=block;startFill=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="mobile" target="api_layer" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- E2: Repo Layer → PostgreSQL — TCP/asyncpg -->
+        <mxCell id="e2" value="&lt;b&gt;TCP (asyncpg)&lt;/b&gt;&lt;br&gt;Port 5432 · SSL" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;strokeColor=#6C8EBF;strokeWidth=2;endArrow=block;endFill=1;startArrow=block;startFill=1;" edge="1" source="repo_layer" target="postgres" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- LEGEND -->
+        <!-- ============================================================ -->
+        <mxCell id="legend_box" value="" style="rounded=1;whiteSpace=wrap;html=1;container=1;collapsible=0;fillColor=#FAFAFA;strokeColor=#CCCCCC;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="850" width="750" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg1" value="&lt;b&gt;Leyenda:&lt;/b&gt;  ── Línea sólida = Comunicación síncrona  ↔ Doble flecha = Bidireccional (Request/Response)  → Flecha simple = Unidireccional&lt;br&gt;Este diagrama refleja únicamente componentes con código implementado en el repositorio." style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;" vertex="1" parent="legend_box">
+          <mxGeometry x="10" y="5" width="730" height="70" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

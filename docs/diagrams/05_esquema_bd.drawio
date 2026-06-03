@@ -1,0 +1,162 @@
+<mxfile host="app.diagrams.net" modified="2026-05-24T00:00:00.000Z" agent="draw.io" version="24.0.0" type="device">
+  <diagram id="er_schema" name="Esquema BD">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="title" value="&lt;font style=&quot;font-size:24px;&quot;&gt;&lt;b&gt;Esquema de Base de Datos - Colibrí Artesano&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;i style=&quot;font-size:14px;&quot;&gt;Modelo Relacional para PostgreSQL&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="50" y="-120" width="600" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ==================== TABLES ==================== -->
+
+        <mxCell id="tbl_users" value="&lt;b style=&quot;font-size:14px&quot;&gt;Users&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; email : varchar(255) UQ&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; password_hash : varchar&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; is_admin : boolean&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; created_at : timestamp" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#E1D5E7;strokeColor=#9673A6;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="50" y="250" width="220" height="150" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_stores" value="&lt;b style=&quot;font-size:14px&quot;&gt;Stores&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; owner_id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; name : varchar(100)&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; description : text&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; logo_url : varchar&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; created_at : timestamp" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#DAE8FC;strokeColor=#6C8EBF;" vertex="1" parent="1">
+          <mxGeometry x="350" y="100" width="220" height="170" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_follows" value="&lt;b style=&quot;font-size:14px&quot;&gt;Follows&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; user_id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; store_id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; created_at : timestamp" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="150" y="50" width="180" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_categories" value="&lt;b style=&quot;font-size:14px&quot;&gt;Categories&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; name : varchar(100)&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; slug : varchar(100) UQ" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#D5E8D4;strokeColor=#82B366;" vertex="1" parent="1">
+          <mxGeometry x="650" y="-50" width="180" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_products" value="&lt;b style=&quot;font-size:14px&quot;&gt;Products&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; store_id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; category_id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; name : varchar(200)&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; description : text&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; base_price : numeric&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; is_active : boolean&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; created_at : timestamp" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#D5E8D4;strokeColor=#82B366;" vertex="1" parent="1">
+          <mxGeometry x="650" y="250" width="220" height="200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_product_imgs" value="&lt;b style=&quot;font-size:14px&quot;&gt;ProductImages&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; product_id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; image_url : varchar&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; is_primary : boolean" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#D5E8D4;strokeColor=#82B366;" vertex="1" parent="1">
+          <mxGeometry x="950" y="150" width="220" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_product_vars" value="&lt;b style=&quot;font-size:14px&quot;&gt;ProductVariants&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; product_id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; name : varchar (ej. Talla)&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; value : varchar (ej. M)&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; price_modifier : numeric&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; stock_quantity : int" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#D5E8D4;strokeColor=#82B366;" vertex="1" parent="1">
+          <mxGeometry x="950" y="350" width="220" height="170" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_favorites" value="&lt;b style=&quot;font-size:14px&quot;&gt;Favorites&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; user_id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; product_id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; created_at : timestamp" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="350" y="350" width="200" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_events" value="&lt;b style=&quot;font-size:14px&quot;&gt;Events&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; created_by : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; title : varchar(200)&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; description : text&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; location : varchar(255)&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; event_date : timestamp&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; cover_image_url : varchar&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; is_approved : boolean" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#FFF2CC;strokeColor=#D6B656;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="100" width="220" height="200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_event_parts" value="&lt;b style=&quot;font-size:14px&quot;&gt;EventParticipants&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; event_id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; store_id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; created_at : timestamp" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#FFF2CC;strokeColor=#D6B656;" vertex="1" parent="1">
+          <mxGeometry x="950" y="-50" width="220" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_main_orders" value="&lt;b style=&quot;font-size:14px&quot;&gt;MainOrders&lt;/b&gt; (Carrito)&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; buyer_id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; total_amount : numeric&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; status : varchar (pending, paid)&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; created_at : timestamp" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#F8CECC;strokeColor=#B85450;" vertex="1" parent="1">
+          <mxGeometry x="50" y="600" width="220" height="150" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_payments" value="&lt;b style=&quot;font-size:14px&quot;&gt;Payments&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; main_order_id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; method : enum (SINPE, CARD, CASH)&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; amount : numeric&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; status : varchar&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; reference_code : varchar&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; created_at : timestamp" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#F8CECC;strokeColor=#B85450;" vertex="1" parent="1">
+          <mxGeometry x="50" y="800" width="220" height="170" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_store_orders" value="&lt;b style=&quot;font-size:14px&quot;&gt;StoreOrders&lt;/b&gt; (Sub-pedidos)&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; main_order_id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; store_id : UUID&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; seller_status : varchar (pending, accepted)&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; subtotal_amount : numeric&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; created_at : timestamp" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#F8CECC;strokeColor=#B85450;" vertex="1" parent="1">
+          <mxGeometry x="350" y="600" width="250" height="170" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tbl_order_items" value="&lt;b style=&quot;font-size:14px&quot;&gt;OrderItems&lt;/b&gt;&lt;hr&gt;&lt;b&gt;PK&lt;/b&gt; &amp;nbsp; id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; store_order_id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; product_id : UUID&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; &amp;nbsp; variant_id : UUID (null)&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; quantity : int&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; unit_price : numeric" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#F8CECC;strokeColor=#B85450;" vertex="1" parent="1">
+          <mxGeometry x="650" y="600" width="220" height="170" as="geometry"/>
+        </mxCell>
+
+        <!-- ==================== EDGES ==================== -->
+
+        <mxCell id="edge_store_user" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_stores" target="tbl_users">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_follow_user" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_follows" target="tbl_users">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_follow_store" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_follows" target="tbl_stores">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_event_user" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#999999;" edge="1" parent="1" source="tbl_events" target="tbl_users">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1360" y="-80"/>
+              <mxPoint x="-10" y="-80"/>
+              <mxPoint x="-10" y="325"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge_epart_event" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_event_parts" target="tbl_events">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_epart_store" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_event_parts" target="tbl_stores">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_prod_store" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_products" target="tbl_stores">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_prod_cat" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_products" target="tbl_categories">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_pimg_prod" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_product_imgs" target="tbl_products">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_pvar_prod" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_product_vars" target="tbl_products">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_fav_user" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_favorites" target="tbl_users">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_fav_prod" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_favorites" target="tbl_products">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_mo_user" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_main_orders" target="tbl_users">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_pay_mo" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_payments" target="tbl_main_orders">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_so_mo" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_store_orders" target="tbl_main_orders">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_so_store" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_store_orders" target="tbl_stores">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_oi_so" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_order_items" target="tbl_store_orders">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_oi_prod" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_order_items" target="tbl_products">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_oi_pvar" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="1" source="tbl_order_items" target="tbl_product_vars">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1060" y="685"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

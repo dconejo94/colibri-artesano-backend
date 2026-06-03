@@ -1,10 +1,11 @@
 from pydantic import BaseModel
+from typing import Generic, TypeVar
 
-from app.domain.schemas.product import ProductResponseDTO
+T = TypeVar("T")
 
 
-class PaginatedProductsResponseDTO(BaseModel):
-    items: list[ProductResponseDTO]
+class PaginatedResponse(BaseModel, Generic[T]):
+    items: list[T]
     page: int
     limit: int
     total: int
