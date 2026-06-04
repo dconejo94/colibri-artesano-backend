@@ -15,6 +15,7 @@ from app.domain.schemas.paginated_response import PaginatedResponse
 from app.domain.schemas.product import ProductCreateDTO, ProductResponseDTO
 from app.domain.schemas.order import StoreOrderResponseDTO, StoreOrderStatusUpdateDTO
 from app.core.exceptions import NotFoundException, ConflictException
+from app.core.security import require_vendor_role
 
 router = APIRouter(prefix="/stores", tags=["Stores"])
 
@@ -22,6 +23,7 @@ router = APIRouter(prefix="/stores", tags=["Stores"])
 @router.post("/", response_model=StoreResponseDTO, status_code=201)
 async def create_store(
     dto: StoreCreateDTO,
+    _: object = Depends(require_vendor_role),
     service: StoreService = Depends(get_store_service),
 ):
     try:
@@ -66,6 +68,7 @@ async def get_store(
 async def update_store(
     store_id: UUID,
     dto: StoreUpdateDTO,
+    _: object = Depends(require_vendor_role),
     service: StoreService = Depends(get_store_service),
 ):
     try:
@@ -77,6 +80,7 @@ async def update_store(
 @router.delete("/{store_id}", status_code=204)
 async def delete_store(
     store_id: UUID,
+    _: object = Depends(require_vendor_role),
     service: StoreService = Depends(get_store_service),
 ):
     try:
@@ -115,6 +119,7 @@ async def list_store_products(
 async def create_store_product(
     store_id: UUID,
     dto: ProductCreateDTO,
+    _: object = Depends(require_vendor_role),
     service: ProductService = Depends(get_product_service),
     store_service: StoreService = Depends(get_store_service),
 ):
@@ -133,6 +138,7 @@ async def list_store_orders(
     store_id: UUID,
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
+    _: object = Depends(require_vendor_role),
     service: OrderService = Depends(get_order_service),
     store_service: StoreService = Depends(get_store_service),
 ):
@@ -152,6 +158,7 @@ async def update_store_order_status(
     store_id: UUID,
     store_order_id: UUID,
     dto: StoreOrderStatusUpdateDTO,
+    _: object = Depends(require_vendor_role),
     service: OrderService = Depends(get_order_service),
 ):
     try:

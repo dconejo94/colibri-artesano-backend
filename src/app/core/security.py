@@ -20,3 +20,13 @@ async def get_current_user(db: AsyncSession = Depends(get_db)):
             detail="No authenticated user",
         )
     return user
+
+
+# TEMPORAL: stub de RBAC mientras el issue de auth de Fabian este pendiente.
+async def require_vendor_role(user=Depends(get_current_user)):
+    if user.role != "vendor":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Vendor role required",
+        )
+    return user
