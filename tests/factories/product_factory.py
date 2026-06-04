@@ -12,7 +12,9 @@ TEST_PRODUCT_ID = uuid.UUID("00000000-0000-0000-0000-000000000004")
 
 
 async def seed_products(db):
-    user = User(id=TEST_USER_ID, email="test@test.com", password_hash="hash")
+    user = User(
+        id=TEST_USER_ID, email="test@test.com", password_hash="hash", role="vendor"
+    )
     db.add(user)
 
     store = Store(id=TEST_STORE_ID, owner_id=TEST_USER_ID, name="Test Store")
