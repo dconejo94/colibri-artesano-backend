@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 
+from app.infrastructure.user_repository_sqlalchemy import SQLAlchemyUserRepository
 from app.infrastructure.category_repository_sqlalchemy import (
     SQLAlchemyCategoryRepository,
 )
@@ -16,12 +17,19 @@ from app.infrastructure.product_variant_repository_sqlalchemy import (
 )
 from app.infrastructure.order_repository_sqlalchemy import SQLAlchemyOrderRepository
 
+from app.services.user_service import UserService
 from app.services.category_service import CategoryService
 from app.services.store_service import StoreService
 from app.services.product_service import ProductService
 from app.services.product_image_service import ProductImageService
 from app.services.product_variant_service import ProductVariantService
 from app.services.order_service import OrderService
+
+
+async def get_user_service(
+    db: AsyncSession = Depends(get_db),
+) -> UserService:
+    return UserService(SQLAlchemyUserRepository(db))
 
 
 async def get_category_service(
