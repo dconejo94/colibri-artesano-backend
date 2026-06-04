@@ -1,7 +1,7 @@
 from uuid import UUID
 from decimal import Decimal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CartItemResponseDTO(BaseModel):
@@ -43,3 +43,7 @@ class CartResponseDTO(BaseModel):
     stores: list[CartStoreResponseDTO]
 
     model_config = {"from_attributes": True}
+
+class AddToCartDTO(BaseModel):
+    product_id: UUID
+    quantity: int = Field(..., gt=0)

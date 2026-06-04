@@ -73,4 +73,5 @@ async def get_cart_service(
     return CartService(
         cart_repository=SQLAlchemyCartRepository(db),
         order_repository=SQLAlchemyOrderRepository(db),
+        product_repository=SQLAlchemyProductRepository(db)
     )

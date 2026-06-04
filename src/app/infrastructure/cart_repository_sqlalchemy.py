@@ -36,3 +36,41 @@ class SQLAlchemyCartRepository(CartRepository):
             )
         )
         return result.scalars().first()
+    
+    async def get_store_order(self, main_order_id: UUID, store_id: UUID,
+    ) -> StoreOrder | None:
+        result = await self.db.execute(
+            select(StoreOrder).where(
+                StoreOrder.main_order_id == main_order_id,
+                StoreOrder.store_id == store_id,
+            )
+        )
+
+        return result.scalars().first()
+    
+    async def get_order_item(self, store_order_id: UUID, product_id: UUID, variant_id: UUID | None,
+    ) -> OrderItem | None:
+        query = select(OrderItem).where(
+            OrderItem.store_order_id == store_order_id,
+            OrderItem.product_id == product_id,
+        )
+
+        result = await self.db.execute(query)
+
+        return result.scalars().first()
+    
+    async def create_store_order(self, store_order: StoreOrder) -> StoreOrder:
+        self.db.add(store_order)
+
+        await self.db.flush()
+        await self.db.refresh(store_order)
+
+        return store_order
+    
+    async def create_order_item(self, item: OrderItem) -> OrderItem:
+        self.db.add(item)
+
+        await self.db.flush()
+        await self.db.refresh(item)
+
+        return item

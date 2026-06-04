@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, HTTPException
 
 from app.domain.schemas.cart import (
-    CartResponseDTO,
+    CartResponseDTO, AddToCartDTO
 )
 
 from app.services.cart_service import CartService
@@ -19,5 +19,16 @@ async def get_cart(
 ):
     try:
         return await service.get_cart(buyer_id=buyer_id)
+    except NotFoundException as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+@router.post("/addProduct", status_code=201)
+async def add_to_cart(
+    dto: AddToCartDTO,
+    buyer_id: UUID = Query(...),
+    service: CartService = Depends(get_cart_service),
+):
+    try:
+        return await service.add_to_cart(buyer_id, dto)
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))

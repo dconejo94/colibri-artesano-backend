@@ -5,24 +5,30 @@ from decimal import Decimal
 from app.domain.schemas.cart import (
     CartItemResponseDTO,
     CartResponseDTO,
-    CartStoreResponseDTO
+    CartStoreResponseDTO,
+    AddToCartDTO
 )
+from app.domain.models.main_order import MainOrder
+from app.domain.models.store_order import StoreOrder
+from app.domain.models.order_item import OrderItem
 
 from app.repositories.cart_repository import CartRepository
 from app.repositories.order_repository import OrderRepository
+from app.repositories.product_repository import ProductRepository
 
 from app.core.exceptions import NotFoundException
-
 
 class CartService:
     def __init__(
         self,
         cart_repository: CartRepository,
-        order_repository: OrderRepository
+        order_repository: OrderRepository,
+        product_repository: ProductRepository
     ):
         self.cart_repository = cart_repository
         self.order_repository = order_repository
-    
+        self.product_repository = product_repository
+
     async def get_cart(self, buyer_id: UUID) -> CartResponseDTO:
         if not await self.order_repository.buyer_exists(buyer_id):
             raise NotFoundException("User", str(buyer_id))
@@ -87,4 +93,62 @@ class CartService:
             total_amount=cart.total_amount,
             stores=stores,
         )
+
+    async def add_to_cart(self, buyer_id: UUID, dto: AddToCartDTO):
+        if not await self.order_repository.buyer_exists(buyer_id):
+            raise NotFoundException("User", str(buyer_id))
         
+        product = await self.product_repository.get_by_id(dto.product_id)
+
+        if not product:
+            raise NotFoundException(
+                "Product",
+                str(dto.product_id),
+            )
+        
+        cart = await self.cart_repository.get_cart(buyer_id)
+
+        if not cart:
+            cart = await self.order_repository.create_main_order(
+                MainOrder(
+                    buyer_id=buyer_id,
+                    total_amount=Decimal("0.00"),
+                    status="pending",
+                )
+            )
+        
+        store_order = await self.cart_repository.get_store_order(cart.id, product.store_id)
+        if not store_order:
+            store_order = await self.cart_repository.create_store_order(
+                StoreOrder(
+                    main_order_id=cart.id,
+                    store_id=product.store_id,
+                    seller_status="pending",
+                    subtotal_amount=Decimal("0.00"),
+                )
+            )
+
+        unit_price = product.base_price
+
+        existing_item = await self.cart_repository.get_order_item(
+            store_order.id,
+            dto.product_id,
+            None,
+        )
+
+        if existing_item:
+            existing_item.quantity += dto.quantity
+        else:
+            await self.cart_repository.create_order_item(
+                OrderItem(
+                    store_order_id=store_order.id,
+                    product_id=product.id,
+                    quantity=dto.quantity,
+                    unit_price=unit_price,
+                )
+            )
+
+        total = unit_price * dto.quantity
+
+        store_order.subtotal_amount += total
+        cart.total_amount += total
