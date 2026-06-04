@@ -13,3 +13,8 @@ from app.domain.schemas.product_variant import (
 )
 from app.domain.schemas.order import MainOrderResponseDTO as MainOrderResponseDTO
 from app.domain.schemas.order import StoreOrderResponseDTO as StoreOrderResponseDTO
+from app.domain.schemas.cart import (
+    CartItemResponseDTO,
+    CartResponseDTO,
+    CartStoreResponseDTO
+)
