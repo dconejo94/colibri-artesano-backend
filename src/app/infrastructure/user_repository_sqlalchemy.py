@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.domain.models.main_order import MainOrder
+from app.domain.models.store_order import StoreOrder
 from app.domain.models.user import User
 from app.repositories.user_repository import UserRepository
 
@@ -37,6 +38,13 @@ class SQLAlchemyUserRepository(UserRepository):
         await self.db.flush()
 
         if user.store:
+            store_orders_result = await self.db.execute(
+                select(StoreOrder).where(StoreOrder.store_id == user.store.id)
+            )
+            for so in store_orders_result.scalars().all():
+                await self.db.delete(so)
+            await self.db.flush()
+
             await self.db.delete(user.store)
             await self.db.flush()
 
