@@ -41,3 +41,15 @@ class CartRepository(ABC):
         item: OrderItem,
     ) -> OrderItem:
         pass
+
+    @abstractmethod
+    async def remove_order_item(
+        self,
+        product_id: UUID,
+        cart_id: UUID
+    ) -> StoreOrder:
+        pass
+
+    @abstractmethod
+    async def flush(self) -> None:
+        pass

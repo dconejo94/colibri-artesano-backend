@@ -80,6 +80,7 @@ class CartService:
 
             stores.append(
                 CartStoreResponseDTO(
+                    id=store_order.id,
                     store_id=store_order.store.id,
                     store_name=store_order.store.name,
                     subtotal_amount=store_order.subtotal_amount,
@@ -152,3 +153,50 @@ class CartService:
 
         store_order.subtotal_amount += total
         cart.total_amount += total
+
+        await self.cart_repository.flush()
+
+        return await self.get_cart(buyer_id)
+
+    async def remove_from_cart(self, buyer_id: UUID, product_id: UUID, store_order_id: UUID):
+        product = await self.product_repository.get_by_id(product_id)
+
+        if not product:
+            raise NotFoundException(
+                "Product",
+                str(product_id),
+            )
+
+        store_order = await self.order_repository.get_store_order_by_id(store_order_id)
+
+        if not store_order:
+            raise NotFoundException(
+                "Cart",
+                str(store_order_id),
+            )
+
+        item = await self.cart_repository.remove_order_item(
+            product_id,
+            store_order_id,
+        )
+
+        if not item:
+            raise NotFoundException(
+                "OrderItem",
+                str(product_id),
+            )
+
+        amount = item.quantity * item.unit_price
+
+        store_order.subtotal_amount = max(Decimal("0.00"), store_order.subtotal_amount - amount)
+
+        main_order = await self.order_repository.get_main_order_by_id(
+            store_order.main_order_id
+        )
+
+        if main_order:
+            main_order.total_amount = max(Decimal("0.00"), main_order.total_amount - amount)
+        
+        await self.cart_repository.flush()
+
+        return await self.get_cart(buyer_id)

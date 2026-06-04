@@ -24,6 +24,8 @@ class CartItemResponseDTO(BaseModel):
 
 
 class CartStoreResponseDTO(BaseModel):
+    id: UUID
+    
     store_id: UUID
     store_name: str
 

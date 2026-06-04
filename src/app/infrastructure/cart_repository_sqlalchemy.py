@@ -74,3 +74,25 @@ class SQLAlchemyCartRepository(CartRepository):
         await self.db.refresh(item)
 
         return item
+    
+    async def remove_order_item(self, product_id: UUID, cart_id: UUID) -> OrderItem | None:
+
+        result = await self.db.execute(
+            select(OrderItem).where(
+                OrderItem.store_order_id == cart_id,
+                OrderItem.product_id == product_id,
+            )
+        )
+
+        item = result.scalars().first()
+
+        if item:
+            await self.db.delete(item)
+
+        await self.db.flush()
+
+        return item
+    
+    
+    async def flush(self) -> None:
+        await self.db.flush()

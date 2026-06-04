@@ -22,7 +22,7 @@ async def get_cart(
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
     
-@router.post("/addProduct", status_code=201)
+@router.post("/addProduct", response_model=CartResponseDTO, status_code=201)
 async def add_to_cart(
     dto: AddToCartDTO,
     buyer_id: UUID = Query(...),
@@ -30,5 +30,17 @@ async def add_to_cart(
 ):
     try:
         return await service.add_to_cart(buyer_id, dto)
+    except NotFoundException as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+@router.delete("/removeProduct/{product_id}", response_model=CartResponseDTO, status_code=200)
+async def remove_from_cart(
+    buyer_id: UUID,
+    product_id: UUID,
+    store_order_id: UUID,
+    service: CartService = Depends(get_cart_service),
+):
+    try:
+        return await service.remove_from_cart(buyer_id, product_id, store_order_id)
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
