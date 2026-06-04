@@ -11,7 +11,7 @@ class UserService:
         return user
 
     async def update_me(self, user: User, data: UserUpdateDTO) -> User:
-        update_data = data.model_dump(exclude_none=True)
+        update_data = data.model_dump(exclude_unset=True)
         return await self.repository.update(user, update_data)
 
     async def delete_me(self, user: User) -> None:
