@@ -19,7 +19,10 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.add_column("users", sa.Column("is_active", sa.Boolean(), nullable=False, server_default="true"))
+    op.add_column(
+        "users",
+        sa.Column("is_active", sa.Boolean(), nullable=False, server_default="true"),
+    )
     op.add_column("users", sa.Column("name", sa.String(100), nullable=True))
     op.add_column("users", sa.Column("phone", sa.String(20), nullable=True))
     op.add_column("users", sa.Column("address", sa.String(), nullable=True))

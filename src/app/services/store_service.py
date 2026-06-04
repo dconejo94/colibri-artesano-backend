@@ -59,4 +59,3 @@ class StoreService:
         if not store:
             raise NotFoundException("Store", str(store_id))
         await self.repository.delete(store)
-
