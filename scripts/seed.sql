@@ -100,85 +100,61 @@ ON CONFLICT (id) DO NOTHING;
 -- ── Product Images ───────────────────────────────────────────────────────────
 -- Using picsum.photos for realistic placeholder images
 
--- Store 1 images
 INSERT INTO product_images (id, product_id, image_url, is_primary) VALUES
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/vasija1/600/600',   true),
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/vasija2/600/600',   false),
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000002', 'https://picsum.photos/seed/plato1/600/600',    true),
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/mascara1/600/600',  true),
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/mascara2/600/600',  false),
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000004', 'https://picsum.photos/seed/collar1/600/600',   true),
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/piedra1/600/600',   true);
-
--- Store 2 images
-INSERT INTO product_images (id, product_id, image_url, is_primary) VALUES
-  (gen_random_uuid(), 'bb000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/rebozo1/600/600',   true),
-  (gen_random_uuid(), 'bb000000-0000-0000-0000-000000000002', 'https://picsum.photos/seed/mantel1/600/600',   true),
-  (gen_random_uuid(), 'bb000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/bolso1/600/600',    true),
-  (gen_random_uuid(), 'bb000000-0000-0000-0000-000000000004', 'https://picsum.photos/seed/cinturon1/600/600', true),
-  (gen_random_uuid(), 'bb000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/hamaca1/600/600',   true),
-  (gen_random_uuid(), 'bb000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/hamaca2/600/600',   false);
-
--- Store 3 images
-INSERT INTO product_images (id, product_id, image_url, is_primary) VALUES
-  (gen_random_uuid(), 'cc000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/jarra1/600/600',    true),
-  (gen_random_uuid(), 'cc000000-0000-0000-0000-000000000002', 'https://picsum.photos/seed/tazas1/600/600',    true),
-  (gen_random_uuid(), 'cc000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/maceta1/600/600',   true),
-  (gen_random_uuid(), 'cc000000-0000-0000-0000-000000000004', 'https://picsum.photos/seed/mural1/600/600',    true),
-  (gen_random_uuid(), 'cc000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/comal1/600/600',    true);
-
--- Store 4 images
-INSERT INTO product_images (id, product_id, image_url, is_primary) VALUES
-  (gen_random_uuid(), 'dd000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/tapiz1/600/600',    true),
-  (gen_random_uuid(), 'dd000000-0000-0000-0000-000000000002', 'https://picsum.photos/seed/canasta1/600/600',  true),
-  (gen_random_uuid(), 'dd000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/cojin1/600/600',    true),
-  (gen_random_uuid(), 'dd000000-0000-0000-0000-000000000004', 'https://picsum.photos/seed/pulsera1/600/600',  true),
-  (gen_random_uuid(), 'dd000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/mochila1/600/600',  true);
-
--- Store 5 images
-INSERT INTO product_images (id, product_id, image_url, is_primary) VALUES
-  (gen_random_uuid(), 'ee000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/tabla1/600/600',    true),
-  (gen_random_uuid(), 'ee000000-0000-0000-0000-000000000002', 'https://picsum.photos/seed/caja1/600/600',     true),
-  (gen_random_uuid(), 'ee000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/espejo1/600/600',   true),
-  (gen_random_uuid(), 'ee000000-0000-0000-0000-000000000004', 'https://picsum.photos/seed/cucharas1/600/600', true),
-  (gen_random_uuid(), 'ee000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/reloj1/600/600',    true);
+  ('f1000000-0000-0000-0000-000000000001', 'aa000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/vasija1/600/600',   true),
+  ('f1000000-0000-0000-0000-000000000002', 'aa000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/vasija2/600/600',   false),
+  ('f1000000-0000-0000-0000-000000000003', 'aa000000-0000-0000-0000-000000000002', 'https://picsum.photos/seed/plato1/600/600',    true),
+  ('f1000000-0000-0000-0000-000000000004', 'aa000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/mascara1/600/600',  true),
+  ('f1000000-0000-0000-0000-000000000005', 'aa000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/mascara2/600/600',  false),
+  ('f1000000-0000-0000-0000-000000000006', 'aa000000-0000-0000-0000-000000000004', 'https://picsum.photos/seed/collar1/600/600',   true),
+  ('f1000000-0000-0000-0000-000000000007', 'aa000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/piedra1/600/600',   true),
+  ('f1000000-0000-0000-0000-000000000008', 'bb000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/rebozo1/600/600',   true),
+  ('f1000000-0000-0000-0000-000000000009', 'bb000000-0000-0000-0000-000000000002', 'https://picsum.photos/seed/mantel1/600/600',   true),
+  ('f1000000-0000-0000-0000-000000000010', 'bb000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/bolso1/600/600',    true),
+  ('f1000000-0000-0000-0000-000000000011', 'bb000000-0000-0000-0000-000000000004', 'https://picsum.photos/seed/cinturon1/600/600', true),
+  ('f1000000-0000-0000-0000-000000000012', 'bb000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/hamaca1/600/600',   true),
+  ('f1000000-0000-0000-0000-000000000013', 'bb000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/hamaca2/600/600',   false),
+  ('f1000000-0000-0000-0000-000000000014', 'cc000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/jarra1/600/600',    true),
+  ('f1000000-0000-0000-0000-000000000015', 'cc000000-0000-0000-0000-000000000002', 'https://picsum.photos/seed/tazas1/600/600',    true),
+  ('f1000000-0000-0000-0000-000000000016', 'cc000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/maceta1/600/600',   true),
+  ('f1000000-0000-0000-0000-000000000017', 'cc000000-0000-0000-0000-000000000004', 'https://picsum.photos/seed/mural1/600/600',    true),
+  ('f1000000-0000-0000-0000-000000000018', 'cc000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/comal1/600/600',    true),
+  ('f1000000-0000-0000-0000-000000000019', 'dd000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/tapiz1/600/600',    true),
+  ('f1000000-0000-0000-0000-000000000020', 'dd000000-0000-0000-0000-000000000002', 'https://picsum.photos/seed/canasta1/600/600',  true),
+  ('f1000000-0000-0000-0000-000000000021', 'dd000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/cojin1/600/600',    true),
+  ('f1000000-0000-0000-0000-000000000022', 'dd000000-0000-0000-0000-000000000004', 'https://picsum.photos/seed/pulsera1/600/600',  true),
+  ('f1000000-0000-0000-0000-000000000023', 'dd000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/mochila1/600/600',  true),
+  ('f1000000-0000-0000-0000-000000000024', 'ee000000-0000-0000-0000-000000000001', 'https://picsum.photos/seed/tabla1/600/600',    true),
+  ('f1000000-0000-0000-0000-000000000025', 'ee000000-0000-0000-0000-000000000002', 'https://picsum.photos/seed/caja1/600/600',     true),
+  ('f1000000-0000-0000-0000-000000000026', 'ee000000-0000-0000-0000-000000000003', 'https://picsum.photos/seed/espejo1/600/600',   true),
+  ('f1000000-0000-0000-0000-000000000027', 'ee000000-0000-0000-0000-000000000004', 'https://picsum.photos/seed/cucharas1/600/600', true),
+  ('f1000000-0000-0000-0000-000000000028', 'ee000000-0000-0000-0000-000000000005', 'https://picsum.photos/seed/reloj1/600/600',    true)
+ON CONFLICT (id) DO NOTHING;
 
 -- ── Product Variants ─────────────────────────────────────────────────────────
 
--- Store 1 variants
 INSERT INTO product_variants (id, product_id, name, value, price_modifier, stock_quantity) VALUES
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000001', 'Tamaño', 'Pequeña (15cm)', -5000.00, 12),
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000001', 'Tamaño', 'Mediana (25cm)',  0.00,     8),
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000001', 'Tamaño', 'Grande (35cm)',   10000.00, 4),
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000004', 'Largo',  'Gargantilla',    -8000.00, 6),
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000004', 'Largo',  'Estándar',        0.00,     10),
-  (gen_random_uuid(), 'aa000000-0000-0000-0000-000000000004', 'Largo',  'Extra largo',     5000.00,  3);
-
--- Store 2 variants
-INSERT INTO product_variants (id, product_id, name, value, price_modifier, stock_quantity) VALUES
-  (gen_random_uuid(), 'bb000000-0000-0000-0000-000000000001', 'Color',  'Añil',     0.00,     15),
-  (gen_random_uuid(), 'bb000000-0000-0000-0000-000000000001', 'Color',  'Terracota', 2000.00, 10),
-  (gen_random_uuid(), 'bb000000-0000-0000-0000-000000000005', 'Tamaño', 'Individual', -15000.00, 20),
-  (gen_random_uuid(), 'bb000000-0000-0000-0000-000000000005', 'Tamaño', 'Familiar',    0.00,     7);
-
--- Store 3 variants
-INSERT INTO product_variants (id, product_id, name, value, price_modifier, stock_quantity) VALUES
-  (gen_random_uuid(), 'cc000000-0000-0000-0000-000000000002', 'Set', '2 tazas', -6000.00, 15),
-  (gen_random_uuid(), 'cc000000-0000-0000-0000-000000000002', 'Set', '4 tazas',  0.00,    10),
-  (gen_random_uuid(), 'cc000000-0000-0000-0000-000000000002', 'Set', '6 tazas',  8000.00,  5);
-
--- Store 4 variants
-INSERT INTO product_variants (id, product_id, name, value, price_modifier, stock_quantity) VALUES
-  (gen_random_uuid(), 'dd000000-0000-0000-0000-000000000005', 'Tamaño', 'Pequeña',  -8000.00, 25),
-  (gen_random_uuid(), 'dd000000-0000-0000-0000-000000000005', 'Tamaño', 'Mediana',   0.00,    12),
-  (gen_random_uuid(), 'dd000000-0000-0000-0000-000000000005', 'Tamaño', 'Grande',    12000.00, 6);
-
--- Store 5 variants
-INSERT INTO product_variants (id, product_id, name, value, price_modifier, stock_quantity) VALUES
-  (gen_random_uuid(), 'ee000000-0000-0000-0000-000000000001', 'Madera', 'Guanacaste', 0.00,    10),
-  (gen_random_uuid(), 'ee000000-0000-0000-0000-000000000001', 'Madera', 'Teca',       3000.00,  5),
-  (gen_random_uuid(), 'ee000000-0000-0000-0000-000000000001', 'Madera', 'Nogal',      5000.00,  3),
-  (gen_random_uuid(), 'ee000000-0000-0000-0000-000000000004', 'Madera', 'Laurel',     0.00,     8),
-  (gen_random_uuid(), 'ee000000-0000-0000-0000-000000000004', 'Madera', 'Cedro',      2000.00,  5);
+  ('f2000000-0000-0000-0000-000000000001', 'aa000000-0000-0000-0000-000000000001', 'Tamaño', 'Pequeña (15cm)', -5000.00, 12),
+  ('f2000000-0000-0000-0000-000000000002', 'aa000000-0000-0000-0000-000000000001', 'Tamaño', 'Mediana (25cm)',  0.00,     8),
+  ('f2000000-0000-0000-0000-000000000003', 'aa000000-0000-0000-0000-000000000001', 'Tamaño', 'Grande (35cm)',   10000.00, 4),
+  ('f2000000-0000-0000-0000-000000000004', 'aa000000-0000-0000-0000-000000000004', 'Largo',  'Gargantilla',    -8000.00, 6),
+  ('f2000000-0000-0000-0000-000000000005', 'aa000000-0000-0000-0000-000000000004', 'Largo',  'Estándar',        0.00,     10),
+  ('f2000000-0000-0000-0000-000000000006', 'aa000000-0000-0000-0000-000000000004', 'Largo',  'Extra largo',     5000.00,  3),
+  ('f2000000-0000-0000-0000-000000000007', 'bb000000-0000-0000-0000-000000000001', 'Color',  'Añil',     0.00,     15),
+  ('f2000000-0000-0000-0000-000000000008', 'bb000000-0000-0000-0000-000000000001', 'Color',  'Terracota', 2000.00, 10),
+  ('f2000000-0000-0000-0000-000000000009', 'bb000000-0000-0000-0000-000000000005', 'Tamaño', 'Individual', -15000.00, 20),
+  ('f2000000-0000-0000-0000-000000000010', 'bb000000-0000-0000-0000-000000000005', 'Tamaño', 'Familiar',    0.00,     7),
+  ('f2000000-0000-0000-0000-000000000011', 'cc000000-0000-0000-0000-000000000002', 'Set', '2 tazas', -6000.00, 15),
+  ('f2000000-0000-0000-0000-000000000012', 'cc000000-0000-0000-0000-000000000002', 'Set', '4 tazas',  0.00,    10),
+  ('f2000000-0000-0000-0000-000000000013', 'cc000000-0000-0000-0000-000000000002', 'Set', '6 tazas',  8000.00,  5),
+  ('f2000000-0000-0000-0000-000000000014', 'dd000000-0000-0000-0000-000000000005', 'Tamaño', 'Pequeña',  -8000.00, 25),
+  ('f2000000-0000-0000-0000-000000000015', 'dd000000-0000-0000-0000-000000000005', 'Tamaño', 'Mediana',   0.00,    12),
+  ('f2000000-0000-0000-0000-000000000016', 'dd000000-0000-0000-0000-000000000005', 'Tamaño', 'Grande',    12000.00, 6),
+  ('f2000000-0000-0000-0000-000000000017', 'ee000000-0000-0000-0000-000000000001', 'Madera', 'Guanacaste', 0.00,    10),
+  ('f2000000-0000-0000-0000-000000000018', 'ee000000-0000-0000-0000-000000000001', 'Madera', 'Teca',       3000.00,  5),
+  ('f2000000-0000-0000-0000-000000000019', 'ee000000-0000-0000-0000-000000000001', 'Madera', 'Nogal',      5000.00,  3),
+  ('f2000000-0000-0000-0000-000000000020', 'ee000000-0000-0000-0000-000000000004', 'Madera', 'Laurel',     0.00,     8),
+  ('f2000000-0000-0000-0000-000000000021', 'ee000000-0000-0000-0000-000000000004', 'Madera', 'Cedro',      2000.00,  5)
+ON CONFLICT (id) DO NOTHING;
 
 COMMIT;

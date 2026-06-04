@@ -82,7 +82,7 @@ docker compose exec backend uv run alembic upgrade head
 
 **Run database seed manually:**
 ```bash
-docker compose exec -T db psql -U "postgres" -d "colibri" < scripts/seed.sql
+docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < scripts/seed.sql
 ```
 
 ### 4. Running Tests
