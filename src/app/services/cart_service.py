@@ -1,12 +1,12 @@
 from uuid import UUID
 
-from decimal import Decimal 
+from decimal import Decimal
 
 from app.domain.schemas.cart import (
     CartItemResponseDTO,
     CartResponseDTO,
     CartStoreResponseDTO,
-    AddToCartDTO
+    AddToCartDTO,
 )
 from app.domain.models.main_order import MainOrder
 from app.domain.models.store_order import StoreOrder
@@ -18,12 +18,13 @@ from app.repositories.product_repository import ProductRepository
 
 from app.core.exceptions import NotFoundException
 
+
 class CartService:
     def __init__(
         self,
         cart_repository: CartRepository,
         order_repository: OrderRepository,
-        product_repository: ProductRepository
+        product_repository: ProductRepository,
     ):
         self.cart_repository = cart_repository
         self.order_repository = order_repository
@@ -32,7 +33,7 @@ class CartService:
     async def get_cart(self, buyer_id: UUID) -> CartResponseDTO:
         if not await self.order_repository.buyer_exists(buyer_id):
             raise NotFoundException("User", str(buyer_id))
-        
+
         cart = await self.cart_repository.get_cart(buyer_id)
 
         if not cart:
@@ -40,7 +41,7 @@ class CartService:
                 order_id=None,
                 buyer_id=buyer_id,
                 total_amount=Decimal("0.00"),
-                stores=[]
+                stores=[],
             )
         stores = []
 
@@ -49,11 +50,7 @@ class CartService:
 
             for item in store_order.items:
                 primary_image = next(
-                    (
-                        image
-                        for image in item.product.images
-                        if image.is_primary
-                    ),
+                    (image for image in item.product.images if image.is_primary),
                     None,
                 )
 
@@ -62,16 +59,12 @@ class CartService:
                         id=item.id,
                         product_id=item.product.id,
                         product_name=item.product.name,
-                        product_image_url=(primary_image.image_url if primary_image else None),
-                        variant_id=(
-                            item.variant.id if item.variant else None
+                        product_image_url=(
+                            primary_image.image_url if primary_image else None
                         ),
-                        variant_name=(
-                            item.variant.name if item.variant else None
-                        ),
-                        variant_value=(
-                            item.variant.value if item.variant else None
-                        ),
+                        variant_id=(item.variant.id if item.variant else None),
+                        variant_name=(item.variant.name if item.variant else None),
+                        variant_value=(item.variant.value if item.variant else None),
                         quantity=item.quantity,
                         unit_price=item.unit_price,
                         subtotal=item.quantity * item.unit_price,
@@ -98,7 +91,7 @@ class CartService:
     async def add_to_cart(self, buyer_id: UUID, dto: AddToCartDTO):
         if not await self.order_repository.buyer_exists(buyer_id):
             raise NotFoundException("User", str(buyer_id))
-        
+
         product = await self.product_repository.get_by_id(dto.product_id)
 
         if not product:
@@ -106,7 +99,7 @@ class CartService:
                 "Product",
                 str(dto.product_id),
             )
-        
+
         cart = await self.cart_repository.get_cart(buyer_id)
 
         if not cart:
@@ -117,8 +110,10 @@ class CartService:
                     status="pending",
                 )
             )
-        
-        store_order = await self.cart_repository.get_store_order(cart.id, product.store_id)
+
+        store_order = await self.cart_repository.get_store_order(
+            cart.id, product.store_id
+        )
         if not store_order:
             store_order = await self.cart_repository.create_store_order(
                 StoreOrder(
@@ -158,7 +153,9 @@ class CartService:
 
         return await self.get_cart(buyer_id)
 
-    async def remove_from_cart(self, buyer_id: UUID, product_id: UUID, store_order_id: UUID):
+    async def remove_from_cart(
+        self, buyer_id: UUID, product_id: UUID, store_order_id: UUID
+    ):
         product = await self.product_repository.get_by_id(product_id)
 
         if not product:
@@ -188,15 +185,19 @@ class CartService:
 
         amount = item.quantity * item.unit_price
 
-        store_order.subtotal_amount = max(Decimal("0.00"), store_order.subtotal_amount - amount)
+        store_order.subtotal_amount = max(
+            Decimal("0.00"), store_order.subtotal_amount - amount
+        )
 
         main_order = await self.order_repository.get_main_order_by_id(
             store_order.main_order_id
         )
 
         if main_order:
-            main_order.total_amount = max(Decimal("0.00"), main_order.total_amount - amount)
-        
+            main_order.total_amount = max(
+                Decimal("0.00"), main_order.total_amount - amount
+            )
+
         await self.cart_repository.flush()
 
         return await self.get_cart(buyer_id)

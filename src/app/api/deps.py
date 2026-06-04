@@ -25,6 +25,7 @@ from app.services.product_variant_service import ProductVariantService
 from app.services.order_service import OrderService
 from app.services.cart_service import CartService
 
+
 async def get_category_service(
     db: AsyncSession = Depends(get_db),
 ) -> CategoryService:
@@ -67,11 +68,12 @@ async def get_order_service(
         variant_repository=SQLAlchemyProductVariantRepository(db),
     )
 
+
 async def get_cart_service(
     db: AsyncSession = Depends(get_db),
 ) -> CartService:
     return CartService(
         cart_repository=SQLAlchemyCartRepository(db),
         order_repository=SQLAlchemyOrderRepository(db),
-        product_repository=SQLAlchemyProductRepository(db)
+        product_repository=SQLAlchemyProductRepository(db),
     )

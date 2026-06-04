@@ -5,12 +5,12 @@ from app.domain.models.main_order import MainOrder
 from app.domain.models.store_order import StoreOrder
 from app.domain.models.order_item import OrderItem
 
-class CartRepository(ABC):
 
+class CartRepository(ABC):
     @abstractmethod
     async def get_cart(self, buyer_id: UUID) -> MainOrder | None:
         pass
-    
+
     @abstractmethod
     async def get_store_order(
         self,
@@ -43,11 +43,7 @@ class CartRepository(ABC):
         pass
 
     @abstractmethod
-    async def remove_order_item(
-        self,
-        product_id: UUID,
-        cart_id: UUID
-    ) -> StoreOrder:
+    async def remove_order_item(self, product_id: UUID, cart_id: UUID) -> StoreOrder:
         pass
 
     @abstractmethod

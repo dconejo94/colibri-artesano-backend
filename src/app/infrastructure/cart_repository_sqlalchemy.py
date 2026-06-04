@@ -11,33 +11,35 @@ from app.domain.models.product import Product
 
 from app.repositories.cart_repository import CartRepository
 
+
 class SQLAlchemyCartRepository(CartRepository):
     def __init__(self, db: AsyncSession):
         self.db = db
 
     async def get_cart(self, buyer_id: UUID) -> MainOrder | None:
         result = await self.db.execute(
-            select(MainOrder).where(
+            select(MainOrder)
+            .where(
                 MainOrder.buyer_id == buyer_id,
                 MainOrder.status == "pending",
             )
-                .options(
-                selectinload(MainOrder.store_orders)
-                .selectinload(StoreOrder.store),
-
+            .options(
+                selectinload(MainOrder.store_orders).selectinload(StoreOrder.store),
                 selectinload(MainOrder.store_orders)
                 .selectinload(StoreOrder.items)
                 .selectinload(OrderItem.product)
                 .selectinload(Product.images),
-
                 selectinload(MainOrder.store_orders)
                 .selectinload(StoreOrder.items)
                 .selectinload(OrderItem.variant),
             )
         )
         return result.scalars().first()
-    
-    async def get_store_order(self, main_order_id: UUID, store_id: UUID,
+
+    async def get_store_order(
+        self,
+        main_order_id: UUID,
+        store_id: UUID,
     ) -> StoreOrder | None:
         result = await self.db.execute(
             select(StoreOrder).where(
@@ -47,8 +49,12 @@ class SQLAlchemyCartRepository(CartRepository):
         )
 
         return result.scalars().first()
-    
-    async def get_order_item(self, store_order_id: UUID, product_id: UUID, variant_id: UUID | None,
+
+    async def get_order_item(
+        self,
+        store_order_id: UUID,
+        product_id: UUID,
+        variant_id: UUID | None,
     ) -> OrderItem | None:
         query = select(OrderItem).where(
             OrderItem.store_order_id == store_order_id,
@@ -58,7 +64,7 @@ class SQLAlchemyCartRepository(CartRepository):
         result = await self.db.execute(query)
 
         return result.scalars().first()
-    
+
     async def create_store_order(self, store_order: StoreOrder) -> StoreOrder:
         self.db.add(store_order)
 
@@ -66,7 +72,7 @@ class SQLAlchemyCartRepository(CartRepository):
         await self.db.refresh(store_order)
 
         return store_order
-    
+
     async def create_order_item(self, item: OrderItem) -> OrderItem:
         self.db.add(item)
 
@@ -74,8 +80,10 @@ class SQLAlchemyCartRepository(CartRepository):
         await self.db.refresh(item)
 
         return item
-    
-    async def remove_order_item(self, product_id: UUID, cart_id: UUID) -> OrderItem | None:
+
+    async def remove_order_item(
+        self, product_id: UUID, cart_id: UUID
+    ) -> OrderItem | None:
 
         result = await self.db.execute(
             select(OrderItem).where(
@@ -92,7 +100,6 @@ class SQLAlchemyCartRepository(CartRepository):
         await self.db.flush()
 
         return item
-    
-    
+
     async def flush(self) -> None:
         await self.db.flush()

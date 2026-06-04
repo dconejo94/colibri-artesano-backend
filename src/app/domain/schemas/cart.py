@@ -25,7 +25,7 @@ class CartItemResponseDTO(BaseModel):
 
 class CartStoreResponseDTO(BaseModel):
     id: UUID
-    
+
     store_id: UUID
     store_name: str
 
@@ -45,6 +45,7 @@ class CartResponseDTO(BaseModel):
     stores: list[CartStoreResponseDTO]
 
     model_config = {"from_attributes": True}
+
 
 class AddToCartDTO(BaseModel):
     product_id: UUID
