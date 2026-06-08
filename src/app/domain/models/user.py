@@ -14,6 +14,12 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
+    is_active = Column(Boolean, nullable=False, default=True, server_default="true")
+    name = Column(String(100), nullable=True)
+    phone = Column(String(20), nullable=True)
+    address = Column(String, nullable=True)
+    avatar_url = Column(String, nullable=True)
+    bio = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     store = relationship("Store", back_populates="owner", uselist=False)
