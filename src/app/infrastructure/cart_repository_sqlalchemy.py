@@ -82,12 +82,12 @@ class SQLAlchemyCartRepository(CartRepository):
         return item
 
     async def remove_order_item(
-        self, product_id: UUID, cart_id: UUID
+        self, product_id: UUID, store_order_id: UUID
     ) -> OrderItem | None:
 
         result = await self.db.execute(
             select(OrderItem).where(
-                OrderItem.store_order_id == cart_id,
+                OrderItem.store_order_id == store_order_id,
                 OrderItem.product_id == product_id,
             )
         )
@@ -99,6 +99,26 @@ class SQLAlchemyCartRepository(CartRepository):
 
         await self.db.flush()
 
+        return item
+
+    async def update_order_item(
+        self, product_id: UUID, store_order_id: UUID, quantity: int
+    ) -> OrderItem | None:
+        result = await self.db.execute(
+            select(OrderItem).where(
+                OrderItem.store_order_id == store_order_id,
+                OrderItem.product_id == product_id
+            )
+        )
+
+        item = result.scalars().first()
+
+
+        if item:
+            item.quantity = quantity
+    
+
+        await self.db.flush()
         return item
 
     async def flush(self) -> None:
