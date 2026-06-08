@@ -103,3 +103,4 @@ class SQLAlchemyCartRepository(CartRepository):
 
     async def flush(self) -> None:
         await self.db.flush()
+        self.db.expire_all()
