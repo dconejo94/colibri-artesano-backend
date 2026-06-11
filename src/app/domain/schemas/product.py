@@ -5,6 +5,8 @@ from datetime import datetime
 
 from app.domain.schemas.product_image import ProductImageResponseDTO
 from app.domain.schemas.product_variant import ProductVariantResponseDTO
+from app.domain.schemas.store import StoreResponseDTO
+from app.domain.schemas.category import CategoryResponseDTO
 
 
 class ProductCreateDTO(BaseModel):
@@ -32,10 +34,14 @@ class ProductResponseDTO(BaseModel):
     base_price: Decimal
     is_active: bool
     created_at: datetime
+    
+    store: StoreResponseDTO | None = None
+    category: CategoryResponseDTO | None = None
+    images: list[ProductImageResponseDTO] = []
+    variants: list[ProductVariantResponseDTO] = []
 
     model_config = {"from_attributes": True}
 
 
 class ProductDetailResponseDTO(ProductResponseDTO):
-    images: list[ProductImageResponseDTO] = []
-    variants: list[ProductVariantResponseDTO] = []
+    pass
