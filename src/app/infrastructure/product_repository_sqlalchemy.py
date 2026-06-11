@@ -42,10 +42,10 @@ class SQLAlchemyProductRepository(ProductRepository):
 
         result = await self.db.execute(
             stmt.options(
-                selectinload(Product.store), 
+                selectinload(Product.store),
                 selectinload(Product.category),
                 selectinload(Product.images),
-                selectinload(Product.variants)
+                selectinload(Product.variants),
             )
             .order_by(Product.created_at.desc())
             .offset((page - 1) * limit)
@@ -59,10 +59,10 @@ class SQLAlchemyProductRepository(ProductRepository):
             select(Product)
             .where(Product.id == product_id)
             .options(
-                selectinload(Product.images), 
+                selectinload(Product.images),
                 selectinload(Product.variants),
                 selectinload(Product.store),
-                selectinload(Product.category)
+                selectinload(Product.category),
             )
         )
         return result.scalars().first()

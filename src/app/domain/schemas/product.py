@@ -34,7 +34,7 @@ class ProductResponseDTO(BaseModel):
     base_price: Decimal
     is_active: bool
     created_at: datetime
-    
+
     store: StoreResponseDTO | None = None
     category: CategoryResponseDTO | None = None
     images: list[ProductImageResponseDTO] = []
