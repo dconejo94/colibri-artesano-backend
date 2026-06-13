@@ -10,3 +10,6 @@ from app.repositories.product_variant_repository import (
     ProductVariantRepository as ProductVariantRepository,
 )
 from app.repositories.order_repository import OrderRepository as OrderRepository
+from app.repositories.search_repository import (
+    ProductSearchRepository as ProductSearchRepository,
+)
