@@ -63,7 +63,9 @@ _PROD_BOLSA = uuid.UUID("aaaaaaaa-0000-0000-0000-000000000014")
 
 async def _seed(db) -> None:
     """Insert deterministic test data into the search test database."""
-    user = User(id=_USER_ID, email="search@test.com", password_hash="hash", role="vendor")
+    user = User(
+        id=_USER_ID, email="search@test.com", password_hash="hash", role="vendor"
+    )
     db.add(user)
 
     store = Store(id=_STORE_ID, owner_id=_USER_ID, name="Search Test Store")
@@ -208,7 +210,9 @@ class TestProductSearch:
         assert data["total"] == 1
         assert data["items"][0]["name"] == "Collar de Jade"
 
-    async def test_search_matches_partial_word_in_description(self, client: AsyncClient):
+    async def test_search_matches_partial_word_in_description(
+        self, client: AsyncClient
+    ):
         # "artesanal" appears in descriptions of both Collar de Jade and Vasija
         # (but Vasija is inactive, so only 1 active result)
         response = await client.get("/api/v1/products/search?q=artesanal")
@@ -220,7 +224,9 @@ class TestProductSearch:
     # is_active filter
     # ------------------------------------------------------------------
 
-    async def test_search_excludes_inactive_products_by_default(self, client: AsyncClient):
+    async def test_search_excludes_inactive_products_by_default(
+        self, client: AsyncClient
+    ):
         # "Vasija de Barro" is inactive; "Barro" appears in its description
         response = await client.get("/api/v1/products/search?q=Barro")
         data = response.json()
@@ -276,8 +282,12 @@ class TestProductSearch:
         assert data["limit"] == 2
         assert len(data["items"]) <= 2
 
-    async def test_search_page_beyond_results_returns_empty_items(self, client: AsyncClient):
-        response = await client.get("/api/v1/products/search?q=Huipil&page=999&limit=10")
+    async def test_search_page_beyond_results_returns_empty_items(
+        self, client: AsyncClient
+    ):
+        response = await client.get(
+            "/api/v1/products/search?q=Huipil&page=999&limit=10"
+        )
         data = response.json()
         assert response.status_code == 200
         assert data["items"] == []
@@ -310,7 +320,9 @@ class TestProductSearch:
     # Multiple matches
     # ------------------------------------------------------------------
 
-    async def test_search_returns_all_matching_active_products(self, client: AsyncClient):
+    async def test_search_returns_all_matching_active_products(
+        self, client: AsyncClient
+    ):
         # "de" appears in "Collar de Jade", "Tapete de Palma", "Bolsa de Cuero"
         response = await client.get("/api/v1/products/search?q=de&limit=100")
         data = response.json()
@@ -376,7 +388,9 @@ class TestProductAutocomplete:
     # Empty / no-match behaviour
     # ------------------------------------------------------------------
 
-    async def test_autocomplete_empty_query_returns_empty_list(self, client: AsyncClient):
+    async def test_autocomplete_empty_query_returns_empty_list(
+        self, client: AsyncClient
+    ):
         response = await client.get("/api/v1/products/autocomplete?q=")
         assert response.status_code == 200
         assert response.json() == []
@@ -411,7 +425,9 @@ class TestProductAutocomplete:
         for field in ("id", "name", "base_price"):
             assert field in item, f"Missing field: {field}"
 
-    async def test_autocomplete_item_does_not_expose_variants(self, client: AsyncClient):
+    async def test_autocomplete_item_does_not_expose_variants(
+        self, client: AsyncClient
+    ):
         """Autocomplete must be a lean projection — no heavy relations."""
         response = await client.get("/api/v1/products/autocomplete?q=Collar")
         item = response.json()[0]

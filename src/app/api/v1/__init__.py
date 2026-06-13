@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.api.v1.categories import router as categories_router
 from app.api.v1.stores import router as stores_router
+
 # search_router MUST come before products_router so that the literal paths
 # /products/search and /products/autocomplete are registered before the
 # /{product_id} wildcard route.
