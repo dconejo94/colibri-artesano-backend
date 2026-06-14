@@ -12,7 +12,11 @@ from app.domain.schemas.store import (
     StoreResponseDTO,
 )
 from app.domain.schemas.paginated_response import PaginatedResponse
-from app.domain.schemas.product import ProductCreateDTO, ProductListDTO, ProductResponseDTO
+from app.domain.schemas.product import (
+    ProductCreateDTO,
+    ProductListDTO,
+    ProductResponseDTO,
+)
 from app.domain.schemas.vendor import VendorProfileDTO
 from app.domain.schemas.order import StoreOrderResponseDTO, StoreOrderStatusUpdateDTO
 from app.core.exceptions import NotFoundException, ConflictException
@@ -52,7 +56,6 @@ async def get_store_by_owner(
         return await service.get_store_by_owner_id(owner_id)
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Store not found for owner")
-
 
 
 @router.get("/{store_id}/profile", response_model=VendorProfileDTO)

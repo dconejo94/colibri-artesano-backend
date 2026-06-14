@@ -5,7 +5,7 @@ import uuid
 import pytest
 from httpx import AsyncClient
 
-from tests.factories.product_factory import TEST_STORE_ID, TEST_USER_ID
+from tests.factories.product_factory import TEST_STORE_ID
 
 
 # ---------------------------------------------------------------------------

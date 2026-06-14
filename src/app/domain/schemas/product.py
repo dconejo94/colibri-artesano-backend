@@ -89,4 +89,3 @@ class ProductDetailResponseDTO(ProductResponseDTO):
     """
 
     pass
-

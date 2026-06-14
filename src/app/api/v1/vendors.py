@@ -34,4 +34,3 @@ async def get_vendor_profile_legacy(
         return await service.get_vendor_profile(store_id)
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Store not found")
-
