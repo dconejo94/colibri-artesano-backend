@@ -12,10 +12,15 @@ from app.domain.schemas.store import (
     StoreResponseDTO,
 )
 from app.domain.schemas.paginated_response import PaginatedResponse
-from app.domain.schemas.product import ProductCreateDTO, ProductResponseDTO
+from app.domain.schemas.product import (
+    ProductCreateDTO,
+    ProductListDTO,
+    ProductResponseDTO,
+)
+from app.domain.schemas.vendor import VendorProfileDTO
 from app.domain.schemas.order import StoreOrderResponseDTO, StoreOrderStatusUpdateDTO
 from app.core.exceptions import NotFoundException, ConflictException
-from app.core.security import require_vendor_role
+from app.core.security import require_vendor_role, require_store_owner
 
 router = APIRouter(prefix="/stores", tags=["Stores"])
 
@@ -53,6 +58,18 @@ async def get_store_by_owner(
         raise HTTPException(status_code=404, detail="Store not found for owner")
 
 
+@router.get("/{store_id}/profile", response_model=VendorProfileDTO)
+async def get_store_profile(
+    store_id: UUID,
+    service: StoreService = Depends(get_store_service),
+):
+    """Public profile for a store: name, description, and active product count."""
+    try:
+        return await service.get_vendor_profile(store_id)
+    except NotFoundException:
+        raise HTTPException(status_code=404, detail="Store not found")
+
+
 @router.get("/{store_id}", response_model=StoreResponseDTO)
 async def get_store(
     store_id: UUID,
@@ -68,7 +85,7 @@ async def get_store(
 async def update_store(
     store_id: UUID,
     dto: StoreUpdateDTO,
-    _: object = Depends(require_vendor_role),
+    _: object = Depends(require_store_owner),
     service: StoreService = Depends(get_store_service),
 ):
     try:
@@ -80,7 +97,7 @@ async def update_store(
 @router.delete("/{store_id}", status_code=204)
 async def delete_store(
     store_id: UUID,
-    _: object = Depends(require_vendor_role),
+    _: object = Depends(require_store_owner),
     service: StoreService = Depends(get_store_service),
 ):
     try:
@@ -91,7 +108,7 @@ async def delete_store(
 
 @router.get(
     "/{store_id}/products",
-    response_model=PaginatedResponse[ProductResponseDTO],
+    response_model=PaginatedResponse[ProductListDTO],
 )
 async def list_store_products(
     store_id: UUID,
@@ -119,12 +136,10 @@ async def list_store_products(
 async def create_store_product(
     store_id: UUID,
     dto: ProductCreateDTO,
-    _: object = Depends(require_vendor_role),
+    _: object = Depends(require_store_owner),
     service: ProductService = Depends(get_product_service),
-    store_service: StoreService = Depends(get_store_service),
 ):
     try:
-        await store_service.get_store_by_id(store_id)
         return await service.create_product(store_id=store_id, dto=dto)
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -138,15 +153,9 @@ async def list_store_orders(
     store_id: UUID,
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
-    _: object = Depends(require_vendor_role),
+    _: object = Depends(require_store_owner),
     service: OrderService = Depends(get_order_service),
-    store_service: StoreService = Depends(get_store_service),
 ):
-    try:
-        await store_service.get_store_by_id(store_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Store not found")
-
     return await service.list_store_orders(store_id=store_id, page=page, limit=limit)
 
 
@@ -158,7 +167,7 @@ async def update_store_order_status(
     store_id: UUID,
     store_order_id: UUID,
     dto: StoreOrderStatusUpdateDTO,
-    _: object = Depends(require_vendor_role),
+    _: object = Depends(require_store_owner),
     service: OrderService = Depends(get_order_service),
 ):
     try:

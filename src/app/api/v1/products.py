@@ -12,6 +12,7 @@ from app.api.deps import (
 )
 from app.domain.schemas.product import (
     ProductUpdateDTO,
+    ProductListDTO,
     ProductResponseDTO,
     ProductDetailResponseDTO,
 )
@@ -30,7 +31,7 @@ from app.core.exceptions import NotFoundException
 router = APIRouter(prefix="/products", tags=["Products"])
 
 
-@router.get("/", response_model=PaginatedResponse[ProductResponseDTO])
+@router.get("/", response_model=PaginatedResponse[ProductListDTO])
 async def list_products(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
