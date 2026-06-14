@@ -41,7 +41,13 @@ class SQLAlchemyProductRepository(ProductRepository):
         total = count_result.scalar()
 
         result = await self.db.execute(
-            stmt.order_by(Product.created_at.desc())
+            stmt.options(
+                selectinload(Product.store),
+                selectinload(Product.category),
+                selectinload(Product.images),
+                selectinload(Product.variants),
+            )
+            .order_by(Product.created_at.desc())
             .offset((page - 1) * limit)
             .limit(limit)
         )
@@ -52,7 +58,12 @@ class SQLAlchemyProductRepository(ProductRepository):
         result = await self.db.execute(
             select(Product)
             .where(Product.id == product_id)
-            .options(selectinload(Product.images), selectinload(Product.variants))
+            .options(
+                selectinload(Product.images),
+                selectinload(Product.variants),
+                selectinload(Product.store),
+                selectinload(Product.category),
+            )
         )
         return result.scalars().first()
 
