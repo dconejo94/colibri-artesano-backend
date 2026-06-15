@@ -27,9 +27,9 @@ class OrderService:
         self.product_repo = product_repository
         self.variant_repo = variant_repository
 
-    async def create_order(self, dto: MainOrderCreateDTO) -> MainOrder:
-        if not await self.order_repo.buyer_exists(dto.buyer_id):
-            raise NotFoundException("User", str(dto.buyer_id))
+    async def create_order(self, buyer_id: UUID, dto: MainOrderCreateDTO) -> MainOrder:
+        if not await self.order_repo.buyer_exists(buyer_id):
+            raise NotFoundException("User", str(buyer_id))
 
         store_groups: dict[UUID, list] = {}
 
@@ -78,7 +78,7 @@ class OrderService:
             total_amount += subtotal
 
         main_order = MainOrder(
-            buyer_id=dto.buyer_id,
+            buyer_id=buyer_id,
             total_amount=total_amount,
             status="pending",
             store_orders=store_orders,
