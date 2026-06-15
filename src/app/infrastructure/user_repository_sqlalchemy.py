@@ -22,6 +22,18 @@ class SQLAlchemyUserRepository(UserRepository):
         )
         return result.scalars().first()
 
+    async def get_by_email(self, email: str) -> User | None:
+        result = await self.db.execute(
+            select(User).where(User.email == email).options(selectinload(User.store))
+        )
+        return result.scalars().first()
+
+    async def create(self, user: User) -> User:
+        self.db.add(user)
+        await self.db.flush()
+        await self.db.refresh(user)
+        return user
+
     async def update(self, user: User, data: dict) -> User:
         for key, value in data.items():
             setattr(user, key, value)
