@@ -5,7 +5,8 @@ from app.domain.models.store import Store
 from app.domain.models.category import Category
 from app.domain.models.product import Product
 
-TEST_USER_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
+# Must match _SEED_USER_ID in security.py so get_current_user returns the store owner.
+TEST_USER_ID = uuid.UUID("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 TEST_STORE_ID = uuid.UUID("00000000-0000-0000-0000-000000000002")
 TEST_CATEGORY_ID = uuid.UUID("00000000-0000-0000-0000-000000000003")
 TEST_PRODUCT_ID = uuid.UUID("00000000-0000-0000-0000-000000000004")

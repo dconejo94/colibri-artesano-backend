@@ -4,7 +4,7 @@ from app.domain.models.store import Store
 from app.domain.schemas.store import StoreCreateDTO, StoreUpdateDTO
 from app.domain.schemas.paginated_response import PaginatedResponse
 from app.domain.schemas.store import StoreResponseDTO
-from app.domain.schemas.vendor import VendorProfileDTO
+from app.domain.schemas.vendor import StoreProfileDTO
 from app.repositories.store_repository import StoreRepository
 from app.core.exceptions import NotFoundException, ConflictException
 
@@ -61,12 +61,12 @@ class StoreService:
             raise NotFoundException("Store", str(store_id))
         await self.repository.delete(store)
 
-    async def get_vendor_profile(self, store_id: UUID) -> VendorProfileDTO:
+    async def get_store_profile(self, store_id: UUID) -> StoreProfileDTO:
         result = await self.repository.get_with_product_count(store_id)
         if not result:
-            raise NotFoundException("Vendor", str(store_id))
+            raise NotFoundException("Store", str(store_id))
         store, product_count = result
-        return VendorProfileDTO(
+        return StoreProfileDTO(
             id=store.id,
             name=store.name,
             description=store.description,

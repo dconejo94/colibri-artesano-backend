@@ -17,7 +17,7 @@ from app.domain.schemas.product import (
     ProductListDTO,
     ProductResponseDTO,
 )
-from app.domain.schemas.vendor import VendorProfileDTO
+from app.domain.schemas.vendor import StoreProfileDTO
 from app.domain.schemas.order import StoreOrderResponseDTO, StoreOrderStatusUpdateDTO
 from app.core.exceptions import NotFoundException, ConflictException
 from app.core.security import require_vendor_role, require_store_owner
@@ -58,14 +58,14 @@ async def get_store_by_owner(
         raise HTTPException(status_code=404, detail="Store not found for owner")
 
 
-@router.get("/{store_id}/profile", response_model=VendorProfileDTO)
+@router.get("/{store_id}/profile", response_model=StoreProfileDTO)
 async def get_store_profile(
     store_id: UUID,
     service: StoreService = Depends(get_store_service),
 ):
     """Public profile for a store: name, description, and active product count."""
     try:
-        return await service.get_vendor_profile(store_id)
+        return await service.get_store_profile(store_id)
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Store not found")
 
