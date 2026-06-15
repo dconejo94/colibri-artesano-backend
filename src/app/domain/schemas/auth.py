@@ -33,3 +33,8 @@ class TokenResponseDTO(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
+
+class AccessTokenResponseDTO(BaseModel):
+    access_token: str
+    token_type: str = "bearer"

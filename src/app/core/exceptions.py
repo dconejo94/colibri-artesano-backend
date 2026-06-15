@@ -18,3 +18,9 @@ class ForbiddenException(Exception):
     def __init__(self, detail: str = "Operation not permitted"):
         self.detail = detail
         super().__init__(detail)
+
+
+class AuthenticationException(Exception):
+    def __init__(self, detail: str = "Could not validate credentials"):
+        self.detail = detail
+        super().__init__(detail)
