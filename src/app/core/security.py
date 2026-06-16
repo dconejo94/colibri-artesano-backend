@@ -142,3 +142,59 @@ async def get_current_user(
 
 # Convenient alias for route signatures: `user: CurrentUser`.
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+async def require_vendor_role(user: CurrentUser) -> User:
+    """Require the authenticated user to have the vendor role."""
+    if user.role != "vendor":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Vendor role required",
+        )
+    return user
+
+
+async def require_store_owner(
+    store_id: UUID,
+    user: User = Depends(require_vendor_role),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    """Require the authenticated vendor to own the requested store (prevents IDOR)."""
+    from app.infrastructure.store_repository_sqlalchemy import SQLAlchemyStoreRepository
+
+    store = await SQLAlchemyStoreRepository(db).get_by_id(store_id)
+    if store is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Store not found"
+        )
+    if store.owner_id != user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not own this store",
+        )
+    return user
+
+
+async def require_product_owner(
+    product_id: UUID,
+    user: User = Depends(require_vendor_role),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    """Require the authenticated vendor to own the store containing the product."""
+    from app.infrastructure.product_repository_sqlalchemy import (
+        SQLAlchemyProductRepository,
+    )
+    from app.infrastructure.store_repository_sqlalchemy import SQLAlchemyStoreRepository
+
+    product = await SQLAlchemyProductRepository(db).get_by_id(product_id)
+    if product is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
+        )
+    store = await SQLAlchemyStoreRepository(db).get_by_id(product.store_id)
+    if store is None or store.owner_id != user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not own this product",
+        )
+    return user

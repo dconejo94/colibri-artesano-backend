@@ -36,8 +36,8 @@ class AuthService:
             email=dto.email,
             password_hash=hash_password(dto.password),
             name=dto.name,
+            role=dto.role,
         )
-        # TODO(rebase #67): set user.role = dto.role once the role column lands.
         user = await self.users.create(user)
 
         if dto.role == "vendor":

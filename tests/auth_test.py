@@ -52,6 +52,28 @@ async def test_register_vendor_creates_store(client):
     assert store.name == "Vendor One Store"
 
 
+async def test_register_persists_role(client):
+    await client.post(_REGISTER, json=_buyer(email="rolebuyer@test.com"))
+    await client.post(
+        _REGISTER,
+        json={
+            "email": "rolevendor@test.com",
+            "password": "password123",
+            "role": "vendor",
+            "store_name": "Role Store",
+        },
+    )
+    async with TestingSessionLocal() as db:
+        buyer = (
+            await db.execute(select(User).where(User.email == "rolebuyer@test.com"))
+        ).scalar_one()
+        vendor = (
+            await db.execute(select(User).where(User.email == "rolevendor@test.com"))
+        ).scalar_one()
+    assert buyer.role == "buyer"
+    assert vendor.role == "vendor"
+
+
 async def test_register_duplicate_email_returns_409(client):
     await client.post(_REGISTER, json=_buyer(email="dup@test.com"))
     resp = await client.post(_REGISTER, json=_buyer(email="dup@test.com"))
