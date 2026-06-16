@@ -31,7 +31,8 @@ class ProductService:
             base_price=dto.base_price,
             is_active=dto.is_active,
         )
-        return await self.repository.create(product)
+        created_product = await self.repository.create(product)
+        return await self.get_product_by_id(created_product.id)
 
     async def list_products(
         self,
@@ -66,7 +67,8 @@ class ProductService:
         for field, value in update_data.items():
             setattr(product, field, value)
 
-        return await self.repository.update(product)
+        updated_product = await self.repository.update(product)
+        return await self.get_product_by_id(updated_product.id)
 
     async def delete_product(self, product_id: UUID) -> None:
         product = await self.repository.get_by_id(product_id)

@@ -58,3 +58,13 @@ class SQLAlchemyStoreRepository(StoreRepository):
     async def delete(self, store: Store) -> None:
         await self.db.delete(store)
         await self.db.flush()
+
+    async def get_with_product_count(self, store_id: UUID) -> tuple[Store, int] | None:
+        result = await self.db.execute(select(Store).where(Store.id == store_id))
+        store = result.scalars().first()
+        if not store:
+            return None
+        count_result = await self.db.execute(
+            select(func.count(Product.id)).where(Product.store_id == store_id)
+        )
+        return store, count_result.scalar()

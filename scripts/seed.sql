@@ -14,19 +14,19 @@ BEGIN;
 
 -- ── Users ────────────────────────────────────────────────────────────────────
 
-INSERT INTO users (id, email, password_hash, is_admin, name, phone, address, bio) VALUES
+INSERT INTO users (id, email, password_hash, is_admin, name, phone, address, bio, role) VALUES
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'daniel@colibri.dev',       '$2b$12$placeholder_hash_daniel',   true,
-   'Daniel Conejo',   '+506 8888-0001', 'San José, Costa Rica',      'Artesano ceramista y administrador de la plataforma.'),
+   'Daniel Conejo',   '+506 8888-0001', 'San José, Costa Rica',      'Artesano ceramista y administrador de la plataforma.',        'vendor'),
   ('b1ffcd00-ad1c-4ff9-cc7e-7cc0ce491b22', 'maria@artesana.cr',        '$2b$12$placeholder_hash_maria',    false,
-   'María Solís',     '+506 8888-0002', 'Sarchí, Alajuela',          'Tejedora de textiles artesanales con más de 20 años de experiencia.'),
+   'María Solís',     '+506 8888-0002', 'Sarchí, Alajuela',          'Tejedora de textiles artesanales con más de 20 años de experiencia.', 'vendor'),
   ('c2aade11-be2d-5aa0-dd8f-8dd1df502c33', 'jose@barro.cr',            '$2b$12$placeholder_hash_jose',     false,
-   'José Vargas',     '+506 8888-0003', 'Nicoya, Guanacaste',        'Alfarero especializado en barro negro y técnicas ancestrales chorotega.'),
+   'José Vargas',     '+506 8888-0003', 'Nicoya, Guanacaste',        'Alfarero especializado en barro negro y técnicas ancestrales chorotega.', 'vendor'),
   ('d3bbef22-cf3e-6bb1-ee9a-9ee2ea613d44', 'lucia@textiles.cr',        '$2b$12$placeholder_hash_lucia',    false,
-   'Lucía Jiménez',   '+506 8888-0004', 'Heredia, Costa Rica',       'Bordadora y cestería artesanal con fibras naturales del Valle Central.'),
+   'Lucía Jiménez',   '+506 8888-0004', 'Heredia, Costa Rica',       'Bordadora y cestería artesanal con fibras naturales del Valle Central.', 'vendor'),
   ('e4ccfa33-da4f-7cc2-ffa0-aff3fb724e55', 'carlos@madera.cr',         '$2b$12$placeholder_hash_carlos',   false,
-   'Carlos Mora',     '+506 8888-0005', 'Ciudad Quesada, San Carlos', 'Tallador en maderas sostenibles del bosque lluvioso costarricense.'),
+   'Carlos Mora',     '+506 8888-0005', 'Ciudad Quesada, San Carlos', 'Tallador en maderas sostenibles del bosque lluvioso costarricense.', 'vendor'),
   ('f5ddab44-eb5a-8dd3-aab1-baa4ac835f66', 'ana.compradora@gmail.com', '$2b$12$placeholder_hash_ana',      false,
-   'Ana Rodríguez',   '+506 8888-0006', 'Cartago, Costa Rica',       'Apasionada por el arte y la artesanía costarricense.')
+   'Ana Rodríguez',   '+506 8888-0006', 'Cartago, Costa Rica',       'Apasionada por el arte y la artesanía costarricense.',        'buyer')
 ON CONFLICT (id) DO NOTHING;
 
 -- ── Categories ───────────────────────────────────────────────────────────────

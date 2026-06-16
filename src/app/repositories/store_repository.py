@@ -31,3 +31,7 @@ class StoreRepository(ABC):
     @abstractmethod
     async def delete(self, store: Store) -> None:
         pass
+
+    @abstractmethod
+    async def get_with_product_count(self, store_id: UUID) -> tuple[Store, int] | None:
+        pass
