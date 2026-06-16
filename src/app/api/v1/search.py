@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query
 
 from app.services.search_service import SearchService
 from app.api.deps import get_search_service
-from app.domain.schemas.product import ProductResponseDTO
+from app.domain.schemas.product import ProductListDTO
 from app.domain.schemas.search import ProductAutocompleteDTO
 from app.domain.schemas.paginated_response import PaginatedResponse
 
@@ -14,13 +14,13 @@ from app.domain.schemas.paginated_response import PaginatedResponse
 router = APIRouter(prefix="/products", tags=["Search"])
 
 
-@router.get("/search", response_model=PaginatedResponse[ProductResponseDTO])
+@router.get("/search", response_model=PaginatedResponse[ProductListDTO])
 async def search_products(
     q: str = Query("", description="Search term (name or description)"),
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(10, ge=1, le=100, description="Results per page"),
     service: SearchService = Depends(get_search_service),
-) -> PaginatedResponse[ProductResponseDTO]:
+) -> PaginatedResponse[ProductListDTO]:
     """Full-text product search.
 
     Searches across product **name** and **description** using trigram

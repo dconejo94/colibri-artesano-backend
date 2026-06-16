@@ -72,7 +72,6 @@ class SQLAlchemyProductSearchRepository(ProductSearchRepository):
                 selectinload(Product.store),
                 selectinload(Product.category),
                 selectinload(Product.images),
-                selectinload(Product.variants),
             )
             .order_by(Product.name)
             .offset((page - 1) * limit)

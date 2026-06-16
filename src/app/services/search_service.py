@@ -1,5 +1,5 @@
 from app.domain.schemas.paginated_response import PaginatedResponse
-from app.domain.schemas.product import ProductResponseDTO
+from app.domain.schemas.product import ProductListDTO
 from app.domain.schemas.search import ProductAutocompleteDTO
 from app.repositories.search_repository import ProductSearchRepository
 
@@ -25,7 +25,7 @@ class SearchService:
         page: int,
         limit: int,
         is_active: bool = True,
-    ) -> PaginatedResponse[ProductResponseDTO]:
+    ) -> PaginatedResponse[ProductListDTO]:
         """Full-text search with pagination.
 
         Returns an empty paginated response when *query* is blank so the
