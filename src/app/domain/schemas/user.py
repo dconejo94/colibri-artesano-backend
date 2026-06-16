@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from app.domain.schemas.auth import UserRole
+
 
 class UserResponseDTO(BaseModel):
     id: UUID
@@ -14,6 +16,7 @@ class UserResponseDTO(BaseModel):
     bio: str | None
     is_active: bool
     is_admin: bool
+    role: UserRole
     created_at: datetime
 
     model_config = {"from_attributes": True}

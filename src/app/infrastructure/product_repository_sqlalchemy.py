@@ -45,7 +45,7 @@ class SQLAlchemyProductRepository(ProductRepository):
                 selectinload(Product.store),
                 selectinload(Product.category),
                 selectinload(Product.images),
-                selectinload(Product.variants),
+                # variants omitted: ProductListDTO does not expose them.
             )
             .order_by(Product.created_at.desc())
             .offset((page - 1) * limit)

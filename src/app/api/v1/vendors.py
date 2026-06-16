@@ -31,6 +31,6 @@ async def get_vendor_profile_legacy(
     service: StoreService = Depends(get_store_service),
 ):
     try:
-        return await service.get_vendor_profile(store_id)
+        return await service.get_store_profile(store_id)
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Store not found")
