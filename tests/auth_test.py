@@ -1,10 +1,15 @@
 """Tests for the auth endpoints: register, login, refresh and route protection."""
 
+from uuid import uuid4
+
 from sqlalchemy import select
 
+from app.config import settings
+from app.core.security import create_access_token
 from app.domain.models.store import Store
 from app.domain.models.user import User
 from tests.conftest import TestingSessionLocal
+from tests.factories.product_factory import TEST_PRODUCT_ID
 
 _REGISTER = "/api/v1/auth/register"
 _LOGIN = "/api/v1/auth/login"
@@ -136,3 +141,54 @@ async def test_protected_route_with_token_succeeds(auth_client):
     )
     assert resp.status_code == 200
     assert resp.json()["email"] == "me@test.com"
+
+
+async def test_expired_access_token_returns_401(auth_client, monkeypatch):
+    # Mint a token that is already expired.
+    monkeypatch.setattr(settings, "ACCESS_TOKEN_EXPIRE_MINUTES", -1)
+    expired = create_access_token(uuid4())
+    resp = await auth_client.get(
+        "/api/v1/users/me", headers={"Authorization": f"Bearer {expired}"}
+    )
+    assert resp.status_code == 401
+
+
+async def test_inactive_user_token_returns_401(auth_client):
+    tokens = (
+        await auth_client.post(_REGISTER, json=_buyer(email="inactive@test.com"))
+    ).json()
+    async with TestingSessionLocal() as db:
+        user = (
+            await db.execute(select(User).where(User.email == "inactive@test.com"))
+        ).scalar_one()
+        user.is_active = False
+        await db.commit()
+
+    resp = await auth_client.get(
+        "/api/v1/users/me",
+        headers={"Authorization": f"Bearer {tokens['access_token']}"},
+    )
+    assert resp.status_code == 401
+
+
+async def test_get_order_of_another_user_returns_404(auth_client):
+    a = (await auth_client.post(_REGISTER, json=_buyer(email="ordera@test.com"))).json()
+    b = (await auth_client.post(_REGISTER, json=_buyer(email="orderb@test.com"))).json()
+    ha = {"Authorization": f"Bearer {a['access_token']}"}
+    hb = {"Authorization": f"Bearer {b['access_token']}"}
+
+    created = await auth_client.post(
+        "/api/v1/orders/",
+        json={"items": [{"product_id": str(TEST_PRODUCT_ID), "quantity": 1}]},
+        headers=ha,
+    )
+    assert created.status_code == 201
+    order_id = created.json()["id"]
+
+    # Owner can read it; another user gets 404 (IDOR closed).
+    assert (
+        await auth_client.get(f"/api/v1/orders/{order_id}", headers=ha)
+    ).status_code == 200
+    assert (
+        await auth_client.get(f"/api/v1/orders/{order_id}", headers=hb)
+    ).status_code == 404
