@@ -43,7 +43,9 @@ async def login(
 
 
 @router.post("/refresh", response_model=AccessTokenResponseDTO)
+@limiter.limit(settings.AUTH_RATE_LIMIT)
 async def refresh(
+    request: Request,
     dto: RefreshDTO,
     service: AuthService = Depends(get_auth_service),
 ):
