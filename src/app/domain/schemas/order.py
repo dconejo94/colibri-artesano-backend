@@ -38,7 +38,6 @@ class StoreOrderStatusUpdateDTO(BaseModel):
 
 
 class MainOrderCreateDTO(BaseModel):
-    buyer_id: UUID
     items: list[OrderItemCreateDTO] = Field(..., min_length=1)
 
 
