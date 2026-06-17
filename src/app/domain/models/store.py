@@ -1,10 +1,26 @@
 import uuid
 
-from sqlalchemy import Column, String, Text, ForeignKey, DateTime, Uuid
+from sqlalchemy import Column, String, Text, ForeignKey, DateTime, Uuid, Table
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.core.database import Base
+
+from sqlalchemy import UniqueConstraint
+
+follows = Table(
+    "follows",
+    Base.metadata,
+    Column("id", Uuid, primary_key=True, default=uuid.uuid4),
+    Column(
+        "user_id", Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    ),
+    Column(
+        "store_id", Uuid, ForeignKey("stores.id", ondelete="CASCADE"), nullable=False
+    ),
+    Column("created_at", DateTime(timezone=True), server_default=func.now()),
+    UniqueConstraint("user_id", "store_id", name="uq_follows_user_store"),
+)
 
 
 class Store(Base):
@@ -25,3 +41,6 @@ class Store(Base):
         passive_deletes=True,
     )
     store_orders = relationship("StoreOrder", back_populates="store")
+    followers = relationship(
+        "User", secondary=follows, back_populates="followed_stores"
+    )
