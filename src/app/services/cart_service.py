@@ -30,9 +30,7 @@ class CartService:
         self.order_repository = order_repository
         self.product_repository = product_repository
 
-    async def get_cart(
-        self, buyer_id: UUID
-    ) -> CartResponseDTO:
+    async def get_cart(self, buyer_id: UUID) -> CartResponseDTO:
         if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
 
@@ -90,9 +88,7 @@ class CartService:
             stores=stores,
         )
 
-    async def add_to_cart(
-        self, buyer_id: UUID, dto: AddToCartDTO
-    ) -> CartResponseDTO:
+    async def add_to_cart(self, buyer_id: UUID, dto: AddToCartDTO) -> CartResponseDTO:
         if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
 
@@ -162,7 +158,7 @@ class CartService:
     ) -> CartResponseDTO:
         if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
-        
+
         product = await self.product_repository.get_by_id(product_id)
 
         if not product:
@@ -171,7 +167,9 @@ class CartService:
                 str(product_id),
             )
 
-        store_order, main_order = await self._validate_store_order_owner(buyer_id, store_order_id)
+        store_order, main_order = await self._validate_store_order_owner(
+            buyer_id, store_order_id
+        )
 
         item = await self.cart_repository.remove_order_item(
             product_id,
@@ -190,9 +188,7 @@ class CartService:
             Decimal("0.00"), store_order.subtotal_amount - amount
         )
 
-        main_order.total_amount = max(
-            Decimal("0.00"), main_order.total_amount - amount
-        )
+        main_order.total_amount = max(Decimal("0.00"), main_order.total_amount - amount)
 
         await self.cart_repository.flush()
 
@@ -201,36 +197,35 @@ class CartService:
     async def update_cart_item(
         self, buyer_id: UUID, product_id: UUID, quantity: int, store_order_id: UUID
     ) -> CartResponseDTO:
-        
+
         if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
-        
+
         product = await self.product_repository.get_by_id(product_id)
 
         if not product:
             raise NotFoundException(
                 "Product",
                 str(product_id),
-            ) 
+            )
 
-        store_order, main_order = await self._validate_store_order_owner(buyer_id, store_order_id)
+        store_order, main_order = await self._validate_store_order_owner(
+            buyer_id, store_order_id
+        )
 
-        existing_item = await self.cart_repository.get_order_item(store_order_id, product_id, None)
+        existing_item = await self.cart_repository.get_order_item(
+            store_order_id, product_id, None
+        )
 
         if not existing_item:
-            raise NotFoundException(
-                "OrderItem",
-                str(product_id)
-            )
+            raise NotFoundException("OrderItem", str(product_id))
 
         previous_amount = existing_item.quantity * existing_item.unit_price
         new_amount = quantity * existing_item.unit_price
         diff = new_amount - previous_amount
 
         item = await self.cart_repository.update_order_item(
-            product_id,
-            store_order_id,
-            quantity
+            product_id, store_order_id, quantity
         )
 
         if not item:
@@ -243,9 +238,7 @@ class CartService:
             Decimal("0.00"), store_order.subtotal_amount + diff
         )
 
-        main_order.total_amount = max(
-            Decimal("0.00"), main_order.total_amount + diff
-        )
+        main_order.total_amount = max(Decimal("0.00"), main_order.total_amount + diff)
 
         await self.cart_repository.flush()
 
@@ -253,7 +246,7 @@ class CartService:
 
     async def _is_user_valid(self, user_id: UUID) -> bool:
         return await self.order_repository.buyer_exists(user_id)
-    
+
     ##async def is_valid_product_quantity(quantity: int, stock: int) -> bool:
     ##    return quantity <= stock and quantity > 0
 

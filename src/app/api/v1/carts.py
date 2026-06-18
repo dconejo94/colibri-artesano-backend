@@ -49,17 +49,22 @@ async def remove_from_cart(
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+
 @router.put(
-    "/updateCartItemQuantity/{product_id}", response_model=CartResponseDTO, status_code=200
+    "/updateCartItemQuantity/{product_id}",
+    response_model=CartResponseDTO,
+    status_code=200,
 )
 async def update_cart_item_quantity_(
     product_id: UUID,
     user: CurrentUser,
     store_order_id: UUID = Query(...),
     quantity: int = Query(...),
-    service: CartService = Depends(get_cart_service), 
+    service: CartService = Depends(get_cart_service),
 ):
     try:
-        return await service.update_cart_item(user.id, product_id, quantity, store_order_id)
+        return await service.update_cart_item(
+            user.id, product_id, quantity, store_order_id
+        )
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))

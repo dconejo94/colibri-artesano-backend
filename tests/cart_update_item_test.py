@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from tests.factories.product_factory import TEST_PRODUCT_ID, TEST_PRODUCT_2_ID
 
+
 async def test_update_cart_item_quantity_success(client):
     add_resp = await client.post(
         "/api/v1/cart/addProduct",
@@ -26,7 +27,8 @@ async def test_update_cart_item_quantity_success(client):
     item = data["stores"][0]["items"][0]
 
     assert item["quantity"] == 5
-    
+
+
 async def test_update_cart_item_nonexistent_product_returns_404(client):
     add_resp = await client.post(
         "/api/v1/cart/addProduct",
@@ -45,6 +47,7 @@ async def test_update_cart_item_nonexistent_product_returns_404(client):
 
     assert resp.status_code == 404
 
+
 async def test_update_cart_item_not_in_cart_returns_404(client):
     add_resp = await client.post(
         "/api/v1/cart/addProduct",
@@ -62,6 +65,7 @@ async def test_update_cart_item_not_in_cart_returns_404(client):
     )
 
     assert resp.status_code == 404
+
 
 async def test_update_cart_item_invalid_store_order_returns_404(client):
     await client.post(
@@ -104,9 +108,6 @@ async def test_update_cart_item_updates_totals(client):
 
     assert item["quantity"] == 3
 
-    expected_total = (
-        Decimal(item["unit_price"])
-        * Decimal(item["quantity"])
-    )
+    expected_total = Decimal(item["unit_price"]) * Decimal(item["quantity"])
 
     assert Decimal(data["total_amount"]) == expected_total

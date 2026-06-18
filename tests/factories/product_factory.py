@@ -13,6 +13,7 @@ TEST_PRODUCT_ID = uuid.UUID("00000000-0000-0000-0000-000000000004")
 TEST_PRODUCT_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
 TEST_PRODUCT_2_ID = uuid.UUID("00000000-0000-0000-0000-000000000003")
 
+
 async def seed_products(db):
     user = User(
         id=TEST_USER_ID, email="test@test.com", password_hash="hash", role="vendor"
@@ -44,6 +45,7 @@ async def seed_products(db):
     )
 
     db.add(product)
+    db.add(product2)
 
     await db.commit()
     await db.refresh(product)
