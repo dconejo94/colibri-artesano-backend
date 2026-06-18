@@ -91,7 +91,9 @@ class SQLAlchemyStoreRepository(StoreRepository):
         return store, product_count, follower_count, is_following
 
     async def add_follower(self, store_id: UUID, user_id: UUID) -> None:
-        stmt = follows.insert().values(id=uuid.uuid4(), store_id=store_id, user_id=user_id)
+        stmt = follows.insert().values(
+            id=uuid.uuid4(), store_id=store_id, user_id=user_id
+        )
         try:
             await self.db.execute(stmt)
             await self.db.flush()
@@ -100,8 +102,7 @@ class SQLAlchemyStoreRepository(StoreRepository):
 
     async def remove_follower(self, store_id: UUID, user_id: UUID) -> None:
         stmt = follows.delete().where(
-            (follows.c.store_id == store_id)
-            & (follows.c.user_id == user_id)
+            (follows.c.store_id == store_id) & (follows.c.user_id == user_id)
         )
         await self.db.execute(stmt)
         await self.db.flush()
@@ -110,10 +111,7 @@ class SQLAlchemyStoreRepository(StoreRepository):
         stmt = (
             select(1)
             .select_from(follows)
-            .where(
-                (follows.c.store_id == store_id)
-                & (follows.c.user_id == user_id)
-            )
+            .where((follows.c.store_id == store_id) & (follows.c.user_id == user_id))
         )
         result = await self.db.execute(stmt)
         return result.scalar() is not None

@@ -12,9 +12,7 @@ follows = Table(
     "follows",
     Base.metadata,
     Column("id", Uuid, primary_key=True, default=uuid.uuid4),
-    Column(
-        "user_id", Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    ),
+    Column("user_id", Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
     Column(
         "store_id", Uuid, ForeignKey("stores.id", ondelete="CASCADE"), nullable=False
     ),
