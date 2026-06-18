@@ -8,7 +8,6 @@ from sqlalchemy.orm import selectinload
 from app.domain.models.store import Store, follows
 from app.domain.models.product import Product
 from app.repositories.store_repository import StoreRepository
-from sqlalchemy.exc import IntegrityError
 
 
 class SQLAlchemyStoreRepository(StoreRepository):
@@ -94,11 +93,8 @@ class SQLAlchemyStoreRepository(StoreRepository):
         stmt = follows.insert().values(
             id=uuid.uuid4(), store_id=store_id, user_id=user_id
         )
-        try:
-            await self.db.execute(stmt)
-            await self.db.flush()
-        except IntegrityError:
-            pass
+        await self.db.execute(stmt)
+        await self.db.flush()
 
     async def remove_follower(self, store_id: UUID, user_id: UUID) -> None:
         stmt = follows.delete().where(
