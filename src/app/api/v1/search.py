@@ -27,8 +27,10 @@ async def search_products(
     similarity on PostgreSQL (GIN index) and case-insensitive LIKE on SQLite
     (test environment).  Only active products are returned by default.
 
-    Returns an empty paginated response when *q* is blank.
+    Returns an empty paginated response when *q* is blank or shorter than 3 characters.
     """
+    if len(q) < 3:
+        return PaginatedResponse(items=[], total=0, page=page, limit=limit)
     return await service.search_products(query=q, page=page, limit=limit)
 
 
@@ -43,6 +45,8 @@ async def autocomplete_products(
     ``base_price``, ``primary_image_url``) optimised for search-as-you-type
     widgets.  Only active products are returned.
 
-    Returns an empty array when *q* is blank.
+    Returns an empty array when *q* is blank or shorter than 3 characters.
     """
+    if len(q) < 3:
+        return []
     return await service.autocomplete_products(query=q)
