@@ -153,8 +153,8 @@ async def test_order_quantity_negative_rejected(client):
 # ── Existence & Ownership Checks ─────────────────────────────────
 
 
-async def test_order_nonexistent_buyer_returns_404(client):
-    """Non-existent buyer_id → 404, not 500."""
+async def test_order_ignores_client_supplied_buyer_id(client):
+    """A buyer_id in the body is ignored; the order belongs to the token user."""
     fake_buyer = uuid.uuid4()
     body = {
         "buyer_id": str(fake_buyer),
@@ -162,7 +162,8 @@ async def test_order_nonexistent_buyer_returns_404(client):
     }
     resp = await client.post("/api/v1/orders/", json=body)
 
-    assert resp.status_code == 404
+    assert resp.status_code == 201
+    assert resp.json()["buyer_id"] == str(TEST_USER_ID)
 
 
 async def test_order_nonexistent_product_returns_404(client):

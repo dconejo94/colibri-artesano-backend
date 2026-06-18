@@ -15,6 +15,7 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
     is_active = Column(Boolean, nullable=False, default=True, server_default="true")
+    role = Column(String(20), nullable=False, default="buyer", server_default="buyer")
     name = Column(String(100), nullable=True)
     phone = Column(String(20), nullable=True)
     address = Column(String, nullable=True)

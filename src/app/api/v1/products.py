@@ -12,6 +12,7 @@ from app.api.deps import (
 )
 from app.domain.schemas.product import (
     ProductUpdateDTO,
+    ProductListDTO,
     ProductResponseDTO,
     ProductDetailResponseDTO,
 )
@@ -26,11 +27,12 @@ from app.domain.schemas.product_variant import (
 )
 from app.domain.schemas.paginated_response import PaginatedResponse
 from app.core.exceptions import NotFoundException
+from app.core.security import require_product_owner
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
 
-@router.get("/", response_model=PaginatedResponse[ProductResponseDTO])
+@router.get("/", response_model=PaginatedResponse[ProductListDTO])
 async def list_products(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
@@ -63,6 +65,7 @@ async def get_product(
 async def update_product(
     product_id: UUID,
     dto: ProductUpdateDTO,
+    _: object = Depends(require_product_owner),
     service: ProductService = Depends(get_product_service),
 ):
     try:
@@ -74,6 +77,7 @@ async def update_product(
 @router.delete("/{product_id}", status_code=204)
 async def delete_product(
     product_id: UUID,
+    _: object = Depends(require_product_owner),
     service: ProductService = Depends(get_product_service),
 ):
     try:
@@ -90,6 +94,7 @@ async def delete_product(
 async def add_product_image(
     product_id: UUID,
     dto: ProductImageCreateDTO,
+    _: object = Depends(require_product_owner),
     service: ProductImageService = Depends(get_product_image_service),
 ):
     return await service.add_image(product_id, dto)
@@ -110,6 +115,7 @@ async def list_product_images(
 async def delete_product_image(
     product_id: UUID,
     image_id: UUID,
+    _: object = Depends(require_product_owner),
     service: ProductImageService = Depends(get_product_image_service),
 ):
     try:
@@ -122,6 +128,7 @@ async def delete_product_image(
 async def set_primary_image(
     product_id: UUID,
     image_id: UUID,
+    _: object = Depends(require_product_owner),
     service: ProductImageService = Depends(get_product_image_service),
 ):
     try:
@@ -139,6 +146,7 @@ async def set_primary_image(
 async def add_product_variant(
     product_id: UUID,
     dto: ProductVariantCreateDTO,
+    _: object = Depends(require_product_owner),
     service: ProductVariantService = Depends(get_product_variant_service),
 ):
     return await service.create_variant(product_id, dto)
@@ -163,6 +171,7 @@ async def update_product_variant(
     product_id: UUID,
     variant_id: UUID,
     dto: ProductVariantUpdateDTO,
+    _: object = Depends(require_product_owner),
     service: ProductVariantService = Depends(get_product_variant_service),
 ):
     try:
@@ -175,6 +184,7 @@ async def update_product_variant(
 async def delete_product_variant(
     product_id: UUID,
     variant_id: UUID,
+    _: object = Depends(require_product_owner),
     service: ProductVariantService = Depends(get_product_variant_service),
 ):
     try:

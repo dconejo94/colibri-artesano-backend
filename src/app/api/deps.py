@@ -18,6 +18,7 @@ from app.infrastructure.product_variant_repository_sqlalchemy import (
 from app.infrastructure.order_repository_sqlalchemy import SQLAlchemyOrderRepository
 from app.infrastructure.cart_repository_sqlalchemy import SQLAlchemyCartRepository
 
+from app.services.auth_service import AuthService
 from app.services.user_service import UserService
 from app.services.category_service import CategoryService
 from app.services.store_service import StoreService
@@ -26,6 +27,15 @@ from app.services.product_image_service import ProductImageService
 from app.services.product_variant_service import ProductVariantService
 from app.services.order_service import OrderService
 from app.services.cart_service import CartService
+
+
+async def get_auth_service(
+    db: AsyncSession = Depends(get_db),
+) -> AuthService:
+    return AuthService(
+        user_repository=SQLAlchemyUserRepository(db),
+        store_repository=SQLAlchemyStoreRepository(db),
+    )
 
 
 async def get_user_service(
