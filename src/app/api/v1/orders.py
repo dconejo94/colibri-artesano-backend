@@ -10,7 +10,7 @@ from app.domain.schemas.order import (
     MainOrderResponseDTO,
 )
 from app.domain.schemas.paginated_response import PaginatedResponse
-from app.core.exceptions import NotFoundException
+from app.core.exceptions import NotFoundException, ConflictException
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
@@ -25,6 +25,8 @@ async def create_order(
         return await service.create_order(current_user.id, dto)
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except ConflictException as e:
+        raise HTTPException(status_code=409, detail=str(e))
 
 
 @router.get("/", response_model=PaginatedResponse[MainOrderResponseDTO])
