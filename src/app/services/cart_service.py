@@ -33,7 +33,7 @@ class CartService:
     async def get_cart(
         self, buyer_id: UUID
     ) -> CartResponseDTO:
-        if not await self.is_user_valid(buyer_id):
+        if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
 
         cart = await self.cart_repository.get_cart(buyer_id)
@@ -92,8 +92,8 @@ class CartService:
 
     async def add_to_cart(
         self, buyer_id: UUID, dto: AddToCartDTO
-    ) -> CartItemResponseDTO:
-        if not await self.is_user_valid(buyer_id):
+    ) -> CartResponseDTO:
+        if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
 
         product = await self.product_repository.get_by_id(dto.product_id)
@@ -159,8 +159,8 @@ class CartService:
 
     async def remove_from_cart(
         self, buyer_id: UUID, product_id: UUID, store_order_id: UUID
-    ) -> CartItemResponseDTO:
-        if not await self.is_user_valid(buyer_id):
+    ) -> CartResponseDTO:
+        if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
         
         product = await self.product_repository.get_by_id(product_id)
@@ -171,13 +171,7 @@ class CartService:
                 str(product_id),
             )
 
-        store_order = await self.order_repository.get_store_order_by_id(store_order_id)
-
-        if not store_order:
-            raise NotFoundException(
-                "Cart",
-                str(store_order_id),
-            )
+        store_order, main_order = await self._validate_store_order_owner(buyer_id, store_order_id)
 
         item = await self.cart_repository.remove_order_item(
             product_id,
@@ -196,14 +190,9 @@ class CartService:
             Decimal("0.00"), store_order.subtotal_amount - amount
         )
 
-        main_order = await self.order_repository.get_main_order_by_id(
-            store_order.main_order_id
+        main_order.total_amount = max(
+            Decimal("0.00"), main_order.total_amount - amount
         )
-
-        if main_order:
-            main_order.total_amount = max(
-                Decimal("0.00"), main_order.total_amount - amount
-            )
 
         await self.cart_repository.flush()
 
@@ -211,9 +200,9 @@ class CartService:
 
     async def update_cart_item(
         self, buyer_id: UUID, product_id: UUID, quantity: int, store_order_id: UUID
-    ) -> CartItemResponseDTO:
+    ) -> CartResponseDTO:
         
-        if not await self.is_user_valid(buyer_id):
+        if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
         
         product = await self.product_repository.get_by_id(product_id)
@@ -222,16 +211,9 @@ class CartService:
             raise NotFoundException(
                 "Product",
                 str(product_id),
-            )
-        
+            ) 
 
-        store_order = await self.order_repository.get_store_order_by_id(store_order_id)
-
-        if not store_order:
-            raise NotFoundException(
-                "Cart",
-                str(store_order_id),
-            )
+        store_order, main_order = await self._validate_store_order_owner(buyer_id, store_order_id)
 
         existing_item = await self.cart_repository.get_order_item(store_order_id, product_id, None)
 
@@ -261,21 +243,41 @@ class CartService:
             Decimal("0.00"), store_order.subtotal_amount + diff
         )
 
-        main_order = await self.order_repository.get_main_order_by_id(
-            store_order.main_order_id
+        main_order.total_amount = max(
+            Decimal("0.00"), main_order.total_amount + diff
         )
-
-        if main_order:
-            main_order.total_amount = max(
-                Decimal("0.00"), main_order.total_amount + diff
-            )
 
         await self.cart_repository.flush()
 
         return await self.get_cart(buyer_id)
 
-    async def is_user_valid(self, user_id: UUID) -> bool:
+    async def _is_user_valid(self, user_id: UUID) -> bool:
         return await self.order_repository.buyer_exists(user_id)
     
     ##async def is_valid_product_quantity(quantity: int, stock: int) -> bool:
     ##    return quantity <= stock and quantity > 0
+
+    async def _validate_store_order_owner(
+        self,
+        buyer_id: UUID,
+        store_order_id: UUID,
+    ) -> tuple[StoreOrder, MainOrder]:
+        store_order = await self.order_repository.get_store_order_by_id(store_order_id)
+
+        if not store_order:
+            raise NotFoundException(
+                "Cart",
+                str(store_order_id),
+            )
+
+        main_order = await self.order_repository.get_main_order_by_id(
+            store_order.main_order_id
+        )
+
+        if not main_order or main_order.buyer_id != buyer_id:
+            raise NotFoundException(
+                "Cart",
+                str(store_order_id),
+            )
+
+        return store_order, main_order
