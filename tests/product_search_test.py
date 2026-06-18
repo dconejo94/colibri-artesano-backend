@@ -270,13 +270,13 @@ class TestProductSearch:
     # ------------------------------------------------------------------
 
     async def test_search_default_page(self, client: AsyncClient):
-        response = await client.get("/api/v1/products/search?q=de")
+        response = await client.get("/api/v1/products/search?q=Palma")
         data = response.json()
         assert data["page"] == 1
         assert data["limit"] == 10
 
     async def test_search_custom_pagination(self, client: AsyncClient):
-        response = await client.get("/api/v1/products/search?q=de&page=1&limit=2")
+        response = await client.get("/api/v1/products/search?q=Palma&page=1&limit=2")
         data = response.json()
         assert response.status_code == 200
         assert data["limit"] == 2
@@ -323,8 +323,8 @@ class TestProductSearch:
     async def test_search_returns_all_matching_active_products(
         self, client: AsyncClient
     ):
-        # "de" appears in "Collar de Jade", "Tapete de Palma", "Bolsa de Cuero"
-        response = await client.get("/api/v1/products/search?q=de&limit=100")
+        # " de " appears in "Collar de Jade", "Tapete de Palma", "Bolsa de Cuero"
+        response = await client.get("/api/v1/products/search?q= de &limit=100")
         data = response.json()
         names = {item["name"] for item in data["items"]}
         assert "Collar de Jade" in names
@@ -410,8 +410,8 @@ class TestProductAutocomplete:
     # ------------------------------------------------------------------
 
     async def test_autocomplete_hard_cap_is_ten(self, client: AsyncClient):
-        # "de" matches at least 3 active products; result must never exceed 10
-        response = await client.get("/api/v1/products/autocomplete?q=de")
+        # " de " matches at least 3 active products; result must never exceed 10
+        response = await client.get("/api/v1/products/autocomplete?q= de ")
         data = response.json()
         assert len(data) <= 10
 

@@ -35,7 +35,7 @@ class ProductSearchRepository(ABC):
         limit: int = 10,
         is_active: bool = True,
     ) -> list[Product]:
-        """Lightweight prefix/trigram search over product names only.
+        """Lightweight prefix/trigram search over product name and description.
 
         Designed to execute in <300 ms.  Returns at most *limit* products
         (hard-capped at 10 by the service layer).  An empty *query* string

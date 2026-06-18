@@ -13,7 +13,7 @@ the PostgreSQL-specific DDL in a dialect check so the migration runner does
 not fail when executing against SQLite.
 
 Revision ID: d1e2f3a4b5c6
-Revises: c3d4e5f6a7b8
+Revises: c97cd381abe6
 Create Date: 2026-06-13
 """
 

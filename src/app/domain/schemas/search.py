@@ -25,13 +25,22 @@ class ProductAutocompleteDTO(BaseModel):
     def _extract_primary_image(cls, data: Any) -> Any:
         """Pull the cover image URL out of the ORM relationship before
         Pydantic tries to serialise the object."""
+        if isinstance(data, dict):
+            return data
+
+        result = {
+            "id": getattr(data, "id", None),
+            "name": getattr(data, "name", None),
+            "base_price": getattr(data, "base_price", None),
+            "primary_image_url": None,
+        }
+
         images = getattr(data, "images", None)
         if images:
             primary = next(
                 (img for img in images if getattr(img, "is_primary", False)),
                 images[0],
             )
-            # Inject the value so it is available as a normal field.
-            if hasattr(data, "__dict__"):
-                data.__dict__.setdefault("primary_image_url", primary.image_url)
-        return data
+            result["primary_image_url"] = primary.image_url
+
+        return result
