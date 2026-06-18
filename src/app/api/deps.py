@@ -16,6 +16,9 @@ from app.infrastructure.product_variant_repository_sqlalchemy import (
     SQLAlchemyProductVariantRepository,
 )
 from app.infrastructure.order_repository_sqlalchemy import SQLAlchemyOrderRepository
+from app.infrastructure.search_repository_sqlalchemy import (
+    SQLAlchemyProductSearchRepository,
+)
 from app.infrastructure.cart_repository_sqlalchemy import SQLAlchemyCartRepository
 
 from app.services.auth_service import AuthService
@@ -26,6 +29,7 @@ from app.services.product_service import ProductService
 from app.services.product_image_service import ProductImageService
 from app.services.product_variant_service import ProductVariantService
 from app.services.order_service import OrderService
+from app.services.search_service import SearchService
 from app.services.cart_service import CartService
 
 
@@ -85,6 +89,12 @@ async def get_order_service(
         product_repository=SQLAlchemyProductRepository(db),
         variant_repository=SQLAlchemyProductVariantRepository(db),
     )
+
+
+async def get_search_service(
+    db: AsyncSession = Depends(get_db),
+) -> SearchService:
+    return SearchService(SQLAlchemyProductSearchRepository(db))
 
 
 async def get_cart_service(

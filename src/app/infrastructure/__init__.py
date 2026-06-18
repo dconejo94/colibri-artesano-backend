@@ -16,3 +16,6 @@ from app.infrastructure.product_variant_repository_sqlalchemy import (
 from app.infrastructure.order_repository_sqlalchemy import (
     SQLAlchemyOrderRepository as SQLAlchemyOrderRepository,
 )
+from app.infrastructure.search_repository_sqlalchemy import (
+    SQLAlchemyProductSearchRepository as SQLAlchemyProductSearchRepository,
+)
