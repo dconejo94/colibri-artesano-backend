@@ -25,3 +25,5 @@ class User(Base):
 
     store = relationship("Store", back_populates="owner", uselist=False)
     orders = relationship("MainOrder", back_populates="buyer")
+    created_events = relationship("Event", back_populates="creator")
+    event_attendances = relationship("EventAttendee", back_populates="user")
