@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from app.domain.models.event import Event, EventAttendee
+from app.domain.models.event import Event
 
 
 class EventRepository(ABC):
@@ -10,26 +10,9 @@ class EventRepository(ABC):
         pass
 
     @abstractmethod
-    async def list_events(
-        self, page: int, limit: int, user_id: UUID | None = None
-    ) -> tuple[list[tuple[Event, int, bool]], int]:
-        """Return (event, attendee_count, is_attending) tuples and total count."""
+    async def list_events(self, page: int, limit: int) -> tuple[list[Event], int]:
         pass
 
     @abstractmethod
-    async def get_by_id(
-        self, event_id: UUID, user_id: UUID | None = None
-    ) -> tuple[Event, int, bool] | None:
-        pass
-
-    @abstractmethod
-    async def add_attendee(self, attendee: EventAttendee) -> EventAttendee:
-        pass
-
-    @abstractmethod
-    async def remove_attendee(self, event_id: UUID, user_id: UUID) -> bool:
-        pass
-
-    @abstractmethod
-    async def is_attending(self, event_id: UUID, user_id: UUID) -> bool:
+    async def get_by_id(self, event_id: UUID) -> Event | None:
         pass

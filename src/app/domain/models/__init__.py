@@ -8,4 +8,3 @@ from .main_order import MainOrder as MainOrder
 from .store_order import StoreOrder as StoreOrder
 from .order_item import OrderItem as OrderItem
 from .event import Event as Event
-from .event import EventAttendee as EventAttendee

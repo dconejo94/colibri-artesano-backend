@@ -29,33 +29,10 @@ def upgrade() -> None:
         sa.Column("end_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("image_url", sa.String(), nullable=True),
         sa.Column("created_by", sa.Uuid(), nullable=False),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.text("now()"),
-            nullable=True,
-        ),
         sa.ForeignKeyConstraint(["created_by"], ["users.id"]),
         sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_table(
-        "event_attendees",
-        sa.Column("id", sa.Uuid(), nullable=False),
-        sa.Column("event_id", sa.Uuid(), nullable=False),
-        sa.Column("user_id", sa.Uuid(), nullable=False),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.text("now()"),
-            nullable=True,
-        ),
-        sa.ForeignKeyConstraint(["event_id"], ["events.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("event_id", "user_id", name="uq_event_attendee"),
     )
 
 
 def downgrade() -> None:
-    op.drop_table("event_attendees")
     op.drop_table("events")
