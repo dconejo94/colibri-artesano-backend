@@ -23,7 +23,7 @@ async def get_cart(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.post("/addProduct", response_model=CartResponseDTO, status_code=201)
+@router.post("/item", response_model=CartResponseDTO, status_code=201)
 async def add_to_cart(
     dto: AddToCartDTO,
     user: CurrentUser,
@@ -36,7 +36,7 @@ async def add_to_cart(
 
 
 @router.delete(
-    "/removeProduct/{product_id}", response_model=CartResponseDTO, status_code=200
+    "/item/{product_id}", response_model=CartResponseDTO, status_code=200
 )
 async def remove_from_cart(
     product_id: UUID,
@@ -50,16 +50,16 @@ async def remove_from_cart(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.put(
-    "/updateCartItemQuantity/{product_id}",
+@router.patch(
+    "/item/{product_id}",
     response_model=CartResponseDTO,
     status_code=200,
 )
-async def update_cart_item_quantity_(
+async def update_cart_item_quantity(
     product_id: UUID,
     user: CurrentUser,
     store_order_id: UUID = Query(...),
-    quantity: int = Query(...),
+    quantity: int = Query(..., gt=0),
     service: CartService = Depends(get_cart_service),
 ):
     try:

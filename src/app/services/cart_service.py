@@ -247,9 +247,6 @@ class CartService:
     async def _is_user_valid(self, user_id: UUID) -> bool:
         return await self.order_repository.buyer_exists(user_id)
 
-    ##async def is_valid_product_quantity(quantity: int, stock: int) -> bool:
-    ##    return quantity <= stock and quantity > 0
-
     async def _validate_store_order_owner(
         self,
         buyer_id: UUID,

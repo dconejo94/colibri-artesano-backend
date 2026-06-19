@@ -20,7 +20,7 @@ async def test_get_empty_cart(client):
 
 async def test_get_cart_with_products(client):
     await client.post(
-        "/api/v1/cart/addProduct",
+        "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
             "quantity": 2,

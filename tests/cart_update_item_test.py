@@ -6,7 +6,7 @@ from tests.factories.product_factory import TEST_PRODUCT_ID, TEST_PRODUCT_2_ID
 
 async def test_update_cart_item_quantity_success(client):
     add_resp = await client.post(
-        "/api/v1/cart/addProduct",
+        "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
             "quantity": 2,
@@ -15,8 +15,8 @@ async def test_update_cart_item_quantity_success(client):
 
     store_order_id = add_resp.json()["stores"][0]["id"]
 
-    resp = await client.put(
-        f"/api/v1/cart/updateCartItemQuantity/{TEST_PRODUCT_ID}"
+    resp = await client.patch(
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
         f"?store_order_id={store_order_id}&quantity=5"
     )
 
@@ -31,7 +31,7 @@ async def test_update_cart_item_quantity_success(client):
 
 async def test_update_cart_item_nonexistent_product_returns_404(client):
     add_resp = await client.post(
-        "/api/v1/cart/addProduct",
+        "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
             "quantity": 1,
@@ -40,8 +40,8 @@ async def test_update_cart_item_nonexistent_product_returns_404(client):
 
     store_order_id = add_resp.json()["stores"][0]["id"]
 
-    resp = await client.put(
-        f"/api/v1/cart/updateCartItemQuantity/{uuid.uuid4()}"
+    resp = await client.patch(
+        f"/api/v1/cart/item/{uuid.uuid4()}"
         f"?store_order_id={store_order_id}&quantity=5"
     )
 
@@ -50,7 +50,7 @@ async def test_update_cart_item_nonexistent_product_returns_404(client):
 
 async def test_update_cart_item_not_in_cart_returns_404(client):
     add_resp = await client.post(
-        "/api/v1/cart/addProduct",
+        "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
             "quantity": 1,
@@ -59,8 +59,8 @@ async def test_update_cart_item_not_in_cart_returns_404(client):
 
     store_order_id = add_resp.json()["stores"][0]["id"]
 
-    resp = await client.put(
-        f"/api/v1/cart/updateCartItemQuantity/{TEST_PRODUCT_2_ID}"
+    resp = await client.patch(
+        f"/api/v1/cart/item/{TEST_PRODUCT_2_ID}"
         f"?store_order_id={store_order_id}&quantity=5"
     )
 
@@ -69,15 +69,15 @@ async def test_update_cart_item_not_in_cart_returns_404(client):
 
 async def test_update_cart_item_invalid_store_order_returns_404(client):
     await client.post(
-        "/api/v1/cart/addProduct",
+        "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
             "quantity": 1,
         },
     )
 
-    resp = await client.put(
-        f"/api/v1/cart/updateCartItemQuantity/{TEST_PRODUCT_ID}"
+    resp = await client.patch(
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
         f"?store_order_id={uuid.uuid4()}&quantity=5"
     )
 
@@ -86,7 +86,7 @@ async def test_update_cart_item_invalid_store_order_returns_404(client):
 
 async def test_update_cart_item_updates_totals(client):
     add_resp = await client.post(
-        "/api/v1/cart/addProduct",
+        "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
             "quantity": 1,
@@ -95,8 +95,8 @@ async def test_update_cart_item_updates_totals(client):
 
     store_order_id = add_resp.json()["stores"][0]["id"]
 
-    resp = await client.put(
-        f"/api/v1/cart/updateCartItemQuantity/{TEST_PRODUCT_ID}"
+    resp = await client.patch(
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
         f"?store_order_id={store_order_id}&quantity=3"
     )
 

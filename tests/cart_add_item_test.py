@@ -5,7 +5,7 @@ from tests.factories.product_factory import TEST_PRODUCT_ID
 
 async def test_add_product_success(client):
     resp = await client.post(
-        "/api/v1/cart/addProduct",
+        "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
             "quantity": 1,
@@ -22,7 +22,7 @@ async def test_add_product_success(client):
 
 async def test_add_nonexistent_product_returns_404(client):
     resp = await client.post(
-        "/api/v1/cart/addProduct",
+        "/api/v1/cart/item",
         json={
             "product_id": str(uuid.uuid4()),
             "quantity": 1,
@@ -34,7 +34,7 @@ async def test_add_nonexistent_product_returns_404(client):
 
 async def test_add_same_product_twice_accumulates_quantity(client):
     await client.post(
-        "/api/v1/cart/addProduct",
+        "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
             "quantity": 2,
@@ -42,7 +42,7 @@ async def test_add_same_product_twice_accumulates_quantity(client):
     )
 
     resp = await client.post(
-        "/api/v1/cart/addProduct",
+        "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
             "quantity": 3,
