@@ -6,7 +6,6 @@ from app.domain.models.user import User
 
 
 from tests.factories.product_factory import TEST_PRODUCT_ID
-from tests.factories.product_factory import TEST_PRODUCT_ID
 
 
 async def test_remove_product_success(client):

@@ -7,8 +7,6 @@ from app.main import app
 from app.core.security import get_current_user
 from app.domain.models.user import User
 
-from tests.factories.product_factory import TEST_PRODUCT_ID
-
 
 async def test_update_cart_item_quantity_success(client):
     add_resp = await client.post(
