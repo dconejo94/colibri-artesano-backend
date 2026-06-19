@@ -30,6 +30,9 @@ from app.services.product_variant_service import ProductVariantService
 from app.services.order_service import OrderService
 from app.services.search_service import SearchService
 
+from app.config import settings
+from app.infrastructure.azure_blob_storage import BlobStorageService
+
 
 async def get_auth_service(
     db: AsyncSession = Depends(get_db),
@@ -93,3 +96,13 @@ async def get_search_service(
     db: AsyncSession = Depends(get_db),
 ) -> SearchService:
     return SearchService(SQLAlchemyProductSearchRepository(db))
+
+
+def get_blob_storage_service() -> BlobStorageService:
+    return BlobStorageService(
+        account_name=settings.AZURE_STORAGE_ACCOUNT_NAME,
+        account_key=settings.AZURE_STORAGE_ACCOUNT_KEY,
+        container=settings.AZURE_STORAGE_CONTAINER,
+        base_url=settings.AZURE_BLOB_BASE_URL,
+        sas_expiry_minutes=settings.AZURE_STORAGE_SAS_EXPIRY_MINUTES,
+    )
