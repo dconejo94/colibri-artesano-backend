@@ -8,6 +8,7 @@ from app.domain.models.user import User
 from tests.factories.product_factory import TEST_PRODUCT_ID
 from tests.factories.product_factory import TEST_PRODUCT_ID
 
+
 async def test_remove_product_success(client):
     add_resp = await client.post(
         "/api/v1/cart/item",
@@ -105,8 +106,7 @@ async def test_remove_product_from_other_user_cart_returns_404(client):
 
     try:
         resp = await client.delete(
-            f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
-            f"?store_order_id={store_order_id}"
+            f"/api/v1/cart/item/{TEST_PRODUCT_ID}?store_order_id={store_order_id}"
         )
     finally:
         del app.dependency_overrides[get_current_user]

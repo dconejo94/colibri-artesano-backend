@@ -35,9 +35,7 @@ async def add_to_cart(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.delete(
-    "/item/{product_id}", response_model=CartResponseDTO, status_code=200
-)
+@router.delete("/item/{product_id}", response_model=CartResponseDTO, status_code=200)
 async def remove_from_cart(
     product_id: UUID,
     user: CurrentUser,
