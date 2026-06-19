@@ -109,9 +109,7 @@ async def create_image_upload_url(
             product_id, dto.filename, dto.content_type
         )
     except StorageNotConfiguredError:
-        raise HTTPException(
-            status_code=503, detail="Image uploads are not configured"
-        )
+        raise HTTPException(status_code=503, detail="Image uploads are not configured")
     except InvalidImageError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     return ProductImageUploadResponseDTO(

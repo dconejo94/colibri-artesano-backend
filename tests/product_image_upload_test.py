@@ -78,7 +78,10 @@ async def test_upload_url_returns_503_when_unconfigured(client):
     on whether the ambient environment happens to have AZURE_* set.
     """
     app.dependency_overrides[get_blob_storage_service] = lambda: BlobStorageService(
-        account_name="", account_key="", container="product-images", base_url="https://x"
+        account_name="",
+        account_key="",
+        container="product-images",
+        base_url="https://x",
     )
 
     resp = await client.post(
