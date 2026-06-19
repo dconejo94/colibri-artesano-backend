@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from app.main import app
 from app.api.deps import get_blob_storage_service
+from app.infrastructure.azure_blob_storage import BlobStorageService
 
 from tests.factories.product_factory import TEST_PRODUCT_ID
 
@@ -71,7 +72,15 @@ async def test_blob_url_round_trips_through_add_image(client):
 
 
 async def test_upload_url_returns_503_when_unconfigured(client):
-    """With no Azure settings the real provider yields a 503, not a 500."""
+    """With no Azure settings the endpoint yields a 503, not a 500.
+
+    The unconfigured service is injected explicitly so the result never depends
+    on whether the ambient environment happens to have AZURE_* set.
+    """
+    app.dependency_overrides[get_blob_storage_service] = lambda: BlobStorageService(
+        account_name="", account_key="", container="product-images", base_url="https://x"
+    )
+
     resp = await client.post(
         f"/api/v1/products/{TEST_PRODUCT_ID}/images/upload-url",
         json={"filename": "photo.jpg", "content_type": "image/jpeg"},

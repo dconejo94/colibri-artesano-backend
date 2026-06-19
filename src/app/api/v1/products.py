@@ -29,7 +29,7 @@ from app.domain.schemas.product_variant import (
     ProductVariantResponseDTO,
 )
 from app.domain.schemas.paginated_response import PaginatedResponse
-from app.core.exceptions import NotFoundException
+from app.core.exceptions import NotFoundException, InvalidImageUrlError
 from app.core.security import require_product_owner
 from app.infrastructure.azure_blob_storage import (
     BlobStorageService,
@@ -130,7 +130,10 @@ async def add_product_image(
     _: object = Depends(require_product_owner),
     service: ProductImageService = Depends(get_product_image_service),
 ):
-    return await service.add_image(product_id, dto)
+    try:
+        return await service.add_image(product_id, dto)
+    except InvalidImageUrlError as exc:
+        raise HTTPException(status_code=400, detail=exc.detail)
 
 
 @router.get(

@@ -52,6 +52,14 @@ class BlobStorageService:
     def is_configured(self) -> bool:
         return bool(self.account_name and self.account_key)
 
+    @property
+    def container_url_prefix(self) -> str:
+        return f"{self.base_url}/{self.container}/"
+
+    def is_own_blob_url(self, url: str) -> bool:
+        """True when ``url`` points at this account's container."""
+        return url.startswith(self.container_url_prefix)
+
     def _require_configured(self) -> None:
         if not self.is_configured:
             raise StorageNotConfiguredError("Azure Blob Storage is not configured")
@@ -107,11 +115,10 @@ class BlobStorageService:
         if not self.is_configured:
             return
 
-        prefix = f"{self.base_url}/{self.container}/"
-        if not blob_url.startswith(prefix):
+        if not self.is_own_blob_url(blob_url):
             # Not one of our blobs (e.g. legacy/seed picsum URL) — nothing to do.
             return
-        blob_name = blob_url[len(prefix) :]
+        blob_name = blob_url[len(self.container_url_prefix) :]
 
         try:
             from azure.storage.blob import BlobServiceClient
