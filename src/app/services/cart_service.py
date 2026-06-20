@@ -134,7 +134,7 @@ class CartService:
         unit_price = Decimal(str(product.base_price))
 
         if variant:
-            unit_price += Decimal(str(variant.price_modifier))
+            unit_price = Decimal(str(variant.price_modifier))
 
         existing_item = await self.cart_repository.get_order_item(
             store_order.id,

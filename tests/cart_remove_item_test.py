@@ -5,7 +5,7 @@ from app.core.security import get_current_user
 from app.domain.models.user import User
 
 
-from tests.factories.product_factory import TEST_PRODUCT_ID
+from tests.factories.product_factory import TEST_PRODUCT_ID, TEST_VARIANT_1_ID, TEST_VARIANT_2_ID
 
 
 async def test_remove_product_success(client):
@@ -13,6 +13,7 @@ async def test_remove_product_success(client):
         "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_1_ID),
             "quantity": 2,
         },
     )
@@ -20,7 +21,9 @@ async def test_remove_product_success(client):
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     resp = await client.delete(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}?store_order_id={store_order_id}"
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"?variant_id={TEST_VARIANT_1_ID}"
+        f"&store_order_id={store_order_id}"
     )
 
     assert resp.status_code == 200
@@ -43,7 +46,9 @@ async def test_remove_nonexistent_product_returns_404(client):
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     resp = await client.delete(
-        f"/api/v1/cart/item/{uuid.uuid4()}?store_order_id={store_order_id}"
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"?variant_id={TEST_VARIANT_1_ID}"
+        f"&store_order_id={store_order_id}"
     )
 
     assert resp.status_code == 404
@@ -61,11 +66,15 @@ async def test_remove_product_not_in_cart_returns_404(client):
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     await client.delete(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}?store_order_id={store_order_id}"
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"?variant_id={TEST_VARIANT_1_ID}"
+        f"&store_order_id={store_order_id}"
     )
 
     resp = await client.delete(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}?store_order_id={store_order_id}"
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"?variant_id={TEST_VARIANT_1_ID}"
+        f"&store_order_id={store_order_id}"
     )
 
     assert resp.status_code == 404
@@ -73,7 +82,9 @@ async def test_remove_product_not_in_cart_returns_404(client):
 
 async def test_remove_invalid_store_order_returns_404(client):
     resp = await client.delete(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}?store_order_id={uuid.uuid4()}"
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"?variant_id={TEST_VARIANT_1_ID}"
+        f"&store_order_id={uuid.uuid4()}"
     )
 
     assert resp.status_code == 404
@@ -105,9 +116,45 @@ async def test_remove_product_from_other_user_cart_returns_404(client):
 
     try:
         resp = await client.delete(
-            f"/api/v1/cart/item/{TEST_PRODUCT_ID}?store_order_id={store_order_id}"
+            f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+            f"?variant_id={TEST_VARIANT_1_ID}"
+            f"&store_order_id={store_order_id}"
         )
     finally:
         del app.dependency_overrides[get_current_user]
 
     assert resp.status_code == 404
+
+async def test_remove_only_requested_variant(client):
+    add_resp = await client.post(
+        "/api/v1/cart/item",
+        json={
+            "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_1_ID),
+            "quantity": 1,
+        },
+    )
+
+    await client.post(
+        "/api/v1/cart/item",
+        json={
+            "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_2_ID),
+            "quantity": 1,
+        },
+    )
+
+    store_order_id = add_resp.json()["stores"][0]["id"]
+
+    resp = await client.delete(
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"?variant_id={TEST_VARIANT_1_ID}"
+        f"&store_order_id={store_order_id}"
+    )
+
+    assert resp.status_code == 200
+
+    items = resp.json()["stores"][0]["items"]
+
+    assert len(items) == 1
+    assert items[0]["variant_id"] == str(TEST_VARIANT_2_ID)

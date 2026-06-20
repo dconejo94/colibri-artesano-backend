@@ -104,4 +104,5 @@ async def get_cart_service(
         cart_repository=SQLAlchemyCartRepository(db),
         order_repository=SQLAlchemyOrderRepository(db),
         product_repository=SQLAlchemyProductRepository(db),
+        variant_repository=SQLAlchemyProductVariantRepository(db)
     )
