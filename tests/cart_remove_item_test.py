@@ -158,6 +158,30 @@ async def test_remove_product_from_other_user_cart_returns_404(client):
     assert resp.status_code == 404
 
 
+async def test_remove_from_placed_order_returns_404(client):
+    # A checked-out order is no longer a cart; the cart must not mutate it.
+    add_resp = await client.post(
+        "/api/v1/cart/item",
+        json={
+            "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_1_ID),
+            "quantity": 2,
+        },
+    )
+    store_order_id = add_resp.json()["stores"][0]["id"]
+
+    place = await client.post("/api/v1/orders/")
+    assert place.status_code == 201
+
+    resp = await client.delete(
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"?variant_id={TEST_VARIANT_1_ID}"
+        f"&store_order_id={store_order_id}"
+    )
+
+    assert resp.status_code == 404
+
+
 async def test_remove_only_requested_variant(client):
     add_resp = await client.post(
         "/api/v1/cart/item",
