@@ -6,7 +6,6 @@ from app.services.order_service import OrderService
 from app.api.deps import get_order_service
 from app.core.security import CurrentUser
 from app.domain.schemas.order import (
-    MainOrderCreateDTO,
     MainOrderResponseDTO,
 )
 from app.domain.schemas.paginated_response import PaginatedResponse
@@ -16,15 +15,13 @@ router = APIRouter(prefix="/orders", tags=["Orders"])
 
 
 @router.post("/", response_model=MainOrderResponseDTO, status_code=201)
-async def create_order(
-    dto: MainOrderCreateDTO,
+async def checkout(
     current_user: CurrentUser,
     service: OrderService = Depends(get_order_service),
 ):
+    """Place an order from the buyer's current cart."""
     try:
-        return await service.create_order(current_user.id, dto)
-    except NotFoundException as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        return await service.checkout(current_user.id)
     except ConflictException as e:
         raise HTTPException(status_code=409, detail=str(e))
 

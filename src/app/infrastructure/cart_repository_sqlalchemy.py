@@ -21,7 +21,7 @@ class SQLAlchemyCartRepository(CartRepository):
             select(MainOrder)
             .where(
                 MainOrder.buyer_id == buyer_id,
-                MainOrder.status == "pending",
+                MainOrder.status == "cart",
             )
             .options(
                 selectinload(MainOrder.store_orders).selectinload(StoreOrder.store),

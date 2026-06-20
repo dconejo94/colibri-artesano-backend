@@ -3,20 +3,17 @@
 import uuid
 
 from tests.factories.product_factory import (
-    TEST_USER_ID,
     TEST_STORE_ID,
     TEST_PRODUCT_ID,
 )
 
 
 async def _create_order(client):
-    resp = await client.post(
-        "/api/v1/orders/",
-        json={
-            "buyer_id": str(TEST_USER_ID),
-            "items": [{"product_id": str(TEST_PRODUCT_ID), "quantity": 1}],
-        },
+    await client.post(
+        "/api/v1/cart/item",
+        json={"product_id": str(TEST_PRODUCT_ID), "quantity": 1},
     )
+    resp = await client.post("/api/v1/orders/")
     return resp.json()
 
 

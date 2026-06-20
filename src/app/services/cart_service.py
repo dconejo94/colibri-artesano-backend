@@ -114,7 +114,7 @@ class CartService:
                 MainOrder(
                     buyer_id=buyer_id,
                     total_amount=Decimal("0.00"),
-                    status="pending",
+                    status="cart",
                 )
             )
 
