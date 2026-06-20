@@ -7,6 +7,8 @@ class StoreProfileDTO(BaseModel):
     name: str
     description: str | None
     product_count: int
+    follower_count: int
+    is_following: bool = False
 
 
 # Backwards-compatible alias used by the deprecated GET /vendors/{store_id} route.

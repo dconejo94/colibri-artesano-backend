@@ -30,6 +30,29 @@ class Settings(BaseSettings):
     # Rate limit applied to the login and register endpoints
     AUTH_RATE_LIMIT: str = "5/minute"
 
+    # Azure Blob Storage (product images).
+    AZURE_STORAGE_ACCOUNT_NAME: str = ""
+    AZURE_STORAGE_ACCOUNT_KEY: str = ""
+    AZURE_STORAGE_CONTAINER: str = "product-images"
+    # Optional endpoint override for Azurite / custom domains.
+    AZURE_STORAGE_BLOB_ENDPOINT: str = ""
+    # Minutes a generated upload SAS stays valid.
+    AZURE_STORAGE_SAS_EXPIRY_MINUTES: int = 15
+    # When True, ``POST /images`` only accepts URLs pointing at the configured
+    # blob host.
+    AZURE_STORAGE_VALIDATE_IMAGE_URL: bool = False
+
+    @property
+    def AZURE_STORAGE_CONFIGURED(self) -> bool:
+        return bool(self.AZURE_STORAGE_ACCOUNT_NAME and self.AZURE_STORAGE_ACCOUNT_KEY)
+
+    @property
+    def AZURE_BLOB_BASE_URL(self) -> str:
+        """Public base URL for the storage account (no trailing slash)."""
+        if self.AZURE_STORAGE_BLOB_ENDPOINT:
+            return self.AZURE_STORAGE_BLOB_ENDPOINT.rstrip("/")
+        return f"https://{self.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
+
     @property
     def SYNC_DATABASE_URL(self) -> str:
         # psycopg understands the ``sslmode`` query parameter.

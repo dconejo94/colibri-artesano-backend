@@ -33,5 +33,19 @@ class StoreRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_with_product_count(self, store_id: UUID) -> tuple[Store, int] | None:
+    async def get_profile_stats(
+        self, store_id: UUID, user_id: UUID | None = None
+    ) -> tuple[Store, int, int, bool] | None:
+        pass
+
+    @abstractmethod
+    async def add_follower(self, store_id: UUID, user_id: UUID) -> None:
+        pass
+
+    @abstractmethod
+    async def remove_follower(self, store_id: UUID, user_id: UUID) -> None:
+        pass
+
+    @abstractmethod
+    async def is_following(self, store_id: UUID, user_id: UUID) -> bool:
         pass
