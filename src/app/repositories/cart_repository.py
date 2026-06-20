@@ -55,5 +55,13 @@ class CartRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_order_item_by_product(
+        self,
+        store_order_id: UUID,
+        product_id: UUID,
+    ) -> OrderItem | None:
+        pass
+
+    @abstractmethod
     async def flush(self) -> None:
         pass

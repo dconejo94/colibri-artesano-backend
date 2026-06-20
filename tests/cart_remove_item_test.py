@@ -5,7 +5,11 @@ from app.core.security import get_current_user
 from app.domain.models.user import User
 
 
-from tests.factories.product_factory import TEST_PRODUCT_ID, TEST_VARIANT_1_ID, TEST_VARIANT_2_ID
+from tests.factories.product_factory import (
+    TEST_PRODUCT_ID,
+    TEST_VARIANT_1_ID,
+    TEST_VARIANT_2_ID,
+)
 
 
 async def test_remove_product_success(client):
@@ -124,6 +128,7 @@ async def test_remove_product_from_other_user_cart_returns_404(client):
         del app.dependency_overrides[get_current_user]
 
     assert resp.status_code == 404
+
 
 async def test_remove_only_requested_variant(client):
     add_resp = await client.post(

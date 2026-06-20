@@ -1,7 +1,11 @@
 import uuid
 from decimal import Decimal
 
-from tests.factories.product_factory import TEST_PRODUCT_ID, TEST_VARIANT_1_ID, TEST_VARIANT_2_ID
+from tests.factories.product_factory import (
+    TEST_PRODUCT_ID,
+    TEST_VARIANT_1_ID,
+    TEST_VARIANT_2_ID,
+)
 
 
 async def test_add_product_success(client):
@@ -58,6 +62,7 @@ async def test_add_same_product_twice_accumulates_quantity(client):
 
     assert item["quantity"] == 5
 
+
 async def test_add_product_with_variant_success(client):
     resp = await client.post(
         "/api/v1/cart/item",
@@ -76,6 +81,7 @@ async def test_add_product_with_variant_success(client):
     assert item["variant_name"] == "Size"
     assert item["variant_value"] == "S"
 
+
 async def test_add_product_with_variant_uses_variant_price(client):
     resp = await client.post(
         "/api/v1/cart/item",
@@ -89,6 +95,7 @@ async def test_add_product_with_variant_uses_variant_price(client):
     item = resp.json()["stores"][0]["items"][0]
 
     assert Decimal(item["unit_price"]) == Decimal("15.00")
+
 
 async def test_add_same_variant_twice_accumulates_quantity(client):
     await client.post(
@@ -108,10 +115,11 @@ async def test_add_same_variant_twice_accumulates_quantity(client):
             "quantity": 3,
         },
     )
-    
+
     item = resp.json()["stores"][0]["items"][0]
 
     assert item["quantity"] == 5
+
 
 async def test_different_variants_create_separate_cart_items(client):
     await client.post(

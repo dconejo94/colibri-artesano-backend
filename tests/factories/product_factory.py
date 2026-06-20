@@ -16,6 +16,7 @@ TEST_PRODUCT_2_ID = uuid.UUID("00000000-0000-0000-0000-000000000005")
 TEST_VARIANT_1_ID = uuid.UUID("00000000-0000-0000-0000-000000000006")
 TEST_VARIANT_2_ID = uuid.UUID("00000000-0000-0000-0000-000000000007")
 
+
 async def seed_products(db):
     user = User(
         id=TEST_USER_ID, email="test@test.com", password_hash="hash", role="vendor"

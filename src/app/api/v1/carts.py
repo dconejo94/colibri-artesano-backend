@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, HTTPException
@@ -44,7 +45,9 @@ async def remove_from_cart(
     service: CartService = Depends(get_cart_service),
 ):
     try:
-        return await service.remove_from_cart(user.id, product_id, variant_id, store_order_id)
+        return await service.remove_from_cart(
+            user.id, product_id, variant_id, store_order_id
+        )
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -54,16 +57,17 @@ async def remove_from_cart(
     response_model=CartResponseDTO,
     status_code=200,
 )
-async def update_cart_item_quantity(
+async def update_cart_item(
     product_id: UUID,
     user: CurrentUser,
+    variant_id: Optional[UUID] = None,
     store_order_id: UUID = Query(...),
     quantity: int = Query(..., gt=0),
     service: CartService = Depends(get_cart_service),
 ):
     try:
         return await service.update_cart_item(
-            user.id, product_id, quantity, store_order_id
+            user.id, product_id, variant_id, quantity, store_order_id
         )
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
