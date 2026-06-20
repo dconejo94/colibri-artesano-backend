@@ -17,9 +17,9 @@ class SQLAlchemyProductImageRepository(ProductImageRepository):
         await self.db.refresh(image)
         return image
 
-    async def list_by_product(self, product_id: UUID) -> list[ProductImage]:
+    async def list_by_variant(self, variant_id: UUID) -> list[ProductImage]:
         result = await self.db.execute(
-            select(ProductImage).where(ProductImage.product_id == product_id)
+            select(ProductImage).where(ProductImage.variant_id == variant_id)
         )
         return list(result.scalars().all())
 
@@ -33,10 +33,10 @@ class SQLAlchemyProductImageRepository(ProductImageRepository):
         await self.db.delete(image)
         await self.db.flush()
 
-    async def clear_primary(self, product_id: UUID) -> None:
+    async def clear_primary(self, variant_id: UUID) -> None:
         await self.db.execute(
             update(ProductImage)
-            .where(ProductImage.product_id == product_id)
+            .where(ProductImage.variant_id == variant_id)
             .values(is_primary=False)
         )
         await self.db.flush()

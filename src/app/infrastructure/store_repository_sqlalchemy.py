@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from app.domain.models.store import Store, follows
 from app.domain.models.product import Product
+from app.domain.models.product_variant import ProductVariant
 from app.repositories.store_repository import StoreRepository
 
 
@@ -43,7 +44,11 @@ class SQLAlchemyStoreRepository(StoreRepository):
         result = await self.db.execute(
             select(Store)
             .where(Store.id == store_id)
-            .options(selectinload(Store.products).selectinload(Product.images))
+            .options(
+                selectinload(Store.products)
+                .selectinload(Product.variants)
+                .selectinload(ProductVariant.images)
+            )
         )
         return result.scalars().first()
 

@@ -53,8 +53,9 @@ class CartService:
             items = []
 
             for item in store_order.items:
+                variant_images = item.variant.images if item.variant else []
                 primary_image = next(
-                    (image for image in item.product.images if image.is_primary),
+                    (image for image in variant_images if image.is_primary),
                     None,
                 )
 

@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.domain.models.product import Product
+from app.domain.models.product_variant import ProductVariant
 from app.repositories.search_repository import ProductSearchRepository
 
 
@@ -71,10 +72,9 @@ class SQLAlchemyProductSearchRepository(ProductSearchRepository):
             base.options(
                 selectinload(Product.store),
                 selectinload(Product.category),
-                selectinload(Product.images),
-                # Needed to derive the product's ``stock`` total without a lazy
-                # load during serialization.
-                selectinload(Product.variants),
+                # Variants (with images) back the derived ``stock`` total and the
+                # listing thumbnails, both without a lazy load.
+                selectinload(Product.variants).selectinload(ProductVariant.images),
             )
             .order_by(Product.name)
             .offset((page - 1) * limit)
@@ -92,11 +92,11 @@ class SQLAlchemyProductSearchRepository(ProductSearchRepository):
         if not query.strip():
             return []
 
-        # For autocomplete we only need names + cover images; variants and
-        # store info are skipped to minimise query weight.
+        # For autocomplete we only need names + a cover image; the cover lives on
+        # the first variant, so load variants with their images.
         result = await self.db.execute(
             self._base_stmt(query, is_active)
-            .options(selectinload(Product.images))
+            .options(selectinload(Product.variants).selectinload(ProductVariant.images))
             .order_by(Product.name)
             .limit(limit)
         )

@@ -32,12 +32,6 @@ class Product(Base):
 
     store = relationship("Store", back_populates="products")
     category = relationship("Category", back_populates="products")
-    images = relationship(
-        "ProductImage",
-        back_populates="product",
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-    )
     variants = relationship(
         "ProductVariant",
         back_populates="product",

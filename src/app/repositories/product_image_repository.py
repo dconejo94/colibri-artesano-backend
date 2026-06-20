@@ -11,7 +11,7 @@ class ProductImageRepository(ABC):
         pass
 
     @abstractmethod
-    async def list_by_product(self, product_id: UUID) -> list[ProductImage]:
+    async def list_by_variant(self, variant_id: UUID) -> list[ProductImage]:
         pass
 
     @abstractmethod
@@ -23,7 +23,7 @@ class ProductImageRepository(ABC):
         pass
 
     @abstractmethod
-    async def clear_primary(self, product_id: UUID) -> None:
+    async def clear_primary(self, variant_id: UUID) -> None:
         pass
 
     @abstractmethod

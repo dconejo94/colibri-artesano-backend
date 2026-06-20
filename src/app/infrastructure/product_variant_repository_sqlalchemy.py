@@ -2,6 +2,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.domain.models.product_variant import ProductVariant
 from app.repositories.product_variant_repository import ProductVariantRepository
@@ -14,24 +15,30 @@ class SQLAlchemyProductVariantRepository(ProductVariantRepository):
     async def create(self, variant: ProductVariant) -> ProductVariant:
         self.db.add(variant)
         await self.db.flush()
-        await self.db.refresh(variant)
+        # Load ``images`` so the response DTO can serialize it without a lazy
+        # load (a fresh variant has none).
+        await self.db.refresh(variant, attribute_names=["images"])
         return variant
 
     async def list_by_product(self, product_id: UUID) -> list[ProductVariant]:
         result = await self.db.execute(
-            select(ProductVariant).where(ProductVariant.product_id == product_id)
+            select(ProductVariant)
+            .where(ProductVariant.product_id == product_id)
+            .options(selectinload(ProductVariant.images))
         )
         return list(result.scalars().all())
 
     async def get_by_id(self, variant_id: UUID):
         result = await self.db.execute(
-            select(ProductVariant).where(ProductVariant.id == variant_id)
+            select(ProductVariant)
+            .where(ProductVariant.id == variant_id)
+            .options(selectinload(ProductVariant.images))
         )
         return result.scalars().first()
 
     async def update(self, variant: ProductVariant) -> ProductVariant:
         await self.db.flush()
-        await self.db.refresh(variant)
+        await self.db.refresh(variant, attribute_names=["images"])
         return variant
 
     async def delete(self, variant: ProductVariant) -> None:

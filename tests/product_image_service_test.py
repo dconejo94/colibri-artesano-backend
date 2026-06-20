@@ -81,15 +81,15 @@ async def test_add_image_skips_validation_when_flag_off():
 async def test_delete_image_cleans_up_blob():
     repo = _FakeRepo()
     storage = _FakeStorage()
-    product_id = uuid.uuid4()
+    variant_id = uuid.uuid4()
     image = ProductImage(
         id=uuid.uuid4(),
-        product_id=product_id,
+        variant_id=variant_id,
         image_url=f"{_BLOB_PREFIX}p/gone.jpg",
     )
     repo.store[image.id] = image
 
     svc = ProductImageService(repo, blob_storage=storage)
-    await svc.delete_image(product_id, image.id)
+    await svc.delete_image(variant_id, image.id)
 
     assert storage.deleted == [f"{_BLOB_PREFIX}p/gone.jpg"]

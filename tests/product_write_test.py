@@ -122,19 +122,20 @@ async def test_delete_product_with_children(client):
     )
     pid = product_resp.json()["id"]
 
-    # 2. Add an image
-    img_resp = await client.post(
-        f"/api/v1/products/{pid}/images",
-        json={"image_url": "https://example.com/img.jpg", "is_primary": True},
-    )
-    assert img_resp.status_code == 201
-
-    # 3. Add a variant
+    # 2. Add a variant
     var_resp = await client.post(
         f"/api/v1/products/{pid}/variants",
         json={"name": "Color", "value": "Rojo", "stock_quantity": 5},
     )
     assert var_resp.status_code == 201
+    variant_id = var_resp.json()["id"]
+
+    # 3. Add an image to that variant
+    img_resp = await client.post(
+        f"/api/v1/products/{pid}/variants/{variant_id}/images",
+        json={"image_url": "https://example.com/img.jpg", "is_primary": True},
+    )
+    assert img_resp.status_code == 201
 
     # 4. Delete the product — should cascade
     del_resp = await client.delete(f"/api/v1/products/{pid}")

@@ -3,7 +3,6 @@ from uuid import UUID
 from decimal import Decimal
 from datetime import datetime
 
-from app.domain.schemas.product_image import ProductImageResponseDTO
 from app.domain.schemas.product_variant import ProductVariantResponseDTO
 from app.domain.schemas.store import StoreResponseDTO, StorePublicDTO
 from app.domain.schemas.category import CategoryResponseDTO
@@ -47,7 +46,9 @@ class ProductListDTO(BaseModel):
     # Public store reference — omits owner_id deliberately.
     store: StorePublicDTO | None = None
     category: CategoryResponseDTO | None = None
-    images: list[ProductImageResponseDTO] = []
+    # Images live on variants now, so the listing carries variants to expose
+    # them (and the per-variant stock/price).
+    variants: list[ProductVariantResponseDTO] = []
 
     model_config = {"from_attributes": True}
 
@@ -69,7 +70,6 @@ class ProductResponseDTO(BaseModel):
 
     store: StoreResponseDTO | None = None
     category: CategoryResponseDTO | None = None
-    images: list[ProductImageResponseDTO] = []
     variants: list[ProductVariantResponseDTO] = []
 
     model_config = {"from_attributes": True}

@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from uuid import UUID
 from decimal import Decimal
 
+from app.domain.schemas.product_image import ProductImageResponseDTO
+
 
 class ProductVariantCreateDTO(BaseModel):
     name: str
@@ -24,5 +26,7 @@ class ProductVariantResponseDTO(BaseModel):
     value: str
     price_modifier: Decimal
     stock_quantity: int
+
+    images: list[ProductImageResponseDTO] = []
 
     model_config = {"from_attributes": True}

@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from app.domain.models.main_order import MainOrder
 from app.domain.models.store_order import StoreOrder
 from app.domain.models.order_item import OrderItem
-from app.domain.models.product import Product
+from app.domain.models.product_variant import ProductVariant
 
 from app.repositories.cart_repository import CartRepository
 
@@ -27,11 +27,12 @@ class SQLAlchemyCartRepository(CartRepository):
                 selectinload(MainOrder.store_orders).selectinload(StoreOrder.store),
                 selectinload(MainOrder.store_orders)
                 .selectinload(StoreOrder.items)
-                .selectinload(OrderItem.product)
-                .selectinload(Product.images),
+                .selectinload(OrderItem.product),
+                # The line's image comes from its variant now.
                 selectinload(MainOrder.store_orders)
                 .selectinload(StoreOrder.items)
-                .selectinload(OrderItem.variant),
+                .selectinload(OrderItem.variant)
+                .selectinload(ProductVariant.images),
             )
         )
         return result.scalars().first()
