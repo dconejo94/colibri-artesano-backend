@@ -1,12 +1,19 @@
 import uuid
 
-from sqlalchemy import Column, String, Text, ForeignKey, DateTime, Uuid, Table
+from sqlalchemy import (
+    Column,
+    String,
+    Text,
+    ForeignKey,
+    DateTime,
+    Uuid,
+    Table,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.core.database import Base
-
-from sqlalchemy import UniqueConstraint
 
 follows = Table(
     "follows",
@@ -41,4 +48,10 @@ class Store(Base):
     store_orders = relationship("StoreOrder", back_populates="store")
     followers = relationship(
         "User", secondary=follows, back_populates="followed_stores"
+    )
+    event_participants = relationship(
+        "EventParticipant",
+        back_populates="store",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
