@@ -72,6 +72,9 @@ class SQLAlchemyProductSearchRepository(ProductSearchRepository):
                 selectinload(Product.store),
                 selectinload(Product.category),
                 selectinload(Product.images),
+                # Needed to derive the product's ``stock`` total without a lazy
+                # load during serialization.
+                selectinload(Product.variants),
             )
             .order_by(Product.name)
             .offset((page - 1) * limit)

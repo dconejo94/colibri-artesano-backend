@@ -170,6 +170,21 @@ async def test_update_targets_the_named_variant(client):
     assert items[str(TEST_VARIANT_2_ID)]["quantity"] == 1
 
 
+async def test_update_exceeding_stock_returns_409(client):
+    # TEST_VARIANT_1 has stock 50.
+    add_resp = await _add(client, TEST_PRODUCT_ID, 2, variant_id=TEST_VARIANT_1_ID)
+    store_order_id = add_resp.json()["stores"][0]["id"]
+
+    resp = await client.patch(
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"?store_order_id={store_order_id}"
+        f"&variant_id={TEST_VARIANT_1_ID}"
+        f"&quantity=51"
+    )
+
+    assert resp.status_code == 409
+
+
 async def test_update_multivariant_without_variant_returns_409(client):
     add_resp = await _add(client, TEST_PRODUCT_ID, 2, variant_id=TEST_VARIANT_1_ID)
     store_order_id = add_resp.json()["stores"][0]["id"]

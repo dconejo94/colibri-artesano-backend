@@ -41,10 +41,10 @@ class OrderService:
 
         for store_order in cart.store_orders:
             for item in store_order.items:
-                product = await self.product_repo.get_by_id(item.product_id)
-                if not product or product.stock < item.quantity:
+                variant = await self.variant_repo.get_by_id(item.variant_id)
+                if not variant or variant.stock_quantity < item.quantity:
                     raise ConflictException(
-                        f"Insufficient stock for product {item.product_id}"
+                        f"Insufficient stock for variant {item.variant_id}"
                     )
 
         cart.status = "placed"

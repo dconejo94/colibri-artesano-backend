@@ -38,7 +38,6 @@ async def seed_products(db):
         name="Artesania",
         description="Lorem Ipsum",
         base_price=Decimal("10.00"),
-        stock=100,
     )
 
     product2 = Product(

@@ -6,6 +6,9 @@ accepts an items body — item validation/pricing happen when adding to the cart
 import uuid
 from decimal import Decimal
 
+from tests.conftest import TestingSessionLocal
+from app.domain.models.product_variant import ProductVariant
+
 from tests.factories.product_factory import (
     TEST_PRODUCT_ID,
     TEST_VARIANT_1_ID,
@@ -55,8 +58,14 @@ async def test_checkout_empty_cart_returns_409(client):
 
 
 async def test_checkout_insufficient_stock_returns_409(client):
-    # TEST_PRODUCT.stock = 100; ask for more than is available.
-    await _add_to_cart(client, TEST_PRODUCT_ID, 150)
+    # Add within stock, then the variant's stock drops below the cart quantity
+    # before checkout — the checkout guard must catch it.
+    await _add_to_cart(client, TEST_PRODUCT_ID, 5, variant_id=TEST_VARIANT_1_ID)
+
+    async with TestingSessionLocal() as db:
+        variant = await db.get(ProductVariant, TEST_VARIANT_1_ID)
+        variant.stock_quantity = 1
+        await db.commit()
 
     resp = await client.post("/api/v1/orders/")
 

@@ -22,7 +22,6 @@ class ProductUpdateDTO(BaseModel):
     name: str | None = None
     description: str | None = None
     base_price: Decimal | None = None
-    stock: int | None = None
     is_active: bool | None = None
 
 

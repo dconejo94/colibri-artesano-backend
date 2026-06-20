@@ -45,7 +45,9 @@ class SQLAlchemyProductRepository(ProductRepository):
                 selectinload(Product.store),
                 selectinload(Product.category),
                 selectinload(Product.images),
-                # variants omitted: ProductListDTO does not expose them.
+                # Variants are loaded (not serialized) so the derived ``stock``
+                # total can be summed without a lazy load.
+                selectinload(Product.variants),
             )
             .order_by(Product.created_at.desc())
             .offset((page - 1) * limit)

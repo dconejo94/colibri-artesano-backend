@@ -42,6 +42,42 @@ async def test_add_multivariant_product_without_variant_returns_409(client):
     assert resp.status_code == 409
 
 
+async def test_add_exceeding_stock_returns_409(client):
+    # TEST_VARIANT_1 has stock 50.
+    resp = await client.post(
+        "/api/v1/cart/item",
+        json={
+            "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_1_ID),
+            "quantity": 51,
+        },
+    )
+
+    assert resp.status_code == 409
+
+
+async def test_add_accumulating_past_stock_returns_409(client):
+    await client.post(
+        "/api/v1/cart/item",
+        json={
+            "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_1_ID),
+            "quantity": 40,
+        },
+    )
+
+    resp = await client.post(
+        "/api/v1/cart/item",
+        json={
+            "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_1_ID),
+            "quantity": 20,
+        },
+    )
+
+    assert resp.status_code == 409
+
+
 async def test_add_nonexistent_product_returns_404(client):
     resp = await client.post(
         "/api/v1/cart/item",

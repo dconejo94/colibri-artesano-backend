@@ -139,6 +139,10 @@ class CartService:
             variant.id,
         )
 
+        current_quantity = existing_item.quantity if existing_item else 0
+        if current_quantity + dto.quantity > variant.stock_quantity:
+            raise ConflictException(f"Insufficient stock for variant '{variant.id}'")
+
         if existing_item:
             existing_item.quantity += dto.quantity
         else:
@@ -239,6 +243,9 @@ class CartService:
 
         if not existing_item:
             raise NotFoundException("OrderItem", str(product_id))
+
+        if quantity > variant.stock_quantity:
+            raise ConflictException(f"Insufficient stock for variant '{variant.id}'")
 
         old_amount = existing_item.quantity * existing_item.unit_price
 
