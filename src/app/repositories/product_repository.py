@@ -32,3 +32,7 @@ class ProductRepository(ABC):
     @abstractmethod
     async def delete(self, product: Product) -> None:
         pass
+
+    @abstractmethod
+    async def get_by_id_for_update(self, product_id: UUID) -> Product | None:
+        pass

@@ -22,6 +22,7 @@ class ProductUpdateDTO(BaseModel):
     name: str | None = None
     description: str | None = None
     base_price: Decimal | None = None
+    stock: int | None = None
     is_active: bool | None = None
 
 
@@ -40,6 +41,7 @@ class ProductListDTO(BaseModel):
     name: str
     description: str | None
     base_price: Decimal
+    stock: int
     is_active: bool
     created_at: datetime
 
@@ -62,6 +64,7 @@ class ProductResponseDTO(BaseModel):
     name: str
     description: str | None
     base_price: Decimal
+    stock: int
     is_active: bool
     created_at: datetime
 

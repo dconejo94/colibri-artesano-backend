@@ -224,3 +224,20 @@ async def test_order_nonexistent_variant_returns_404(client):
     resp = await client.post("/api/v1/orders/", json=body)
 
     assert resp.status_code == 404
+
+
+async def test_order_insufficient_stock_returns_409(client):
+    body = {
+        "buyer_id": str(TEST_USER_ID),
+        "items": [
+            {
+                "product_id": str(TEST_PRODUCT_ID),
+                "quantity": 9999,
+            }
+        ],
+    }
+
+    resp = await client.post("/api/v1/orders/", json=body)
+
+    assert resp.status_code == 409
+    assert "Insufficient stock" in resp.json()["detail"]
