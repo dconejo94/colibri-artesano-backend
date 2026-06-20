@@ -64,7 +64,10 @@ async def _make_client(*, override_auth: bool):
 
     app.dependency_overrides[get_db] = override_get_db
     if override_auth:
+        from app.core.security import get_current_user_optional
+
         app.dependency_overrides[get_current_user] = override_get_current_user
+        app.dependency_overrides[get_current_user_optional] = override_get_current_user
 
     async with TestingSessionLocal() as db:
         await seed_products(db)

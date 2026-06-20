@@ -9,6 +9,7 @@ from app.api.deps import (
     get_product_service,
     get_product_image_service,
     get_product_variant_service,
+    get_blob_storage_service,
 )
 from app.domain.schemas.product import (
     ProductUpdateDTO,
@@ -19,6 +20,8 @@ from app.domain.schemas.product import (
 from app.domain.schemas.product_image import (
     ProductImageCreateDTO,
     ProductImageResponseDTO,
+    ProductImageUploadRequestDTO,
+    ProductImageUploadResponseDTO,
 )
 from app.domain.schemas.product_variant import (
     ProductVariantCreateDTO,
@@ -26,8 +29,13 @@ from app.domain.schemas.product_variant import (
     ProductVariantResponseDTO,
 )
 from app.domain.schemas.paginated_response import PaginatedResponse
-from app.core.exceptions import NotFoundException
+from app.core.exceptions import NotFoundException, InvalidImageUrlError
 from app.core.security import require_product_owner
+from app.infrastructure.azure_blob_storage import (
+    BlobStorageService,
+    InvalidImageError,
+    StorageNotConfiguredError,
+)
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
@@ -87,6 +95,29 @@ async def delete_product(
 
 
 @router.post(
+    "/{product_id}/images/upload-url",
+    response_model=ProductImageUploadResponseDTO,
+)
+async def create_image_upload_url(
+    product_id: UUID,
+    dto: ProductImageUploadRequestDTO,
+    _: object = Depends(require_product_owner),
+    storage: BlobStorageService = Depends(get_blob_storage_service),
+):
+    try:
+        upload_url, blob_url, expires_at = storage.generate_upload_sas(
+            product_id, dto.filename, dto.content_type
+        )
+    except StorageNotConfiguredError:
+        raise HTTPException(status_code=503, detail="Image uploads are not configured")
+    except InvalidImageError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return ProductImageUploadResponseDTO(
+        upload_url=upload_url, blob_url=blob_url, expires_at=expires_at
+    )
+
+
+@router.post(
     "/{product_id}/images",
     response_model=ProductImageResponseDTO,
     status_code=201,
@@ -97,7 +128,10 @@ async def add_product_image(
     _: object = Depends(require_product_owner),
     service: ProductImageService = Depends(get_product_image_service),
 ):
-    return await service.add_image(product_id, dto)
+    try:
+        return await service.add_image(product_id, dto)
+    except InvalidImageUrlError as exc:
+        raise HTTPException(status_code=400, detail=exc.detail)
 
 
 @router.get(

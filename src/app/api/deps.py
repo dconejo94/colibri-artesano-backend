@@ -30,6 +30,9 @@ from app.services.product_variant_service import ProductVariantService
 from app.services.order_service import OrderService
 from app.services.search_service import SearchService
 
+from app.config import settings
+from app.infrastructure.azure_blob_storage import BlobStorageService
+
 
 async def get_auth_service(
     db: AsyncSession = Depends(get_db),
@@ -67,10 +70,25 @@ async def get_product_service(
     )
 
 
+def get_blob_storage_service() -> BlobStorageService:
+    return BlobStorageService(
+        account_name=settings.AZURE_STORAGE_ACCOUNT_NAME,
+        account_key=settings.AZURE_STORAGE_ACCOUNT_KEY,
+        container=settings.AZURE_STORAGE_CONTAINER,
+        base_url=settings.AZURE_BLOB_BASE_URL,
+        sas_expiry_minutes=settings.AZURE_STORAGE_SAS_EXPIRY_MINUTES,
+    )
+
+
 async def get_product_image_service(
     db: AsyncSession = Depends(get_db),
+    blob_storage: BlobStorageService = Depends(get_blob_storage_service),
 ) -> ProductImageService:
-    return ProductImageService(SQLAlchemyProductImageRepository(db))
+    return ProductImageService(
+        SQLAlchemyProductImageRepository(db),
+        blob_storage=blob_storage,
+        validate_image_url=settings.AZURE_STORAGE_VALIDATE_IMAGE_URL,
+    )
 
 
 async def get_product_variant_service(

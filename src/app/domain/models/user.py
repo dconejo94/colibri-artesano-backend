@@ -25,3 +25,6 @@ class User(Base):
 
     store = relationship("Store", back_populates="owner", uselist=False)
     orders = relationship("MainOrder", back_populates="buyer")
+    followed_stores = relationship(
+        "Store", secondary="follows", back_populates="followers"
+    )

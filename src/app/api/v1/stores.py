@@ -5,7 +5,11 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from app.services.store_service import StoreService
 from app.services.product_service import ProductService
 from app.services.order_service import OrderService
-from app.api.deps import get_store_service, get_product_service, get_order_service
+from app.api.deps import (
+    get_store_service,
+    get_product_service,
+    get_order_service,
+)
 from app.domain.schemas.store import (
     StoreCreateDTO,
     StoreUpdateDTO,
@@ -20,7 +24,13 @@ from app.domain.schemas.product import (
 from app.domain.schemas.vendor import StoreProfileDTO
 from app.domain.schemas.order import StoreOrderResponseDTO, StoreOrderStatusUpdateDTO
 from app.core.exceptions import NotFoundException, ConflictException
-from app.core.security import require_vendor_role, require_store_owner
+from app.core.security import (
+    require_vendor_role,
+    require_store_owner,
+    get_current_user_optional,
+    get_current_user,
+    User,
+)
 
 router = APIRouter(prefix="/stores", tags=["Stores"])
 
@@ -61,11 +71,39 @@ async def get_store_by_owner(
 @router.get("/{store_id}/profile", response_model=StoreProfileDTO)
 async def get_store_profile(
     store_id: UUID,
+    current_user: User | None = Depends(get_current_user_optional),
     service: StoreService = Depends(get_store_service),
 ):
-    """Public profile for a store: name, description, and active product count."""
+    """Public profile for a store: name, description, active product count, and followers."""
     try:
-        return await service.get_store_profile(store_id)
+        current_user_id = current_user.id if current_user else None
+        return await service.get_store_profile(store_id, current_user_id)
+    except NotFoundException:
+        raise HTTPException(status_code=404, detail="Store not found")
+
+
+@router.post("/{store_id}/follow", status_code=204)
+async def follow_store(
+    store_id: UUID,
+    current_user: User = Depends(get_current_user),
+    service: StoreService = Depends(get_store_service),
+):
+    try:
+        await service.follow_store(store_id, current_user.id)
+    except ConflictException as e:
+        raise HTTPException(status_code=409, detail=e.detail)
+    except NotFoundException:
+        raise HTTPException(status_code=404, detail="Store not found")
+
+
+@router.delete("/{store_id}/follow", status_code=204)
+async def unfollow_store(
+    store_id: UUID,
+    current_user: User = Depends(get_current_user),
+    service: StoreService = Depends(get_store_service),
+):
+    try:
+        await service.unfollow_store(store_id, current_user.id)
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Store not found")
 
