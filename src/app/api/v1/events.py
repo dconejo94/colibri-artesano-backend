@@ -69,7 +69,7 @@ async def create_event(
     current_user: CurrentUser,
     service: EventService = Depends(get_event_service),
 ):
-    _require_admin(current_user)
+    require_admin(current_user)
     return await service.create_event(creator_id=current_user.id, dto=dto)
 
 
@@ -80,7 +80,7 @@ async def update_event(
     current_user: CurrentUser,
     service: EventService = Depends(get_event_service),
 ):
-    _require_admin(current_user)
+    require_admin(current_user)
     try:
         return await service.update_event(event_id, dto)
     except NotFoundException:
@@ -93,7 +93,7 @@ async def delete_event(
     current_user: CurrentUser,
     service: EventService = Depends(get_event_service),
 ):
-    _require_admin(current_user)
+    require_admin(current_user)
     try:
         await service.delete_event(event_id)
     except NotFoundException:
@@ -103,7 +103,9 @@ async def delete_event(
 # ── Participants ──────────────────────────────────────────────────
 
 
-@router.post("/{event_id}/participants", response_model=ParticipantResponseDTO, status_code=201)
+@router.post(
+    "/{event_id}/participants", response_model=ParticipantResponseDTO, status_code=201
+)
 async def request_participation(
     event_id: UUID,
     current_user: CurrentUser,
@@ -152,7 +154,7 @@ async def list_participants(
     current_user: CurrentUser,
     service: EventService = Depends(get_event_service),
 ):
-    _require_admin(current_user)
+    require_admin(current_user)
     try:
         return await service.list_participants(event_id)
     except NotFoundException:
@@ -169,7 +171,7 @@ async def review_participation(
     current_user: CurrentUser,
     service: EventService = Depends(get_event_service),
 ):
-    _require_admin(current_user)
+    require_admin(current_user)
     try:
         return await service.review_participation(
             event_id=event_id,
