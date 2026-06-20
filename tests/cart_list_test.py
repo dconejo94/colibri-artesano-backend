@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from tests.factories.product_factory import (
     TEST_USER_ID,
-    TEST_PRODUCT_ID,
+    TEST_PRODUCT_2_ID,
 )
 
 
@@ -22,7 +22,7 @@ async def test_get_cart_with_products(client):
     await client.post(
         "/api/v1/cart/item",
         json={
-            "product_id": str(TEST_PRODUCT_ID),
+            "product_id": str(TEST_PRODUCT_2_ID),
             "quantity": 2,
         },
     )

@@ -115,21 +115,6 @@ class SQLAlchemyCartRepository(CartRepository):
 
         return item
 
-    async def get_order_item_by_product(
-        self,
-        store_order_id: UUID,
-        product_id: UUID,
-    ) -> OrderItem | None:
-
-        result = await self.db.execute(
-            select(OrderItem).where(
-                OrderItem.store_order_id == store_order_id,
-                OrderItem.product_id == product_id,
-            )
-        )
-
-        return result.scalars().first()
-
     async def flush(self) -> None:
         await self.db.flush()
         self.db.expire_all()

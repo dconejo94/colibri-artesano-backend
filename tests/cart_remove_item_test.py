@@ -7,6 +7,7 @@ from app.domain.models.user import User
 
 from tests.factories.product_factory import (
     TEST_PRODUCT_ID,
+    TEST_PRODUCT_2_ID,
     TEST_VARIANT_1_ID,
     TEST_VARIANT_2_ID,
 )
@@ -38,11 +39,12 @@ async def test_remove_product_success(client):
     assert data["stores"][0]["items"] == []
 
 
-async def test_remove_product_without_variant(client):
+async def test_remove_single_variant_product_without_variant(client):
+    # TEST_PRODUCT_2 has one variant, so remove resolves it without variant_id.
     add_resp = await client.post(
         "/api/v1/cart/item",
         json={
-            "product_id": str(TEST_PRODUCT_ID),
+            "product_id": str(TEST_PRODUCT_2_ID),
             "quantity": 2,
         },
     )
@@ -50,7 +52,7 @@ async def test_remove_product_without_variant(client):
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     resp = await client.delete(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}?store_order_id={store_order_id}"
+        f"/api/v1/cart/item/{TEST_PRODUCT_2_ID}?store_order_id={store_order_id}"
     )
 
     assert resp.status_code == 200
@@ -60,11 +62,13 @@ async def test_remove_product_without_variant(client):
     assert data["stores"][0]["items"] == []
 
 
-async def test_remove_nonexistent_product_returns_404(client):
+async def test_remove_variant_not_in_cart_returns_404(client):
+    # Add variant 1, then try to remove variant 2 (a real variant not in cart).
     add_resp = await client.post(
         "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_1_ID),
             "quantity": 1,
         },
     )
@@ -73,7 +77,7 @@ async def test_remove_nonexistent_product_returns_404(client):
 
     resp = await client.delete(
         f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
-        f"?variant_id={TEST_VARIANT_1_ID}"
+        f"?variant_id={TEST_VARIANT_2_ID}"
         f"&store_order_id={store_order_id}"
     )
 
@@ -85,6 +89,7 @@ async def test_remove_product_not_in_cart_returns_404(client):
         "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_1_ID),
             "quantity": 1,
         },
     )
@@ -121,6 +126,7 @@ async def test_remove_product_from_other_user_cart_returns_404(client):
         "/api/v1/cart/item",
         json={
             "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_1_ID),
             "quantity": 2,
         },
     )

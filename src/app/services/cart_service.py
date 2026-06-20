@@ -17,7 +17,7 @@ from app.repositories.order_repository import OrderRepository
 from app.repositories.product_repository import ProductRepository
 from app.repositories.product_variant_repository import ProductVariantRepository
 
-from app.core.exceptions import NotFoundException
+from app.core.exceptions import NotFoundException, ConflictException
 
 
 class CartService:
@@ -101,11 +101,7 @@ class CartService:
         if not product:
             raise NotFoundException("Product", str(dto.product_id))
 
-        variant = None
-        if dto.variant_id:
-            variant = await self._validate_variant_is_valid(
-                dto.product_id, dto.variant_id
-            )
+        variant = await self._resolve_variant(dto.product_id, dto.variant_id)
 
         cart = await self.cart_repository.get_cart(buyer_id)
 
@@ -133,15 +129,14 @@ class CartService:
                 )
             )
 
-        unit_price = Decimal(str(product.base_price))
-
-        if variant:
-            unit_price += Decimal(str(variant.price_modifier))
+        unit_price = Decimal(str(product.base_price)) + Decimal(
+            str(variant.price_modifier)
+        )
 
         existing_item = await self.cart_repository.get_order_item(
             store_order.id,
             dto.product_id,
-            dto.variant_id,
+            variant.id,
         )
 
         if existing_item:
@@ -151,7 +146,7 @@ class CartService:
                 OrderItem(
                     store_order_id=store_order.id,
                     product_id=product.id,
-                    variant_id=dto.variant_id,
+                    variant_id=variant.id,
                     quantity=dto.quantity,
                     unit_price=unit_price,
                 )
@@ -184,8 +179,7 @@ class CartService:
                 str(product_id),
             )
 
-        if variant_id is not None:
-            await self._validate_variant_is_valid(product_id, variant_id)
+        variant = await self._resolve_variant(product_id, variant_id)
 
         store_order, main_order = await self._validate_store_order_owner(
             buyer_id, store_order_id
@@ -193,7 +187,7 @@ class CartService:
 
         item = await self.cart_repository.remove_order_item(
             product_id,
-            variant_id,
+            variant.id,
             store_order_id,
         )
 
@@ -231,13 +225,16 @@ class CartService:
         if not product:
             raise NotFoundException("Product", str(product_id))
 
+        variant = await self._resolve_variant(product_id, variant_id)
+
         store_order, main_order = await self._validate_store_order_owner(
             buyer_id, store_order_id
         )
 
-        existing_item = await self.cart_repository.get_order_item_by_product(
+        existing_item = await self.cart_repository.get_order_item(
             store_order_id,
             product_id,
+            variant.id,
         )
 
         if not existing_item:
@@ -245,25 +242,9 @@ class CartService:
 
         old_amount = existing_item.quantity * existing_item.unit_price
 
-        effective_variant_id = (
-            variant_id if variant_id is not None else existing_item.variant_id
-        )
-
-        variant = None
-        if effective_variant_id is not None:
-            variant = await self._validate_variant_is_valid(
-                product_id, effective_variant_id
-            )
-
-        unit_price = Decimal(str(product.base_price))
-        if variant:
-            unit_price += Decimal(str(variant.price_modifier))
-
-        existing_item.variant_id = effective_variant_id
         existing_item.quantity = quantity
-        existing_item.unit_price = unit_price
 
-        new_amount = quantity * unit_price
+        new_amount = quantity * existing_item.unit_price
         diff = new_amount - old_amount
 
         store_order.subtotal_amount = max(
@@ -307,6 +288,28 @@ class CartService:
             )
 
         return store_order, main_order
+
+    async def _resolve_variant(
+        self, product_id: UUID, variant_id: UUID | None
+    ) -> ProductVariant:
+        """Resolve the variant for a cart line.
+
+        Every cart line targets a concrete variant (the unit that carries stock
+        and price). If the caller names a variant, validate it. Otherwise fall
+        back to the product's single variant, or require an explicit choice when
+        the product has several.
+        """
+        if variant_id is not None:
+            return await self._validate_variant_is_valid(product_id, variant_id)
+
+        variants = await self.variant_repository.list_by_product(product_id)
+        if len(variants) == 1:
+            return variants[0]
+        if not variants:
+            raise ConflictException(f"Product '{product_id}' has no variants")
+        raise ConflictException(
+            f"Product '{product_id}' has multiple variants; variant_id is required"
+        )
 
     async def _validate_variant_is_valid(
         self, product_id: UUID, variant_id: UUID

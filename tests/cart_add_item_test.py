@@ -3,16 +3,18 @@ from decimal import Decimal
 
 from tests.factories.product_factory import (
     TEST_PRODUCT_ID,
+    TEST_PRODUCT_2_ID,
     TEST_VARIANT_1_ID,
     TEST_VARIANT_2_ID,
 )
 
 
-async def test_add_product_success(client):
+async def test_add_single_variant_product_resolves_variant(client):
+    # TEST_PRODUCT_2 has exactly one variant, so no variant_id is needed.
     resp = await client.post(
         "/api/v1/cart/item",
         json={
-            "product_id": str(TEST_PRODUCT_ID),
+            "product_id": str(TEST_PRODUCT_2_ID),
             "quantity": 1,
         },
     )
@@ -23,6 +25,21 @@ async def test_add_product_success(client):
 
     assert len(data["stores"]) == 1
     assert len(data["stores"][0]["items"]) == 1
+    # The line is bound to the product's single variant.
+    assert data["stores"][0]["items"][0]["variant_id"] is not None
+
+
+async def test_add_multivariant_product_without_variant_returns_409(client):
+    # TEST_PRODUCT has two variants, so the caller must choose one.
+    resp = await client.post(
+        "/api/v1/cart/item",
+        json={
+            "product_id": str(TEST_PRODUCT_ID),
+            "quantity": 1,
+        },
+    )
+
+    assert resp.status_code == 409
 
 
 async def test_add_nonexistent_product_returns_404(client):
@@ -41,7 +58,7 @@ async def test_add_same_product_twice_accumulates_quantity(client):
     await client.post(
         "/api/v1/cart/item",
         json={
-            "product_id": str(TEST_PRODUCT_ID),
+            "product_id": str(TEST_PRODUCT_2_ID),
             "quantity": 2,
         },
     )
@@ -49,7 +66,7 @@ async def test_add_same_product_twice_accumulates_quantity(client):
     resp = await client.post(
         "/api/v1/cart/item",
         json={
-            "product_id": str(TEST_PRODUCT_ID),
+            "product_id": str(TEST_PRODUCT_2_ID),
             "quantity": 3,
         },
     )

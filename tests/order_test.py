@@ -8,11 +8,12 @@ from decimal import Decimal
 
 from tests.factories.product_factory import (
     TEST_PRODUCT_ID,
+    TEST_VARIANT_1_ID,
     TEST_VARIANT_2_ID,
 )
 
 
-async def _add_to_cart(client, product_id, quantity, variant_id=None):
+async def _add_to_cart(client, product_id, quantity, variant_id=TEST_VARIANT_1_ID):
     body = {"product_id": str(product_id), "quantity": quantity}
     if variant_id is not None:
         body["variant_id"] = str(variant_id)

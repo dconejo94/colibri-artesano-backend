@@ -7,7 +7,7 @@ from app.domain.schemas.cart import CartResponseDTO, AddToCartDTO
 
 from app.services.cart_service import CartService
 from app.api.deps import get_cart_service
-from app.core.exceptions import NotFoundException
+from app.core.exceptions import NotFoundException, ConflictException
 from app.core.security import CurrentUser
 
 router = APIRouter(prefix="/cart", tags=["Carts"])
@@ -34,6 +34,8 @@ async def add_to_cart(
         return await service.add_to_cart(user.id, dto)
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except ConflictException as e:
+        raise HTTPException(status_code=409, detail=str(e))
 
 
 @router.delete("/item/{product_id}", response_model=CartResponseDTO, status_code=200)
@@ -50,6 +52,8 @@ async def remove_from_cart(
         )
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except ConflictException as e:
+        raise HTTPException(status_code=409, detail=str(e))
 
 
 @router.patch(
@@ -71,3 +75,5 @@ async def update_cart_item(
         )
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except ConflictException as e:
+        raise HTTPException(status_code=409, detail=str(e))

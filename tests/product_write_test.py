@@ -34,6 +34,26 @@ async def test_create_product_success(client):
     assert data["stock"] == 0
 
 
+async def test_create_product_creates_default_variant(client):
+    # Every product must be sellable, so creation seeds one default variant.
+    body = {
+        "category_id": str(TEST_CATEGORY_ID),
+        "name": "Variant-less Product",
+        "base_price": 12.00,
+    }
+
+    resp = await client.post(
+        f"/api/v1/stores/{TEST_STORE_ID}/products",
+        json=body,
+    )
+    assert resp.status_code == 201
+    product_id = resp.json()["id"]
+
+    variants = await client.get(f"/api/v1/products/{product_id}/variants")
+    assert variants.status_code == 200
+    assert len(variants.json()) == 1
+
+
 async def test_create_product_bad_category_returns_404(client):
     """Non-existent category_id should 404, not 500."""
     fake_cat = uuid.uuid4()
