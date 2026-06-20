@@ -18,7 +18,7 @@ from app.core.security import CurrentUser
 router = APIRouter(prefix="/events", tags=["Events"])
 
 
-def _require_admin(current_user: CurrentUser) -> CurrentUser:
+def require_admin(current_user: CurrentUser) -> CurrentUser:
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Admin role required")
     return current_user
@@ -103,7 +103,7 @@ async def delete_event(
 # ── Participants ──────────────────────────────────────────────────
 
 
-@router.post("/{event_id}/participants", response_model=ParticipantResponseDTO)
+@router.post("/{event_id}/participants", response_model=ParticipantResponseDTO, status_code=201)
 async def request_participation(
     event_id: UUID,
     current_user: CurrentUser,

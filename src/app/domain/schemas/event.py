@@ -66,10 +66,6 @@ class EventResponseDTO(BaseModel):
 # ── Participation ─────────────────────────────────────────────────
 
 
-class ParticipantRequestDTO(BaseModel):
-    store_id: UUID
-
-
 class ParticipantReviewDTO(BaseModel):
     status: ParticipationStatus
 

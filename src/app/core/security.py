@@ -178,16 +178,6 @@ async def require_vendor_role(user: CurrentUser) -> User:
     return user
 
 
-async def require_vendor_or_admin(user: CurrentUser) -> User:
-    """Require the authenticated user to be a vendor or platform admin."""
-    if user.role != "vendor" and not user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Vendor or admin role required",
-        )
-    return user
-
-
 async def require_store_owner(
     store_id: UUID,
     user: User = Depends(require_vendor_role),
