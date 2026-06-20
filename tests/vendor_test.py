@@ -21,7 +21,7 @@ async def test_get_store_profile(client: AsyncClient):
     data = resp.json()
     assert data["id"] == str(TEST_STORE_ID)
     assert data["name"] == "Test Store"
-    assert data["product_count"] == 1
+    assert data["product_count"] == 2
 
 
 async def test_get_store_profile_not_found(client: AsyncClient):

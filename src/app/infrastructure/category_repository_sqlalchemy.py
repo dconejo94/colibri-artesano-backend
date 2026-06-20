@@ -6,6 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from app.domain.models.category import Category
 from app.domain.models.product import Product
+from app.domain.models.product_variant import ProductVariant
 from app.repositories.category_repository import CategoryRepository
 
 
@@ -27,7 +28,11 @@ class SQLAlchemyCategoryRepository(CategoryRepository):
         result = await self.db.execute(
             select(Category)
             .where(Category.id == category_id)
-            .options(selectinload(Category.products).selectinload(Product.images))
+            .options(
+                selectinload(Category.products)
+                .selectinload(Product.variants)
+                .selectinload(ProductVariant.images)
+            )
         )
         return result.scalars().first()
 

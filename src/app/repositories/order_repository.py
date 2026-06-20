@@ -16,6 +16,10 @@ class OrderRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_cart_by_buyer(self, buyer_id: UUID) -> Optional[MainOrder]:
+        pass
+
+    @abstractmethod
     async def list_main_orders_by_buyer(
         self, buyer_id: UUID, page: int, limit: int
     ) -> tuple[list[MainOrder], int]:

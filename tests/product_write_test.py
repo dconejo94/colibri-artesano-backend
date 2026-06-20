@@ -34,6 +34,26 @@ async def test_create_product_success(client):
     assert data["stock"] == 0
 
 
+async def test_create_product_creates_default_variant(client):
+    # Every product must be sellable, so creation seeds one default variant.
+    body = {
+        "category_id": str(TEST_CATEGORY_ID),
+        "name": "Variant-less Product",
+        "base_price": 12.00,
+    }
+
+    resp = await client.post(
+        f"/api/v1/stores/{TEST_STORE_ID}/products",
+        json=body,
+    )
+    assert resp.status_code == 201
+    product_id = resp.json()["id"]
+
+    variants = await client.get(f"/api/v1/products/{product_id}/variants")
+    assert variants.status_code == 200
+    assert len(variants.json()) == 1
+
+
 async def test_create_product_bad_category_returns_404(client):
     """Non-existent category_id should 404, not 500."""
     fake_cat = uuid.uuid4()
@@ -102,19 +122,20 @@ async def test_delete_product_with_children(client):
     )
     pid = product_resp.json()["id"]
 
-    # 2. Add an image
-    img_resp = await client.post(
-        f"/api/v1/products/{pid}/images",
-        json={"image_url": "https://example.com/img.jpg", "is_primary": True},
-    )
-    assert img_resp.status_code == 201
-
-    # 3. Add a variant
+    # 2. Add a variant
     var_resp = await client.post(
         f"/api/v1/products/{pid}/variants",
         json={"name": "Color", "value": "Rojo", "stock_quantity": 5},
     )
     assert var_resp.status_code == 201
+    variant_id = var_resp.json()["id"]
+
+    # 3. Add an image to that variant
+    img_resp = await client.post(
+        f"/api/v1/products/{pid}/variants/{variant_id}/images",
+        json={"image_url": "https://example.com/img.jpg", "is_primary": True},
+    )
+    assert img_resp.status_code == 201
 
     # 4. Delete the product — should cascade
     del_resp = await client.delete(f"/api/v1/products/{pid}")
