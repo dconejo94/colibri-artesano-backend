@@ -13,3 +13,4 @@ from app.repositories.order_repository import OrderRepository as OrderRepository
 from app.repositories.search_repository import (
     ProductSearchRepository as ProductSearchRepository,
 )
+from app.repositories.notification_repository import NotificationRepository as NotificationRepository

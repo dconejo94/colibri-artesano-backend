@@ -16,3 +16,8 @@ from app.domain.schemas.product_variant import (
 from app.domain.schemas.order import MainOrderResponseDTO as MainOrderResponseDTO
 from app.domain.schemas.order import StoreOrderResponseDTO as StoreOrderResponseDTO
 from app.domain.schemas.search import ProductAutocompleteDTO as ProductAutocompleteDTO
+from app.domain.schemas.notification import (
+    FCMTokenDTO as FCMTokenDTO,
+    NotificationResponseDTO as NotificationResponseDTO,
+    NotificationListResponseDTO as NotificationListResponseDTO
+)

@@ -7,3 +7,5 @@ from .product_variant import ProductVariant as ProductVariant
 from .main_order import MainOrder as MainOrder
 from .store_order import StoreOrder as StoreOrder
 from .order_item import OrderItem as OrderItem
+from .fcm_token import FCMToken as FCMToken
+from .notification import Notification as Notification

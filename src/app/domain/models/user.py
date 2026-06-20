@@ -28,3 +28,5 @@ class User(Base):
     followed_stores = relationship(
         "Store", secondary="follows", back_populates="followers"
     )
+    notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+    fcm_tokens = relationship("FCMToken", back_populates="user", cascade="all, delete-orphan")
