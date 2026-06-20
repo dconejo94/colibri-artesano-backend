@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -115,6 +115,30 @@ class SQLAlchemyCartRepository(CartRepository):
         await self.db.flush()
 
         return item
+
+    async def count_store_order_items(self, store_order_id: UUID) -> int:
+        result = await self.db.execute(
+            select(func.count())
+            .select_from(OrderItem)
+            .where(OrderItem.store_order_id == store_order_id)
+        )
+        return result.scalar() or 0
+
+    async def delete_store_order(self, store_order: StoreOrder) -> None:
+        await self.db.delete(store_order)
+        await self.db.flush()
+
+    async def count_main_order_store_orders(self, main_order_id: UUID) -> int:
+        result = await self.db.execute(
+            select(func.count())
+            .select_from(StoreOrder)
+            .where(StoreOrder.main_order_id == main_order_id)
+        )
+        return result.scalar() or 0
+
+    async def delete_main_order(self, main_order: MainOrder) -> None:
+        await self.db.delete(main_order)
+        await self.db.flush()
 
     async def flush(self) -> None:
         await self.db.flush()

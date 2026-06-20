@@ -35,8 +35,8 @@ async def test_remove_product_success(client):
 
     data = resp.json()
 
-    assert len(data["stores"]) == 1
-    assert data["stores"][0]["items"] == []
+    # Removing the store's last item clears the empty store order from the cart.
+    assert data["stores"] == []
 
 
 async def test_remove_single_variant_product_without_variant(client):
@@ -59,7 +59,7 @@ async def test_remove_single_variant_product_without_variant(client):
 
     data = resp.json()
 
-    assert data["stores"][0]["items"] == []
+    assert data["stores"] == []
 
 
 async def test_remove_variant_not_in_cart_returns_404(client):

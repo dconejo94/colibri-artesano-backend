@@ -190,10 +190,10 @@ class CartService:
             buyer_id, store_order_id
         )
 
-        item = await self.cart_repository.remove_order_item(
+        item = await self.cart_repository.get_order_item(
+            store_order_id,
             product_id,
             variant.id,
-            store_order_id,
         )
 
         if not item:
@@ -203,12 +203,31 @@ class CartService:
             )
 
         amount = item.quantity * item.unit_price
-
-        store_order.subtotal_amount = max(
-            Decimal("0.00"), store_order.subtotal_amount - amount
+        item_count = await self.cart_repository.count_store_order_items(store_order_id)
+        store_count = await self.cart_repository.count_main_order_store_orders(
+            main_order.id
         )
 
-        main_order.total_amount = max(Decimal("0.00"), main_order.total_amount - amount)
+        # Removing the last item drops its empty store order; removing the last
+        # store drops the whole cart. Deleting a parent cascades to its children,
+        # so the item is only removed on its own when the store survives.
+        if item_count <= 1 and store_count <= 1:
+            await self.cart_repository.delete_main_order(main_order)
+        elif item_count <= 1:
+            await self.cart_repository.delete_store_order(store_order)
+            main_order.total_amount = max(
+                Decimal("0.00"), main_order.total_amount - amount
+            )
+        else:
+            await self.cart_repository.remove_order_item(
+                product_id, variant.id, store_order_id
+            )
+            store_order.subtotal_amount = max(
+                Decimal("0.00"), store_order.subtotal_amount - amount
+            )
+            main_order.total_amount = max(
+                Decimal("0.00"), main_order.total_amount - amount
+            )
 
         await self.cart_repository.flush()
 
