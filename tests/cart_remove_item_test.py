@@ -38,6 +38,28 @@ async def test_remove_product_success(client):
     assert data["stores"][0]["items"] == []
 
 
+async def test_remove_product_without_variant(client):
+    add_resp = await client.post(
+        "/api/v1/cart/item",
+        json={
+            "product_id": str(TEST_PRODUCT_ID),
+            "quantity": 2,
+        },
+    )
+
+    store_order_id = add_resp.json()["stores"][0]["id"]
+
+    resp = await client.delete(
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}?store_order_id={store_order_id}"
+    )
+
+    assert resp.status_code == 200
+
+    data = resp.json()
+
+    assert data["stores"][0]["items"] == []
+
+
 async def test_remove_nonexistent_product_returns_404(client):
     add_resp = await client.post(
         "/api/v1/cart/item",

@@ -222,7 +222,8 @@ async def test_update_cart_item_changes_variant(client):
     assert item["variant_id"] == str(TEST_VARIANT_2_ID)
     assert item["quantity"] == 2
 
-    assert Decimal(item["unit_price"]) == Decimal("15.00")
+    # base 10.00 + variant 2 modifier 15.00
+    assert Decimal(item["unit_price"]) == Decimal("25.00")
 
 
 async def test_update_cart_item_keeps_variant_when_not_sent(client):

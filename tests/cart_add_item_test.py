@@ -94,7 +94,25 @@ async def test_add_product_with_variant_uses_variant_price(client):
 
     item = resp.json()["stores"][0]["items"][0]
 
-    assert Decimal(item["unit_price"]) == Decimal("15.00")
+    # Variant price is the product base price plus the variant modifier,
+    # matching how orders are priced (base 10.00 + modifier 15.00).
+    assert Decimal(item["unit_price"]) == Decimal("25.00")
+
+
+async def test_add_zero_modifier_variant_uses_base_price(client):
+    resp = await client.post(
+        "/api/v1/cart/item",
+        json={
+            "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_1_ID),
+            "quantity": 1,
+        },
+    )
+
+    item = resp.json()["stores"][0]["items"][0]
+
+    # A variant with a 0.00 modifier must not make the item free.
+    assert Decimal(item["unit_price"]) == Decimal("10.00")
 
 
 async def test_add_same_variant_twice_accumulates_quantity(client):

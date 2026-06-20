@@ -136,7 +136,7 @@ class CartService:
         unit_price = Decimal(str(product.base_price))
 
         if variant:
-            unit_price = Decimal(str(variant.price_modifier))
+            unit_price += Decimal(str(variant.price_modifier))
 
         existing_item = await self.cart_repository.get_order_item(
             store_order.id,
@@ -167,7 +167,11 @@ class CartService:
         return await self.get_cart(buyer_id)
 
     async def remove_from_cart(
-        self, buyer_id: UUID, product_id: UUID, variant_id: UUID, store_order_id: UUID
+        self,
+        buyer_id: UUID,
+        product_id: UUID,
+        variant_id: UUID | None,
+        store_order_id: UUID,
     ) -> CartResponseDTO:
         if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
@@ -180,7 +184,8 @@ class CartService:
                 str(product_id),
             )
 
-        await self._validate_variant_is_valid(product_id, variant_id)
+        if variant_id is not None:
+            await self._validate_variant_is_valid(product_id, variant_id)
 
         store_order, main_order = await self._validate_store_order_owner(
             buyer_id, store_order_id
@@ -252,7 +257,7 @@ class CartService:
 
         unit_price = Decimal(str(product.base_price))
         if variant:
-            unit_price = Decimal(str(variant.price_modifier))
+            unit_price += Decimal(str(variant.price_modifier))
 
         existing_item.variant_id = effective_variant_id
         existing_item.quantity = quantity
