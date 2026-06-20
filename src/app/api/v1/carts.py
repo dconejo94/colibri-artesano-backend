@@ -38,12 +38,13 @@ async def add_to_cart(
 @router.delete("/item/{product_id}", response_model=CartResponseDTO, status_code=200)
 async def remove_from_cart(
     product_id: UUID,
+    variant_id: UUID,
     user: CurrentUser,
     store_order_id: UUID = Query(...),
     service: CartService = Depends(get_cart_service),
 ):
     try:
-        return await service.remove_from_cart(user.id, product_id, store_order_id)
+        return await service.remove_from_cart(user.id, product_id, variant_id, store_order_id)
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
 

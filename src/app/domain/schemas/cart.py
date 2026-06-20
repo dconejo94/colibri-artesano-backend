@@ -49,4 +49,5 @@ class CartResponseDTO(BaseModel):
 
 class AddToCartDTO(BaseModel):
     product_id: UUID
+    variant_id: UUID | None = None
     quantity: int = Field(..., gt=0)

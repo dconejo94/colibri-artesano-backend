@@ -56,10 +56,16 @@ class SQLAlchemyCartRepository(CartRepository):
         product_id: UUID,
         variant_id: UUID | None,
     ) -> OrderItem | None:
+
         query = select(OrderItem).where(
             OrderItem.store_order_id == store_order_id,
             OrderItem.product_id == product_id,
         )
+
+        if variant_id is None:
+            query = query.where(OrderItem.variant_id.is_(None))
+        else:
+            query = query.where(OrderItem.variant_id == variant_id)
 
         result = await self.db.execute(query)
 
@@ -82,15 +88,23 @@ class SQLAlchemyCartRepository(CartRepository):
         return item
 
     async def remove_order_item(
-        self, product_id: UUID, store_order_id: UUID
+        self,
+        product_id: UUID,
+        variant_id: UUID | None,
+        store_order_id: UUID,
     ) -> OrderItem | None:
 
-        result = await self.db.execute(
-            select(OrderItem).where(
-                OrderItem.store_order_id == store_order_id,
-                OrderItem.product_id == product_id,
-            )
+        query = select(OrderItem).where(
+            OrderItem.store_order_id == store_order_id,
+            OrderItem.product_id == product_id,
         )
+
+        if variant_id is None:
+            query = query.where(OrderItem.variant_id.is_(None))
+        else:
+            query = query.where(OrderItem.variant_id == variant_id)
+
+        result = await self.db.execute(query)
 
         item = result.scalars().first()
 
@@ -100,7 +114,7 @@ class SQLAlchemyCartRepository(CartRepository):
         await self.db.flush()
 
         return item
-
+   
     async def update_order_item(
         self, product_id: UUID, store_order_id: UUID, quantity: int
     ) -> OrderItem | None:

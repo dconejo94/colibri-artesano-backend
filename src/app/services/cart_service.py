@@ -1,5 +1,4 @@
 from uuid import UUID
-
 from decimal import Decimal
 
 from app.domain.schemas.cart import (
@@ -11,10 +10,12 @@ from app.domain.schemas.cart import (
 from app.domain.models.main_order import MainOrder
 from app.domain.models.store_order import StoreOrder
 from app.domain.models.order_item import OrderItem
+from app.domain.models.product_variant import ProductVariant
 
 from app.repositories.cart_repository import CartRepository
 from app.repositories.order_repository import OrderRepository
 from app.repositories.product_repository import ProductRepository
+from app.repositories.product_variant_repository import ProductVariantRepository
 
 from app.core.exceptions import NotFoundException
 
@@ -25,10 +26,12 @@ class CartService:
         cart_repository: CartRepository,
         order_repository: OrderRepository,
         product_repository: ProductRepository,
+        variant_repository: ProductVariantRepository,
     ):
         self.cart_repository = cart_repository
         self.order_repository = order_repository
         self.product_repository = product_repository
+        self.variant_repository = variant_repository
 
     async def get_cart(self, buyer_id: UUID) -> CartResponseDTO:
         if not await self._is_user_valid(buyer_id):
@@ -43,6 +46,7 @@ class CartService:
                 total_amount=Decimal("0.00"),
                 stores=[],
             )
+
         stores = []
 
         for store_order in cart.store_orders:
@@ -95,10 +99,11 @@ class CartService:
         product = await self.product_repository.get_by_id(dto.product_id)
 
         if not product:
-            raise NotFoundException(
-                "Product",
-                str(dto.product_id),
-            )
+            raise NotFoundException("Product", str(dto.product_id))
+
+        variant = None
+        if dto.variant_id:
+            variant = await self._validate_variant_is_valid(dto.product_id, dto.variant_id)
 
         cart = await self.cart_repository.get_cart(buyer_id)
 
@@ -112,8 +117,10 @@ class CartService:
             )
 
         store_order = await self.cart_repository.get_store_order(
-            cart.id, product.store_id
+            cart.id,
+            product.store_id,
         )
+
         if not store_order:
             store_order = await self.cart_repository.create_store_order(
                 StoreOrder(
@@ -124,12 +131,15 @@ class CartService:
                 )
             )
 
-        unit_price = product.base_price
+        unit_price = Decimal(str(product.base_price))
+
+        if variant:
+            unit_price += Decimal(str(variant.price_modifier))
 
         existing_item = await self.cart_repository.get_order_item(
             store_order.id,
             dto.product_id,
-            None,
+            dto.variant_id,
         )
 
         if existing_item:
@@ -139,6 +149,7 @@ class CartService:
                 OrderItem(
                     store_order_id=store_order.id,
                     product_id=product.id,
+                    variant_id=dto.variant_id,
                     quantity=dto.quantity,
                     unit_price=unit_price,
                 )
@@ -154,7 +165,7 @@ class CartService:
         return await self.get_cart(buyer_id)
 
     async def remove_from_cart(
-        self, buyer_id: UUID, product_id: UUID, store_order_id: UUID
+        self, buyer_id: UUID, product_id: UUID, variant_id: UUID, store_order_id: UUID
     ) -> CartResponseDTO:
         if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
@@ -166,6 +177,8 @@ class CartService:
                 "Product",
                 str(product_id),
             )
+        
+        await self._validate_variant_is_valid(product_id, variant_id)
 
         store_order, main_order = await self._validate_store_order_owner(
             buyer_id, store_order_id
@@ -173,6 +186,7 @@ class CartService:
 
         item = await self.cart_repository.remove_order_item(
             product_id,
+            variant_id,
             store_order_id,
         )
 
@@ -244,6 +258,7 @@ class CartService:
 
         return await self.get_cart(buyer_id)
 
+
     async def _is_user_valid(self, user_id: UUID) -> bool:
         return await self.order_repository.buyer_exists(user_id)
 
@@ -252,7 +267,9 @@ class CartService:
         buyer_id: UUID,
         store_order_id: UUID,
     ) -> tuple[StoreOrder, MainOrder]:
-        store_order = await self.order_repository.get_store_order_by_id(store_order_id)
+        store_order = await self.order_repository.get_store_order_by_id(
+            store_order_id
+        )
 
         if not store_order:
             raise NotFoundException(
@@ -271,3 +288,20 @@ class CartService:
             )
 
         return store_order, main_order
+    
+    async def _validate_variant_is_valid(self, product_id: UUID, variant_id: UUID) -> ProductVariant:
+        variant = await self.variant_repository.get_by_id(variant_id)
+
+        if not variant:
+            raise NotFoundException(
+                "ProductVariant",
+                str(variant_id),
+            )
+
+        if variant.product_id != product_id:
+            raise NotFoundException(
+                "ProductVariant",
+                str(variant_id),
+            )
+
+        return variant
