@@ -1,10 +1,11 @@
 from uuid import UUID
+import uuid
 
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.domain.models.store import Store
+from app.domain.models.store import Store, follows
 from app.domain.models.product import Product
 from app.repositories.store_repository import StoreRepository
 
@@ -59,12 +60,54 @@ class SQLAlchemyStoreRepository(StoreRepository):
         await self.db.delete(store)
         await self.db.flush()
 
-    async def get_with_product_count(self, store_id: UUID) -> tuple[Store, int] | None:
+    async def get_profile_stats(
+        self, store_id: UUID, user_id: UUID | None = None
+    ) -> tuple[Store, int, int, bool] | None:
         result = await self.db.execute(select(Store).where(Store.id == store_id))
         store = result.scalars().first()
         if not store:
             return None
-        count_result = await self.db.execute(
+
+        # Products count
+        p_count_result = await self.db.execute(
             select(func.count(Product.id)).where(Product.store_id == store_id)
         )
-        return store, count_result.scalar()
+        product_count = p_count_result.scalar() or 0
+
+        # Followers count
+        f_count_result = await self.db.execute(
+            select(func.count())
+            .select_from(follows)
+            .where(follows.c.store_id == store_id)
+        )
+        follower_count = f_count_result.scalar() or 0
+
+        # Is following
+        is_following = False
+        if user_id:
+            is_following = await self.is_following(store_id, user_id)
+
+        return store, product_count, follower_count, is_following
+
+    async def add_follower(self, store_id: UUID, user_id: UUID) -> None:
+        stmt = follows.insert().values(
+            id=uuid.uuid4(), store_id=store_id, user_id=user_id
+        )
+        await self.db.execute(stmt)
+        await self.db.flush()
+
+    async def remove_follower(self, store_id: UUID, user_id: UUID) -> None:
+        stmt = follows.delete().where(
+            (follows.c.store_id == store_id) & (follows.c.user_id == user_id)
+        )
+        await self.db.execute(stmt)
+        await self.db.flush()
+
+    async def is_following(self, store_id: UUID, user_id: UUID) -> bool:
+        stmt = (
+            select(1)
+            .select_from(follows)
+            .where((follows.c.store_id == store_id) & (follows.c.user_id == user_id))
+        )
+        result = await self.db.execute(stmt)
+        return result.scalar() is not None

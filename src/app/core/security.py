@@ -25,6 +25,9 @@ REFRESH_TOKEN_TYPE = "refresh"
 
 # Reads the bearer token from the Authorization header (tokenUrl is docs-only).
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
+oauth2_scheme_optional = OAuth2PasswordBearer(
+    tokenUrl="api/v1/auth/login", auto_error=False
+)
 
 
 class TokenError(Exception):
@@ -137,6 +140,27 @@ async def get_current_user(
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    return user
+
+
+async def get_current_user_optional(
+    token: Annotated[str | None, Depends(oauth2_scheme_optional)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> User | None:
+    """Resolve the authenticated user optionally from a Bearer access token."""
+    if not token:
+        return None
+
+    from app.infrastructure.user_repository_sqlalchemy import SQLAlchemyUserRepository
+
+    try:
+        user_id = decode_token(token, expected_type=ACCESS_TOKEN_TYPE)
+    except TokenError:
+        return None
+
+    user = await SQLAlchemyUserRepository(db).get_by_id(user_id)
+    if user is None or not user.is_active:
+        return None
     return user
 
 
