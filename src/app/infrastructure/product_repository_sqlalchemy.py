@@ -75,3 +75,9 @@ class SQLAlchemyProductRepository(ProductRepository):
     async def delete(self, product: Product) -> None:
         await self.db.delete(product)
         await self.db.flush()
+
+    async def get_by_id_for_update(self, product_id: UUID) -> Product | None:
+        query = select(Product).where(Product.id == product_id).with_for_update()
+
+        result = await self.db.execute(query)
+        return result.scalars().first()
