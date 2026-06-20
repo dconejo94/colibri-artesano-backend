@@ -31,4 +31,7 @@ jobs:
       - name: Run Alembic migration
         env:
           DATABASE_URL: ${{ secrets.MIGRATION_DATABASE_URL }}
+          # Required so app.config.Settings instantiates on import; migrations
+          # never sign tokens, so the value is a non-sensitive placeholder.
+          JWT_SECRET_KEY: "unused-by-migrations"
         run: uv run alembic ${{ inputs.command }}

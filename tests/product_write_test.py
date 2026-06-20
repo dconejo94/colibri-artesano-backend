@@ -19,12 +19,19 @@ async def test_create_product_success(client):
         "description": "A test product",
         "base_price": 100.00,
     }
-    resp = await client.post(f"/api/v1/stores/{TEST_STORE_ID}/products", json=body)
+
+    resp = await client.post(
+        f"/api/v1/stores/{TEST_STORE_ID}/products",
+        json=body,
+    )
 
     assert resp.status_code == 201
+
     data = resp.json()
+
     assert data["name"] == "New Product"
     assert data["store_id"] == str(TEST_STORE_ID)
+    assert data["stock"] == 0
 
 
 async def test_create_product_bad_category_returns_404(client):

@@ -13,7 +13,7 @@ from app.domain.schemas.order import MainOrderResponseDTO, StoreOrderResponseDTO
 from app.repositories.order_repository import OrderRepository
 from app.repositories.product_repository import ProductRepository
 from app.repositories.product_variant_repository import ProductVariantRepository
-from app.core.exceptions import NotFoundException
+from app.core.exceptions import NotFoundException, ConflictException
 
 
 class OrderService:
@@ -45,6 +45,9 @@ class OrderService:
                 if not variant or variant.product_id != product.id:
                     raise NotFoundException("ProductVariant", str(item_dto.variant_id))
                 unit_price += Decimal(str(variant.price_modifier))
+
+            if product.stock < item_dto.quantity:
+                raise ConflictException(f"Insufficient stock for product {product.id}")
 
             store_id = product.store_id
             store_groups.setdefault(store_id, []).append((item_dto, unit_price))

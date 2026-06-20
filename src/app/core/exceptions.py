@@ -24,3 +24,9 @@ class AuthenticationException(Exception):
     def __init__(self, detail: str = "Could not validate credentials"):
         self.detail = detail
         super().__init__(detail)
+
+
+class InvalidImageUrlError(Exception):
+    def __init__(self, detail: str = "Image URL is not on the allowed blob host"):
+        self.detail = detail
+        super().__init__(detail)
