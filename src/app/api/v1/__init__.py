@@ -12,6 +12,7 @@ from app.api.v1.products import router as products_router
 from app.api.v1.orders import router as orders_router
 from app.api.v1.users import router as users_router
 from app.api.v1.vendors import router as vendors_router
+from app.api.v1.events import router as events_router
 from app.api.v1.carts import router as cart_router
 
 api_router = APIRouter(
@@ -26,4 +27,5 @@ api_router.include_router(products_router)
 api_router.include_router(orders_router)
 api_router.include_router(users_router)
 api_router.include_router(vendors_router)
+api_router.include_router(events_router)
 api_router.include_router(cart_router)
