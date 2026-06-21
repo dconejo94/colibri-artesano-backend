@@ -36,6 +36,35 @@ class SQLAlchemyNotificationRepository(NotificationRepository):
 
         return list(result.scalars().all()), total or 0
 
+    async def get_unread_by_user_id(
+        self,
+        user_id: UUID,
+        page: int,
+        limit: int
+    ) -> tuple[list[Notification], int]:
+
+        total = await self.db.scalar(
+            select(func.count())
+            .select_from(Notification)
+            .where(
+                Notification.user_id == user_id,
+                Notification.is_read == False
+            )
+        )
+
+        result = await self.db.execute(
+            select(Notification)
+            .where(
+                Notification.user_id == user_id,
+                Notification.is_read == False
+            )
+            .order_by(Notification.created_at.desc())
+            .offset((page - 1) * limit)
+            .limit(limit)
+        )
+
+        return list(result.scalars().all()), total or 0
+
     async def create(self, notification: Notification) -> Notification:
         self.db.add(notification)
         await self.db.flush()

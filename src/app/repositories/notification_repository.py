@@ -16,6 +16,14 @@ class NotificationRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_unread_by_user_id(
+            self,
+            user_id: UUID,
+            page: int,
+            limit: int
+        ) -> tuple[list[Notification], int]:
+
+    @abstractmethod
     async def create(self, notification: Notification) -> Notification:
         pass
 

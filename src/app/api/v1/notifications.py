@@ -21,6 +21,15 @@ async def get_notifications(
 ):
     return await service.get_notifications(current_user.id, page, limit)
 
+@router.get("/unread", response_model=PaginatedResponse[NotificationResponseDTO], status_code=200)
+async def get_notifications(
+    current_user: CurrentUser,
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    service: NotificationService = Depends(get_notification_service)
+):
+    return await service.get_notifications_unread(current_user.id, page, limit)
+
 @router.post("/token", status_code=204)
 async def register_fcm_token(
     dto: FCMTokenDTO,
