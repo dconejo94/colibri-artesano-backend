@@ -20,4 +20,4 @@ class FCMToken(Base):
     token = Column(String, unique=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    user = relationship("User", back_populates="notifications")
+    user = relationship("User", back_populates="fcm_tokens")

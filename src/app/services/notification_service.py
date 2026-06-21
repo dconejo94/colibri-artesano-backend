@@ -12,12 +12,21 @@ class NotificationService:
 
     async def get_notifications(self, user_id: UUID) -> NotificationListResponseDTO:
         notifications = await self.repository.get_by_user_id(user_id)
-        response = NotificationListResponseDTO(
-            list[notifications],
+        
+        return NotificationListResponseDTO(
+            notifications=[NotificationResponseDTO.model_validate(n) for n in notifications],
             size=len(notifications)
         )
-        return response
 
     async def register_fcm_token(self, user_id: UUID, token: str) -> None:
         fcm_token = FCMToken(user_id=user_id, token=token)
         await self.repository.save_fcm_token(fcm_token)
+
+    async def notify_order_confirmed(self, user_id: UUID, order_id: UUID) -> None:
+        await self.repository.create(Notification(
+            user_id=user_id,
+            title="Orden confirmada",
+            body="Tu orden fue confirmada exitosamente.",
+            type="order_confirmed",
+            reference_id=order_id,
+        ))

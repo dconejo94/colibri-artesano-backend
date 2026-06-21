@@ -111,8 +111,10 @@ async def get_order_service(
         order_repository=SQLAlchemyOrderRepository(db),
         product_repository=SQLAlchemyProductRepository(db),
         variant_repository=SQLAlchemyProductVariantRepository(db),
+        notification_service=NotificationService(
+            SQLAlchemyNotificationRepository(db)
+        ),
     )
-
 
 async def get_search_service(
     db: AsyncSession = Depends(get_db),

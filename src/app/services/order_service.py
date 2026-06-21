@@ -11,18 +11,19 @@ from app.repositories.order_repository import OrderRepository
 from app.repositories.product_repository import ProductRepository
 from app.repositories.product_variant_repository import ProductVariantRepository
 from app.core.exceptions import NotFoundException, ConflictException
-
-
+from app.services.notification_service import NotificationService
 class OrderService:
     def __init__(
         self,
         order_repository: OrderRepository,
         product_repository: ProductRepository,
         variant_repository: ProductVariantRepository,
+        notification_service: NotificationService
     ):
         self.order_repo = order_repository
         self.product_repo = product_repository
         self.variant_repo = variant_repository
+        self.notification_service = notification_service
 
     async def checkout(self, buyer_id: UUID) -> MainOrder:
         """Convert the buyer's active cart into a placed order.
@@ -47,9 +48,15 @@ class OrderService:
                         f"Insufficient stock for variant {item.variant_id}"
                     )
 
+        await self.notification_service.notify_order_confirmed(
+            user_id=buyer_id,
+            order_id=cart.id,
+        )        
         cart.status = "placed"
-        return cart
-
+        cart_id = cart.id
+        await self.order_repo.flush()
+        return await self.order_repo.get_main_order_by_id(cart_id)
+    
     async def get_order(self, order_id: UUID) -> MainOrder:
         order = await self.order_repo.get_main_order_by_id(order_id)
         if not order:
@@ -79,4 +86,6 @@ class OrderService:
         if not store_order:
             raise NotFoundException("StoreOrder", str(store_order_id))
         store_order.seller_status = dto.seller_status
-        return await self.order_repo.update_store_order_status(store_order)
+        await self.order_repo.update_store_order_status(store_order)
+        return await self.order_repo.get_store_order_by_id(store_order_id)
+
