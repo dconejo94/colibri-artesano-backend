@@ -4,6 +4,8 @@ from tests.factories.product_factory import (
     TEST_NOTIFICATION_ID2,
     TEST_NOTIFICATION_ID,
     TEST_NOTIFICATION_ID3,
+    TEST_CATEGORY_ID,
+    TEST_STORE_ID,
 )
 
 # ── GET /notifications/ ───────────────────────────────────────────
@@ -137,3 +139,25 @@ async def test_checkout_creates_order_confirmed_notification(client):
     data = resp.json()
 
     assert any(n["type"] == "order_confirmed" for n in data["items"])
+
+
+async def test_create_product_notifies_followers(client, follower_client):
+    store_id = str(TEST_STORE_ID)
+
+    resp = await follower_client.post(f"/api/v1/stores/{store_id}/follow")
+    assert resp.status_code == 204
+
+    resp = await client.post(
+        f"/api/v1/stores/{store_id}/products",
+        json={
+            "category_id": str(TEST_CATEGORY_ID),
+            "name": "Producto nuevo",
+            "base_price": 25.00,
+        },
+    )
+    assert resp.status_code in (200, 201)
+
+    resp = await follower_client.get("/api/v1/notifications/")
+    data = resp.json()
+
+    assert any(n["type"] == "new_product" for n in data["items"])
