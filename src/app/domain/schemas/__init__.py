@@ -25,5 +25,4 @@ from app.domain.schemas.cart import (
 from app.domain.schemas.notification import (
     FCMTokenDTO as FCMTokenDTO,
     NotificationResponseDTO as NotificationResponseDTO,
-    NotificationListResponseDTO as NotificationListResponseDTO
 )

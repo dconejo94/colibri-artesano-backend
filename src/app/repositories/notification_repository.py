@@ -22,6 +22,7 @@ class NotificationRepository(ABC):
             page: int,
             limit: int
         ) -> tuple[list[Notification], int]:
+        pass
 
     @abstractmethod
     async def create(self, notification: Notification) -> Notification:
@@ -33,4 +34,12 @@ class NotificationRepository(ABC):
 
     @abstractmethod
     async def get_fcm_tokens_by_user(self, user_id: UUID) -> list[FCMToken]:
+        pass
+
+    @abstractmethod
+    async def get_notification_by_id(self, notification_id:UUID) -> Notification | None:
+        pass
+
+    @abstractmethod
+    async def update(self, notification: Notification) -> None:
         pass

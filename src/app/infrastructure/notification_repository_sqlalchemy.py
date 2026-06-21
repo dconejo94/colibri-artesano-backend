@@ -92,3 +92,13 @@ class SQLAlchemyNotificationRepository(NotificationRepository):
             select(FCMToken).where(FCMToken.user_id == user_id)
         )
         return list(result.scalars().all())
+    
+    async def get_notification_by_id(self, notification_id:UUID) -> Notification | None:
+        result = await self.db.execute(
+            select(Notification).where(Notification.id == notification_id)
+        )
+        return result.scalars().first()
+
+    async def update(self, notification: Notification) -> None:
+        await self.db.flush()
+        await self.db.refresh(notification)

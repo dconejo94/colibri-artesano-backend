@@ -6,6 +6,7 @@ from app.domain.schemas.notification import NotificationResponseDTO
 from app.repositories.notification_repository import NotificationRepository
 from app.domain.schemas.paginated_response import PaginatedResponse
 
+from app.core.exceptions import NotFoundException
 
 class NotificationService:
     def __init__(self, repository: NotificationRepository):
@@ -54,6 +55,15 @@ class NotificationService:
     async def register_fcm_token(self, user_id: UUID, token: str) -> None:
         fcm_token = FCMToken(user_id=user_id, token=token)
         await self.repository.save_fcm_token(fcm_token)
+
+    async def mark_notification_as_read(self, user_id: UUID, notification_id: UUID) -> None:
+        notification = await self.repository.get_notification_by_id(notification_id)
+        if notification is None:
+            raise NotFoundException("Notification", str(notification_id))
+        if notification.user_id != user_id:
+            raise NotFoundException("Notification", str(notification_id))
+        notification.is_read = True
+        await self.repository.update(notification)
 
     async def notify_order_confirmed(self, user_id: UUID, order_id: UUID) -> None:
         await self.repository.create(Notification(
