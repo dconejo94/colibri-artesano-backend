@@ -9,7 +9,6 @@ from sqlalchemy import (
     DateTime,
     Text,
     Uuid,
-    Integer,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -30,19 +29,22 @@ class Product(Base):
     base_price = Column(Numeric(10, 2), nullable=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    stock = Column(Integer, nullable=False, default=0, server_default="0")
 
     store = relationship("Store", back_populates="products")
     category = relationship("Category", back_populates="products")
-    images = relationship(
-        "ProductImage",
-        back_populates="product",
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-    )
     variants = relationship(
         "ProductVariant",
         back_populates="product",
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
+
+    @property
+    def stock(self) -> int:
+        """Total available stock, derived from the variants.
+
+        The variant is the single source of truth for stock; the product-level
+        figure is just their sum (never stored, so it cannot drift). Callers
+        must eager-load ``variants`` before reading this.
+        """
+        return sum(variant.stock_quantity or 0 for variant in self.variants)

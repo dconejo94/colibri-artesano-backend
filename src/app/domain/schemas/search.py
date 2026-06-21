@@ -35,12 +35,17 @@ class ProductAutocompleteDTO(BaseModel):
             "primary_image_url": None,
         }
 
-        images = getattr(data, "images", None)
-        if images:
-            primary = next(
-                (img for img in images if getattr(img, "is_primary", False)),
-                images[0],
-            )
-            result["primary_image_url"] = primary.image_url
+        # Images live on variants now; the cover comes from the first variant
+        # (lowest id) — its primary image, or the first available one.
+        variants = getattr(data, "variants", None) or []
+        if variants:
+            first_variant = min(variants, key=lambda v: str(v.id))
+            images = getattr(first_variant, "images", None) or []
+            if images:
+                primary = next(
+                    (img for img in images if getattr(img, "is_primary", False)),
+                    images[0],
+                )
+                result["primary_image_url"] = primary.image_url
 
         return result

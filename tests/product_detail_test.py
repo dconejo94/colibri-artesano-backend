@@ -43,7 +43,6 @@ async def test_get_product_by_id_response_schema(client):
         "base_price",
         "is_active",
         "created_at",
-        "images",
         "variants",
     }
 

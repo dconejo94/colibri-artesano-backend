@@ -30,8 +30,24 @@ class SQLAlchemyOrderRepository(OrderRepository):
         )
         return result.scalars().first()
 
+    async def get_cart_by_buyer(self, buyer_id: UUID):
+        result = await self.db.execute(
+            select(MainOrder)
+            .where(
+                MainOrder.buyer_id == buyer_id,
+                MainOrder.status == "cart",
+            )
+            .options(
+                selectinload(MainOrder.store_orders).selectinload(StoreOrder.items)
+            )
+        )
+        return result.scalars().first()
+
     async def list_main_orders_by_buyer(self, buyer_id: UUID, page: int, limit: int):
-        stmt = select(MainOrder).where(MainOrder.buyer_id == buyer_id)
+        stmt = select(MainOrder).where(
+            MainOrder.buyer_id == buyer_id,
+            MainOrder.status == "placed",
+        )
 
         count_result = await self.db.execute(
             select(func.count()).select_from(stmt.subquery())

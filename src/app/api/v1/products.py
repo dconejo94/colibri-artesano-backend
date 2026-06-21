@@ -95,18 +95,19 @@ async def delete_product(
 
 
 @router.post(
-    "/{product_id}/images/upload-url",
+    "/{product_id}/variants/{variant_id}/images/upload-url",
     response_model=ProductImageUploadResponseDTO,
 )
 async def create_image_upload_url(
     product_id: UUID,
+    variant_id: UUID,
     dto: ProductImageUploadRequestDTO,
     _: object = Depends(require_product_owner),
     storage: BlobStorageService = Depends(get_blob_storage_service),
 ):
     try:
         upload_url, blob_url, expires_at = storage.generate_upload_sas(
-            product_id, dto.filename, dto.content_type
+            variant_id, dto.filename, dto.content_type
         )
     except StorageNotConfiguredError:
         raise HTTPException(status_code=503, detail="Image uploads are not configured")
@@ -118,55 +119,62 @@ async def create_image_upload_url(
 
 
 @router.post(
-    "/{product_id}/images",
+    "/{product_id}/variants/{variant_id}/images",
     response_model=ProductImageResponseDTO,
     status_code=201,
 )
 async def add_product_image(
     product_id: UUID,
+    variant_id: UUID,
     dto: ProductImageCreateDTO,
     _: object = Depends(require_product_owner),
     service: ProductImageService = Depends(get_product_image_service),
 ):
     try:
-        return await service.add_image(product_id, dto)
+        return await service.add_image(variant_id, dto)
     except InvalidImageUrlError as exc:
         raise HTTPException(status_code=400, detail=exc.detail)
 
 
 @router.get(
-    "/{product_id}/images",
+    "/{product_id}/variants/{variant_id}/images",
     response_model=list[ProductImageResponseDTO],
 )
 async def list_product_images(
     product_id: UUID,
+    variant_id: UUID,
     service: ProductImageService = Depends(get_product_image_service),
 ):
-    return await service.list_images(product_id)
+    return await service.list_images(variant_id)
 
 
-@router.delete("/{product_id}/images/{image_id}", status_code=204)
+@router.delete("/{product_id}/variants/{variant_id}/images/{image_id}", status_code=204)
 async def delete_product_image(
     product_id: UUID,
+    variant_id: UUID,
     image_id: UUID,
     _: object = Depends(require_product_owner),
     service: ProductImageService = Depends(get_product_image_service),
 ):
     try:
-        await service.delete_image(product_id, image_id)
+        await service.delete_image(variant_id, image_id)
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Image not found")
 
 
-@router.patch("/{product_id}/images/{image_id}/primary", status_code=200)
+@router.patch(
+    "/{product_id}/variants/{variant_id}/images/{image_id}/primary",
+    status_code=200,
+)
 async def set_primary_image(
     product_id: UUID,
+    variant_id: UUID,
     image_id: UUID,
     _: object = Depends(require_product_owner),
     service: ProductImageService = Depends(get_product_image_service),
 ):
     try:
-        await service.set_primary(product_id, image_id)
+        await service.set_primary(variant_id, image_id)
         return {"detail": "Primary image updated"}
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Image not found")
