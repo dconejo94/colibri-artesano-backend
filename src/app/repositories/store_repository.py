@@ -3,7 +3,7 @@ from uuid import UUID
 from typing import Optional
 
 from app.domain.models.store import Store
-
+from app.domain.models.user import User
 
 class StoreRepository(ABC):
     @abstractmethod
@@ -48,4 +48,8 @@ class StoreRepository(ABC):
 
     @abstractmethod
     async def is_following(self, store_id: UUID, user_id: UUID) -> bool:
+        pass
+
+    @abstractmethod
+    async def get_followers(self, store_id: UUID) -> list[User]:
         pass

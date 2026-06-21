@@ -30,3 +30,27 @@ class NotificationService:
             type="order_confirmed",
             reference_id=order_id,
         ))
+    
+    async def notify_new_product(
+        self, user_ids: list[UUID], product_id: UUID, store_name: str, product_name: str
+    ) -> None:
+        for user_id in user_ids:
+            await self.repository.create(Notification(
+                user_id=user_id,
+                title=f"Nuevo producto de {store_name}",
+                body=f'{store_name} publicó "{product_name}"',
+                type="new_product",
+                reference_id=product_id,
+            ))
+
+    async def notify_new_event(
+        self, user_ids: list[UUID], event_id: UUID, event_name: str
+    ) -> None:
+        for user_id in user_ids:
+            await self.repository.create(Notification(
+                user_id=user_id,
+                title="Nuevo evento publicado",
+                body=f'Nuevo "{event_name}"',
+                type="new_event",
+                reference_id=event_id,
+            ))

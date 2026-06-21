@@ -74,6 +74,10 @@ async def get_product_service(
         repository=SQLAlchemyProductRepository(db),
         category_repository=SQLAlchemyCategoryRepository(db),
         variant_repository=SQLAlchemyProductVariantRepository(db),
+        store_repository=SQLAlchemyStoreRepository(db),           
+        notification_service=NotificationService(                
+            SQLAlchemyNotificationRepository(db)
+        ),
     )
 
 
