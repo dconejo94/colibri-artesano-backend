@@ -4,24 +4,18 @@ from uuid import UUID
 from app.domain.models.notification import Notification
 from app.domain.models.fcm_token import FCMToken
 
-class NotificationRepository(ABC):
 
+class NotificationRepository(ABC):
     @abstractmethod
     async def get_by_user_id(
-        self,
-        user_id: UUID,
-        page: int,
-        limit: int
+        self, user_id: UUID, page: int, limit: int
     ) -> tuple[list[Notification], int]:
         pass
 
     @abstractmethod
     async def get_unread_by_user_id(
-            self,
-            user_id: UUID,
-            page: int,
-            limit: int
-        ) -> tuple[list[Notification], int]:
+        self, user_id: UUID, page: int, limit: int
+    ) -> tuple[list[Notification], int]:
         pass
 
     @abstractmethod
@@ -37,7 +31,9 @@ class NotificationRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_notification_by_id(self, notification_id:UUID) -> Notification | None:
+    async def get_notification_by_id(
+        self, notification_id: UUID
+    ) -> Notification | None:
         pass
 
     @abstractmethod

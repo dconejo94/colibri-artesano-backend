@@ -15,4 +15,6 @@ from app.repositories.search_repository import (
 )
 from app.repositories.cart_repository import CartRepository as CartRepository
 
-from app.repositories.notification_repository import NotificationRepository as NotificationRepository
+from app.repositories.notification_repository import (
+    NotificationRepository as NotificationRepository,
+)

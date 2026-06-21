@@ -1,4 +1,4 @@
-import uuid 
+import uuid
 
 from sqlalchemy import (
     Column,
@@ -14,6 +14,7 @@ from app.core.database import Base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 import sqlalchemy as sa
+
 
 class Notification(Base):
     __tablename__ = "notifications"

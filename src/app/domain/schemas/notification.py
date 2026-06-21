@@ -16,5 +16,3 @@ class NotificationResponseDTO(BaseModel):
     reference_id: UUID | None
     is_read: bool
     created_at: datetime
-
-  

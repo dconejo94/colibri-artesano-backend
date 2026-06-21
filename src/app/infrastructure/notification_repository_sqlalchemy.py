@@ -8,16 +8,13 @@ from app.domain.models.notification import Notification
 from app.domain.models.fcm_token import FCMToken
 from app.repositories.notification_repository import NotificationRepository
 
+
 class SQLAlchemyNotificationRepository(NotificationRepository):
     def __init__(self, db: AsyncSession):
         self.db = db
 
-
     async def get_by_user_id(
-        self,
-        user_id: UUID,
-        page: int,
-        limit: int
+        self, user_id: UUID, page: int, limit: int
     ) -> tuple[list[Notification], int]:
 
         total = await self.db.scalar(
@@ -37,27 +34,18 @@ class SQLAlchemyNotificationRepository(NotificationRepository):
         return list(result.scalars().all()), total or 0
 
     async def get_unread_by_user_id(
-        self,
-        user_id: UUID,
-        page: int,
-        limit: int
+        self, user_id: UUID, page: int, limit: int
     ) -> tuple[list[Notification], int]:
 
         total = await self.db.scalar(
             select(func.count())
             .select_from(Notification)
-            .where(
-                Notification.user_id == user_id,
-                Notification.is_read == False
-            )
+            .where(Notification.user_id == user_id, Notification.is_read.is_(False))
         )
 
         result = await self.db.execute(
             select(Notification)
-            .where(
-                Notification.user_id == user_id,
-                Notification.is_read == False
-            )
+            .where(Notification.user_id == user_id, Notification.is_read.is_(False))
             .order_by(Notification.created_at.desc())
             .offset((page - 1) * limit)
             .limit(limit)
@@ -92,8 +80,10 @@ class SQLAlchemyNotificationRepository(NotificationRepository):
             select(FCMToken).where(FCMToken.user_id == user_id)
         )
         return list(result.scalars().all())
-    
-    async def get_notification_by_id(self, notification_id:UUID) -> Notification | None:
+
+    async def get_notification_by_id(
+        self, notification_id: UUID
+    ) -> Notification | None:
         result = await self.db.execute(
             select(Notification).where(Notification.id == notification_id)
         )

@@ -11,6 +11,7 @@ from app.domain.models.product_variant import ProductVariant
 from app.domain.models.user import User
 from app.repositories.store_repository import StoreRepository
 
+
 class SQLAlchemyStoreRepository(StoreRepository):
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -118,11 +119,6 @@ class SQLAlchemyStoreRepository(StoreRepository):
         return result.scalar() is not None
 
     async def get_followers(self, store_id: UUID) -> list[User]:
-        stmt = (
-            select(User)
-            .where(
-                User.followed_stores.any(Store.id == store_id)
-            )
-        )
+        stmt = select(User).where(User.followed_stores.any(Store.id == store_id))
         result = await self.db.execute(stmt)
         return list(result.scalars().all())

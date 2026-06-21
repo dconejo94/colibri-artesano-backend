@@ -1,8 +1,8 @@
-import uuid 
+import uuid
 
 from sqlalchemy import (
     Column,
-    String, 
+    String,
     ForeignKey,
     DateTime,
     Uuid,
@@ -11,6 +11,7 @@ from sqlalchemy import (
 from app.core.database import Base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+
 
 class FCMToken(Base):
     __tablename__ = "fcm_tokens"

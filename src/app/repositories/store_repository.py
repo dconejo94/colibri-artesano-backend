@@ -5,6 +5,7 @@ from typing import Optional
 from app.domain.models.store import Store
 from app.domain.models.user import User
 
+
 class StoreRepository(ABC):
     @abstractmethod
     async def create(self, store: Store) -> Store:

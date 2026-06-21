@@ -1,7 +1,13 @@
 import uuid
-from tests.factories.product_factory import TEST_USER_ID, TEST_PRODUCT_ID, TEST_NOTIFICATION_ID2,TEST_NOTIFICATION_ID, TEST_NOTIFICATION_ID3
+from tests.factories.product_factory import (
+    TEST_PRODUCT_ID,
+    TEST_NOTIFICATION_ID2,
+    TEST_NOTIFICATION_ID,
+    TEST_NOTIFICATION_ID3,
+)
 
 # ── GET /notifications/ ───────────────────────────────────────────
+
 
 async def test_get_notifications_returns_own(client):
     resp = await client.get("/api/v1/notifications/")
@@ -20,6 +26,7 @@ async def test_get_notifications_does_not_return_others(client):
     assert str(TEST_NOTIFICATION_ID2) in returned_ids
 
     assert str(TEST_NOTIFICATION_ID3) not in returned_ids
+
 
 async def test_get_notifications_response_schema(client):
     resp = await client.get("/api/v1/notifications/")
@@ -45,6 +52,7 @@ async def test_get_notifications_pagination(client):
 
 # ── GET /notifications/unread ─────────────────────────────────────
 
+
 async def test_get_unread_notifications(client):
     resp = await client.get("/api/v1/notifications/unread")
 
@@ -56,12 +64,14 @@ async def test_get_unread_notifications(client):
 
 # ── PATCH /notifications/{id}/read ───────────────────────────────
 
+
 async def test_mark_notification_as_read(client):
     notif_id = str(TEST_NOTIFICATION_ID)
 
     resp = await client.patch(f"/api/v1/notifications/{notif_id}/read")
 
     assert resp.status_code == 204
+
 
 async def test_mark_notification_as_read_reflects_on_get(client):
     notif_id = str(TEST_NOTIFICATION_ID)
@@ -75,6 +85,7 @@ async def test_mark_notification_as_read_reflects_on_get(client):
 
     assert item["is_read"] is True
 
+
 async def test_mark_notification_not_found(client):
     resp = await client.patch(f"/api/v1/notifications/{uuid.uuid4()}/read")
 
@@ -82,14 +93,13 @@ async def test_mark_notification_not_found(client):
 
 
 async def test_mark_other_users_notification_returns_404(client):
-    resp = await client.patch(
-        f"/api/v1/notifications/{TEST_NOTIFICATION_ID3}/read"
-    )
+    resp = await client.patch(f"/api/v1/notifications/{TEST_NOTIFICATION_ID3}/read")
 
     assert resp.status_code == 404
 
 
 # ── POST /notifications/token ─────────────────────────────────────
+
 
 async def test_register_fcm_token(client):
     resp = await client.post(
@@ -107,6 +117,7 @@ async def test_register_fcm_token_missing_body(client):
 
 
 # ── Triggers ─────────────────────────────────────────────────────
+
 
 async def test_checkout_creates_order_confirmed_notification(client):
     from tests.factories.product_factory import TEST_VARIANT_1_ID
