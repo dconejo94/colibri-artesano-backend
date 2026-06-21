@@ -10,14 +10,14 @@ from tests.factories.product_factory import (
 
 
 async def test_get_notifications_returns_own(client):
-    resp = await client.get("/api/v1/notifications/")
+    resp = await client.get("/api/v1/notifications")
 
     assert resp.status_code == 200
     assert resp.json()["total"] == 2
 
 
 async def test_get_notifications_does_not_return_others(client):
-    resp = await client.get("/api/v1/notifications/")
+    resp = await client.get("/api/v1/notifications")
 
     data = resp.json()
     returned_ids = {n["id"] for n in data["items"]}
@@ -29,7 +29,7 @@ async def test_get_notifications_does_not_return_others(client):
 
 
 async def test_get_notifications_response_schema(client):
-    resp = await client.get("/api/v1/notifications/")
+    resp = await client.get("/api/v1/notifications")
 
     item = resp.json()["items"][0]
 
@@ -42,7 +42,7 @@ async def test_get_notifications_response_schema(client):
 
 
 async def test_get_notifications_pagination(client):
-    resp = await client.get("/api/v1/notifications/?page=1&limit=1")
+    resp = await client.get("/api/v1/notifications?page=1&limit=1")
 
     data = resp.json()
 
@@ -132,7 +132,7 @@ async def test_checkout_creates_order_confirmed_notification(client):
     )
     await client.post("/api/v1/orders/")
 
-    resp = await client.get("/api/v1/notifications/")
+    resp = await client.get("/api/v1/notifications")
 
     data = resp.json()
 

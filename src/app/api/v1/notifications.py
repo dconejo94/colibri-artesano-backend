@@ -15,7 +15,7 @@ router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
 
 @router.get(
-    "/", response_model=PaginatedResponse[NotificationResponseDTO], status_code=200
+    "", response_model=PaginatedResponse[NotificationResponseDTO], status_code=200
 )
 async def get_notifications(
     current_user: CurrentUser,

@@ -11,7 +11,7 @@ class NotificationResponseDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
     title: str
-    body: str
+    body: str | None
     type: str
     reference_id: UUID | None
     is_read: bool

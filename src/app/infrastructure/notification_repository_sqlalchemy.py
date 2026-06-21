@@ -1,4 +1,3 @@
-# app/infrastructure/sqlalchemy_notification_repository.py
 from uuid import UUID
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
