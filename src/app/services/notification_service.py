@@ -2,20 +2,36 @@
 from uuid import UUID
 from app.domain.models.notification import Notification
 from app.domain.models.fcm_token import FCMToken
-from app.domain.schemas.notification import NotificationResponseDTO, NotificationListResponseDTO
+from app.domain.schemas.notification import NotificationResponseDTO
 from app.repositories.notification_repository import NotificationRepository
+from app.domain.schemas.paginated_response import PaginatedResponse
 
 
 class NotificationService:
     def __init__(self, repository: NotificationRepository):
         self.repository = repository
 
-    async def get_notifications(self, user_id: UUID) -> NotificationListResponseDTO:
-        notifications = await self.repository.get_by_user_id(user_id)
-        
-        return NotificationListResponseDTO(
-            notifications=[NotificationResponseDTO.model_validate(n) for n in notifications],
-            size=len(notifications)
+    async def get_notifications(
+        self,
+        user_id: UUID,
+        page: int,
+        limit: int
+    ) -> PaginatedResponse[NotificationResponseDTO]:
+
+        notifications, total = await self.repository.get_by_user_id(
+            user_id,
+            page,
+            limit
+        )
+
+        return PaginatedResponse(
+            items=[
+                NotificationResponseDTO.model_validate(n)
+                for n in notifications
+            ],
+            page=page,
+            limit=limit,
+            total=total
         )
 
     async def register_fcm_token(self, user_id: UUID, token: str) -> None:

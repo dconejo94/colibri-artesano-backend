@@ -1,7 +1,8 @@
 # app/infrastructure/sqlalchemy_notification_repository.py
 from uuid import UUID
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+
 
 from app.domain.models.notification import Notification
 from app.domain.models.fcm_token import FCMToken
@@ -11,13 +12,29 @@ class SQLAlchemyNotificationRepository(NotificationRepository):
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_by_user_id(self, user_id: UUID) -> list[Notification]:
+
+    async def get_by_user_id(
+        self,
+        user_id: UUID,
+        page: int,
+        limit: int
+    ) -> tuple[list[Notification], int]:
+
+        total = await self.db.scalar(
+            select(func.count())
+            .select_from(Notification)
+            .where(Notification.user_id == user_id)
+        )
+
         result = await self.db.execute(
             select(Notification)
             .where(Notification.user_id == user_id)
             .order_by(Notification.created_at.desc())
+            .offset((page - 1) * limit)
+            .limit(limit)
         )
-        return list(result.scalars().all())
+
+        return list(result.scalars().all()), total or 0
 
     async def create(self, notification: Notification) -> Notification:
         self.db.add(notification)

@@ -17,7 +17,4 @@ class NotificationResponseDTO(BaseModel):
     is_read: bool
     created_at: datetime
 
-class NotificationListResponseDTO(BaseModel):
-    notifications: list[NotificationResponseDTO]
-    size: int
-    
+  

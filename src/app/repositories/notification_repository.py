@@ -7,7 +7,12 @@ from app.domain.models.fcm_token import FCMToken
 class NotificationRepository(ABC):
 
     @abstractmethod
-    async def get_by_user_id(self, user_id: UUID) -> list[Notification]:
+    async def get_by_user_id(
+        self,
+        user_id: UUID,
+        page: int,
+        limit: int
+    ) -> tuple[list[Notification], int]:
         pass
 
     @abstractmethod
