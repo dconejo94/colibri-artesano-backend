@@ -1,10 +1,12 @@
 from uuid import UUID
 
 from app.domain.models.product import Product
+from app.domain.models.product_variant import ProductVariant
 from app.domain.schemas.product import ProductCreateDTO, ProductUpdateDTO
 from app.domain.schemas.paginated_response import PaginatedResponse
 from app.domain.schemas.product import ProductResponseDTO
 from app.repositories.product_repository import ProductRepository
+from app.repositories.product_variant_repository import ProductVariantRepository
 from app.repositories.category_repository import CategoryRepository
 from app.core.exceptions import NotFoundException
 
@@ -14,9 +16,11 @@ class ProductService:
         self,
         repository: ProductRepository,
         category_repository: CategoryRepository,
+        variant_repository: ProductVariantRepository,
     ):
         self.repository = repository
         self.category_repo = category_repository
+        self.variant_repo = variant_repository
 
     async def create_product(self, store_id: UUID, dto: ProductCreateDTO) -> Product:
         category = await self.category_repo.get_by_id(dto.category_id)
@@ -32,6 +36,18 @@ class ProductService:
             is_active=dto.is_active,
         )
         created_product = await self.repository.create(product)
+
+        # Every product must be sellable as a variant, so seed a default one.
+        await self.variant_repo.create(
+            ProductVariant(
+                product_id=created_product.id,
+                name="Default",
+                value="Único",
+                price_modifier=0,
+                stock_quantity=0,
+            )
+        )
+
         return await self.get_product_by_id(created_product.id)
 
     async def list_products(

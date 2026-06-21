@@ -15,6 +15,8 @@ TEST_PRODUCT_ID = uuid.UUID("00000000-0000-0000-0000-000000000004")
 TEST_PRODUCT_2_ID = uuid.UUID("00000000-0000-0000-0000-000000000005")
 TEST_VARIANT_1_ID = uuid.UUID("00000000-0000-0000-0000-000000000006")
 TEST_VARIANT_2_ID = uuid.UUID("00000000-0000-0000-0000-000000000007")
+# Single default variant for TEST_PRODUCT_2 (a one-variant product).
+TEST_VARIANT_3_ID = uuid.UUID("00000000-0000-0000-0000-000000000008")
 
 
 async def seed_products(db):
@@ -36,7 +38,6 @@ async def seed_products(db):
         name="Artesania",
         description="Lorem Ipsum",
         base_price=Decimal("10.00"),
-        stock=100,
     )
 
     product2 = Product(
@@ -69,8 +70,18 @@ async def seed_products(db):
         stock_quantity=50,
     )
 
+    variant3 = ProductVariant(
+        id=TEST_VARIANT_3_ID,
+        product_id=TEST_PRODUCT_2_ID,
+        name="Default",
+        value="Único",
+        price_modifier=Decimal("0.00"),
+        stock_quantity=30,
+    )
+
     db.add(variant1)
     db.add(variant2)
+    db.add(variant3)
 
     await db.commit()
     await db.refresh(product)

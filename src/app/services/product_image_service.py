@@ -19,7 +19,7 @@ class ProductImageService:
         self.validate_image_url = validate_image_url
 
     async def add_image(
-        self, product_id: UUID, dto: ProductImageCreateDTO
+        self, variant_id: UUID, dto: ProductImageCreateDTO
     ) -> ProductImage:
         if (
             self.validate_image_url
@@ -28,20 +28,20 @@ class ProductImageService:
         ):
             raise InvalidImageUrlError()
         image = ProductImage(
-            product_id=product_id,
+            variant_id=variant_id,
             image_url=dto.image_url,
             is_primary=dto.is_primary,
         )
         if dto.is_primary:
-            await self.repository.clear_primary(product_id)
+            await self.repository.clear_primary(variant_id)
         return await self.repository.create(image)
 
-    async def list_images(self, product_id: UUID) -> list[ProductImage]:
-        return await self.repository.list_by_product(product_id)
+    async def list_images(self, variant_id: UUID) -> list[ProductImage]:
+        return await self.repository.list_by_variant(variant_id)
 
-    async def delete_image(self, product_id: UUID, image_id: UUID) -> None:
+    async def delete_image(self, variant_id: UUID, image_id: UUID) -> None:
         image = await self.repository.get_by_id(image_id)
-        if not image or image.product_id != product_id:
+        if not image or image.variant_id != variant_id:
             raise NotFoundException("ProductImage", str(image_id))
         image_url = image.image_url
         await self.repository.delete(image)
@@ -49,9 +49,9 @@ class ProductImageService:
             # Best-effort: never raises, so a missing blob can't fail the delete.
             self.blob_storage.delete_blob(image_url)
 
-    async def set_primary(self, product_id: UUID, image_id: UUID) -> None:
+    async def set_primary(self, variant_id: UUID, image_id: UUID) -> None:
         image = await self.repository.get_by_id(image_id)
-        if not image or image.product_id != product_id:
+        if not image or image.variant_id != variant_id:
             raise NotFoundException("ProductImage", str(image_id))
-        await self.repository.clear_primary(product_id)
+        await self.repository.clear_primary(variant_id)
         await self.repository.set_primary(image_id)

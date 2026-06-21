@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.domain.models.product import Product
+from app.domain.models.product_variant import ProductVariant
 from app.repositories.product_repository import ProductRepository
 
 
@@ -44,8 +45,9 @@ class SQLAlchemyProductRepository(ProductRepository):
             stmt.options(
                 selectinload(Product.store),
                 selectinload(Product.category),
-                selectinload(Product.images),
-                # variants omitted: ProductListDTO does not expose them.
+                # Variants (with their images) drive both the derived ``stock``
+                # total and the listing thumbnails.
+                selectinload(Product.variants).selectinload(ProductVariant.images),
             )
             .order_by(Product.created_at.desc())
             .offset((page - 1) * limit)
@@ -59,8 +61,7 @@ class SQLAlchemyProductRepository(ProductRepository):
             select(Product)
             .where(Product.id == product_id)
             .options(
-                selectinload(Product.images),
-                selectinload(Product.variants),
+                selectinload(Product.variants).selectinload(ProductVariant.images),
                 selectinload(Product.store),
                 selectinload(Product.category),
             )

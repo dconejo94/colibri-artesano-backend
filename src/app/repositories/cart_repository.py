@@ -49,17 +49,19 @@ class CartRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_order_item(
-        self, product_id: UUID, store_order_id: UUID, quantity: int
-    ) -> OrderItem:
+    async def count_store_order_items(self, store_order_id: UUID) -> int:
         pass
 
     @abstractmethod
-    async def get_order_item_by_product(
-        self,
-        store_order_id: UUID,
-        product_id: UUID,
-    ) -> OrderItem | None:
+    async def delete_store_order(self, store_order: StoreOrder) -> None:
+        pass
+
+    @abstractmethod
+    async def count_main_order_store_orders(self, main_order_id: UUID) -> int:
+        pass
+
+    @abstractmethod
+    async def delete_main_order(self, main_order: MainOrder) -> None:
         pass
 
     @abstractmethod

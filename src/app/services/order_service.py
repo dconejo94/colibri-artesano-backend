@@ -1,11 +1,8 @@
 from uuid import UUID
-from decimal import Decimal
 
 from app.domain.models.main_order import MainOrder
 from app.domain.models.store_order import StoreOrder
-from app.domain.models.order_item import OrderItem
 from app.domain.schemas.order import (
-    MainOrderCreateDTO,
     StoreOrderStatusUpdateDTO,
 )
 from app.domain.schemas.paginated_response import PaginatedResponse
@@ -27,66 +24,31 @@ class OrderService:
         self.product_repo = product_repository
         self.variant_repo = variant_repository
 
-    async def create_order(self, buyer_id: UUID, dto: MainOrderCreateDTO) -> MainOrder:
-        if not await self.order_repo.buyer_exists(buyer_id):
-            raise NotFoundException("User", str(buyer_id))
+    async def checkout(self, buyer_id: UUID) -> MainOrder:
+        """Convert the buyer's active cart into a placed order.
 
-        store_groups: dict[UUID, list] = {}
+        The cart already holds the validated, priced items, so checkout only
+        verifies stock and transitions the same MainOrder from "cart" to
+        "placed". No new order is created.
+        """
+        cart = await self.order_repo.get_cart_by_buyer(buyer_id)
 
-        for item_dto in dto.items:
-            product = await self.product_repo.get_by_id(item_dto.product_id)
-            if not product:
-                raise NotFoundException("Product", str(item_dto.product_id))
-
-            unit_price = Decimal(str(product.base_price))
-
-            if item_dto.variant_id:
-                variant = await self.variant_repo.get_by_id(item_dto.variant_id)
-                if not variant or variant.product_id != product.id:
-                    raise NotFoundException("ProductVariant", str(item_dto.variant_id))
-                unit_price += Decimal(str(variant.price_modifier))
-
-            if product.stock < item_dto.quantity:
-                raise ConflictException(f"Insufficient stock for product {product.id}")
-
-            store_id = product.store_id
-            store_groups.setdefault(store_id, []).append((item_dto, unit_price))
-
-        total_amount = Decimal("0")
-        store_orders = []
-
-        for store_id, grouped_items in store_groups.items():
-            subtotal = Decimal("0")
-            order_items = []
-
-            for item_dto, unit_price in grouped_items:
-                line_total = unit_price * item_dto.quantity
-                subtotal += line_total
-                order_items.append(
-                    OrderItem(
-                        product_id=item_dto.product_id,
-                        variant_id=item_dto.variant_id,
-                        quantity=item_dto.quantity,
-                        unit_price=unit_price,
-                    )
-                )
-
-            store_order = StoreOrder(
-                store_id=store_id,
-                seller_status="pending",
-                subtotal_amount=subtotal,
-                items=order_items,
-            )
-            store_orders.append(store_order)
-            total_amount += subtotal
-
-        main_order = MainOrder(
-            buyer_id=buyer_id,
-            total_amount=total_amount,
-            status="pending",
-            store_orders=store_orders,
+        has_items = cart is not None and any(
+            store_order.items for store_order in cart.store_orders
         )
-        return await self.order_repo.create_main_order(main_order)
+        if not has_items:
+            raise ConflictException("Cart is empty")
+
+        for store_order in cart.store_orders:
+            for item in store_order.items:
+                variant = await self.variant_repo.get_by_id(item.variant_id)
+                if not variant or variant.stock_quantity < item.quantity:
+                    raise ConflictException(
+                        f"Insufficient stock for variant {item.variant_id}"
+                    )
+
+        cart.status = "placed"
+        return cart
 
     async def get_order(self, order_id: UUID) -> MainOrder:
         order = await self.order_repo.get_main_order_by_id(order_id)

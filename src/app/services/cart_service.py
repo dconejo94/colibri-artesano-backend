@@ -9,29 +9,35 @@ from app.domain.schemas.cart import (
 )
 from app.domain.models.main_order import MainOrder
 from app.domain.models.store_order import StoreOrder
-from app.domain.models.order_item import OrderItem
-from app.domain.models.product_variant import ProductVariant
 
 from app.repositories.cart_repository import CartRepository
 from app.repositories.order_repository import OrderRepository
 from app.repositories.product_repository import ProductRepository
-from app.repositories.product_variant_repository import ProductVariantRepository
+from app.services.store_order_service import StoreOrderService
 
 from app.core.exceptions import NotFoundException
 
 
 class CartService:
+    """Orchestrates the cart: the cart owns its store orders, and a store order
+    owns its product lines (delegated to ``StoreOrderService``).
+
+    The cart finds or creates the buyer's active cart and the right store order
+    for a product, then hands the line work to the store order. It keeps the
+    cart total, cleans up empty store orders / carts, and guards the cart phase.
+    """
+
     def __init__(
         self,
         cart_repository: CartRepository,
         order_repository: OrderRepository,
         product_repository: ProductRepository,
-        variant_repository: ProductVariantRepository,
+        store_order_service: StoreOrderService,
     ):
         self.cart_repository = cart_repository
         self.order_repository = order_repository
         self.product_repository = product_repository
-        self.variant_repository = variant_repository
+        self.store_orders = store_order_service
 
     async def get_cart(self, buyer_id: UUID) -> CartResponseDTO:
         if not await self._is_user_valid(buyer_id):
@@ -53,8 +59,9 @@ class CartService:
             items = []
 
             for item in store_order.items:
+                variant_images = item.variant.images if item.variant else []
                 primary_image = next(
-                    (image for image in item.product.images if image.is_primary),
+                    (image for image in variant_images if image.is_primary),
                     None,
                 )
 
@@ -97,114 +104,70 @@ class CartService:
             raise NotFoundException("User", str(buyer_id))
 
         product = await self.product_repository.get_by_id(dto.product_id)
-
         if not product:
             raise NotFoundException("Product", str(dto.product_id))
 
-        variant = None
-        if dto.variant_id:
-            variant = await self._validate_variant_is_valid(
-                dto.product_id, dto.variant_id
-            )
-
-        cart = await self.cart_repository.get_cart(buyer_id)
-
-        if not cart:
-            cart = await self.order_repository.create_main_order(
-                MainOrder(
-                    buyer_id=buyer_id,
-                    total_amount=Decimal("0.00"),
-                    status="pending",
-                )
-            )
-
-        store_order = await self.cart_repository.get_store_order(
-            cart.id,
-            product.store_id,
+        variant = await self.store_orders.resolve_variant(
+            dto.product_id, dto.variant_id
         )
 
-        if not store_order:
-            store_order = await self.cart_repository.create_store_order(
-                StoreOrder(
-                    main_order_id=cart.id,
-                    store_id=product.store_id,
-                    seller_status="pending",
-                    subtotal_amount=Decimal("0.00"),
-                )
-            )
+        cart = await self._ensure_cart(buyer_id)
+        store_order = await self._ensure_store_order(cart, product.store_id)
 
-        unit_price = Decimal(str(product.base_price))
-
-        if variant:
-            unit_price = Decimal(str(variant.price_modifier))
-
-        existing_item = await self.cart_repository.get_order_item(
-            store_order.id,
-            dto.product_id,
-            dto.variant_id,
+        amount = await self.store_orders.add_product(
+            store_order, product, variant, dto.quantity
         )
-
-        if existing_item:
-            existing_item.quantity += dto.quantity
-        else:
-            await self.cart_repository.create_order_item(
-                OrderItem(
-                    store_order_id=store_order.id,
-                    product_id=product.id,
-                    variant_id=dto.variant_id,
-                    quantity=dto.quantity,
-                    unit_price=unit_price,
-                )
-            )
-
-        total = unit_price * dto.quantity
-
-        store_order.subtotal_amount += total
-        cart.total_amount += total
+        cart.total_amount += amount
 
         await self.cart_repository.flush()
 
         return await self.get_cart(buyer_id)
 
     async def remove_from_cart(
-        self, buyer_id: UUID, product_id: UUID, variant_id: UUID, store_order_id: UUID
+        self,
+        buyer_id: UUID,
+        product_id: UUID,
+        variant_id: UUID | None,
+        store_order_id: UUID,
     ) -> CartResponseDTO:
         if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
 
         product = await self.product_repository.get_by_id(product_id)
-
         if not product:
-            raise NotFoundException(
-                "Product",
-                str(product_id),
-            )
+            raise NotFoundException("Product", str(product_id))
 
-        await self._validate_variant_is_valid(product_id, variant_id)
+        variant = await self.store_orders.resolve_variant(product_id, variant_id)
 
         store_order, main_order = await self._validate_store_order_owner(
             buyer_id, store_order_id
         )
 
-        item = await self.cart_repository.remove_order_item(
-            product_id,
-            variant_id,
-            store_order_id,
+        line = await self.store_orders.get_line(store_order_id, product_id, variant.id)
+        if not line:
+            raise NotFoundException("OrderItem", str(product_id))
+
+        amount = line.quantity * line.unit_price
+        item_count = await self.cart_repository.count_store_order_items(store_order_id)
+        store_count = await self.cart_repository.count_main_order_store_orders(
+            main_order.id
         )
 
-        if not item:
-            raise NotFoundException(
-                "OrderItem",
-                str(product_id),
+        # Removing the last line drops its empty store order; removing the last
+        # store drops the whole cart. Deleting a parent cascades to its children,
+        # so the line is only removed on its own when the store survives.
+        if item_count <= 1 and store_count <= 1:
+            await self.cart_repository.delete_main_order(main_order)
+        elif item_count <= 1:
+            await self.cart_repository.delete_store_order(store_order)
+            main_order.total_amount = max(
+                Decimal("0.00"), main_order.total_amount - amount
             )
-
-        amount = item.quantity * item.unit_price
-
-        store_order.subtotal_amount = max(
-            Decimal("0.00"), store_order.subtotal_amount - amount
-        )
-
-        main_order.total_amount = max(Decimal("0.00"), main_order.total_amount - amount)
+        else:
+            await self.store_orders.remove_line(store_order, line)
+            main_order.total_amount = max(
+                Decimal("0.00"), main_order.total_amount - amount
+            )
 
         await self.cart_repository.flush()
 
@@ -218,7 +181,6 @@ class CartService:
         quantity: int,
         store_order_id: UUID,
     ) -> CartResponseDTO:
-
         if not await self._is_user_valid(buyer_id):
             raise NotFoundException("User", str(buyer_id))
 
@@ -226,54 +188,45 @@ class CartService:
         if not product:
             raise NotFoundException("Product", str(product_id))
 
+        variant = await self.store_orders.resolve_variant(product_id, variant_id)
+
         store_order, main_order = await self._validate_store_order_owner(
             buyer_id, store_order_id
         )
 
-        existing_item = await self.cart_repository.get_order_item_by_product(
-            store_order_id,
-            product_id,
+        diff = await self.store_orders.update_quantity(
+            store_order, product_id, variant, quantity
         )
-
-        if not existing_item:
-            raise NotFoundException("OrderItem", str(product_id))
-
-        old_amount = existing_item.quantity * existing_item.unit_price
-
-        effective_variant_id = (
-            variant_id if variant_id is not None else existing_item.variant_id
-        )
-
-        variant = None
-        if effective_variant_id is not None:
-            variant = await self._validate_variant_is_valid(
-                product_id, effective_variant_id
-            )
-
-        unit_price = Decimal(str(product.base_price))
-        if variant:
-            unit_price = Decimal(str(variant.price_modifier))
-
-        existing_item.variant_id = effective_variant_id
-        existing_item.quantity = quantity
-        existing_item.unit_price = unit_price
-
-        new_amount = quantity * unit_price
-        diff = new_amount - old_amount
-
-        store_order.subtotal_amount = max(
-            Decimal("0.00"),
-            store_order.subtotal_amount + diff,
-        )
-
-        main_order.total_amount = max(
-            Decimal("0.00"),
-            main_order.total_amount + diff,
-        )
+        main_order.total_amount = max(Decimal("0.00"), main_order.total_amount + diff)
 
         await self.cart_repository.flush()
 
         return await self.get_cart(buyer_id)
+
+    async def _ensure_cart(self, buyer_id: UUID) -> MainOrder:
+        cart = await self.cart_repository.get_cart(buyer_id)
+        if cart:
+            return cart
+        return await self.order_repository.create_main_order(
+            MainOrder(
+                buyer_id=buyer_id,
+                total_amount=Decimal("0.00"),
+                status="cart",
+            )
+        )
+
+    async def _ensure_store_order(self, cart: MainOrder, store_id: UUID) -> StoreOrder:
+        store_order = await self.cart_repository.get_store_order(cart.id, store_id)
+        if store_order:
+            return store_order
+        return await self.cart_repository.create_store_order(
+            StoreOrder(
+                main_order_id=cart.id,
+                store_id=store_id,
+                seller_status="pending",
+                subtotal_amount=Decimal("0.00"),
+            )
+        )
 
     async def _is_user_valid(self, user_id: UUID) -> bool:
         return await self.order_repository.buyer_exists(user_id)
@@ -286,38 +239,19 @@ class CartService:
         store_order = await self.order_repository.get_store_order_by_id(store_order_id)
 
         if not store_order:
-            raise NotFoundException(
-                "Cart",
-                str(store_order_id),
-            )
+            raise NotFoundException("Cart", str(store_order_id))
 
         main_order = await self.order_repository.get_main_order_by_id(
             store_order.main_order_id
         )
 
-        if not main_order or main_order.buyer_id != buyer_id:
-            raise NotFoundException(
-                "Cart",
-                str(store_order_id),
-            )
+        # Only the buyer's active cart is mutable. A placed order is frozen, so a
+        # store order outside the cart phase is treated as not found.
+        if (
+            not main_order
+            or main_order.buyer_id != buyer_id
+            or main_order.status != "cart"
+        ):
+            raise NotFoundException("Cart", str(store_order_id))
 
         return store_order, main_order
-
-    async def _validate_variant_is_valid(
-        self, product_id: UUID, variant_id: UUID
-    ) -> ProductVariant:
-        variant = await self.variant_repository.get_by_id(variant_id)
-
-        if not variant:
-            raise NotFoundException(
-                "ProductVariant",
-                str(variant_id),
-            )
-
-        if variant.product_id != product_id:
-            raise NotFoundException(
-                "ProductVariant",
-                str(variant_id),
-            )
-
-        return variant

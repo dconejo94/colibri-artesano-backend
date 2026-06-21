@@ -9,7 +9,7 @@ from app.core.security import create_access_token
 from app.domain.models.store import Store
 from app.domain.models.user import User
 from tests.conftest import TestingSessionLocal
-from tests.factories.product_factory import TEST_PRODUCT_ID
+from tests.factories.product_factory import TEST_PRODUCT_ID, TEST_VARIANT_1_ID
 
 _REGISTER = "/api/v1/auth/register"
 _LOGIN = "/api/v1/auth/login"
@@ -199,11 +199,18 @@ async def test_get_order_of_another_user_returns_404(auth_client):
     ha = {"Authorization": f"Bearer {a['access_token']}"}
     hb = {"Authorization": f"Bearer {b['access_token']}"}
 
-    created = await auth_client.post(
-        "/api/v1/orders/",
-        json={"items": [{"product_id": str(TEST_PRODUCT_ID), "quantity": 1}]},
+    add = await auth_client.post(
+        "/api/v1/cart/item",
+        json={
+            "product_id": str(TEST_PRODUCT_ID),
+            "variant_id": str(TEST_VARIANT_1_ID),
+            "quantity": 1,
+        },
         headers=ha,
     )
+    assert add.status_code == 201
+
+    created = await auth_client.post("/api/v1/orders/", headers=ha)
     assert created.status_code == 201
     order_id = created.json()["id"]
 

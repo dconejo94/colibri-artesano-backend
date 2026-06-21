@@ -13,19 +13,19 @@ from app.core.security import get_current_user
 from app.domain.models.user import User
 
 
-async def test_update_cart_item_quantity_success(client):
-    add_resp = await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "quantity": 2,
-        },
-    )
+async def _add(client, product_id, quantity, variant_id=None):
+    body = {"product_id": str(product_id), "quantity": quantity}
+    if variant_id is not None:
+        body["variant_id"] = str(variant_id)
+    return await client.post("/api/v1/cart/item", json=body)
 
+
+async def test_update_cart_item_quantity_success(client):
+    add_resp = await _add(client, TEST_PRODUCT_2_ID, 2)
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     resp = await client.patch(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"/api/v1/cart/item/{TEST_PRODUCT_2_ID}"
         f"?store_order_id={store_order_id}&quantity=5"
     )
 
@@ -41,14 +41,7 @@ async def test_update_cart_item_quantity_success(client):
 
 
 async def test_update_cart_item_nonexistent_product_returns_404(client):
-    add_resp = await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "quantity": 1,
-        },
-    )
-
+    add_resp = await _add(client, TEST_PRODUCT_2_ID, 1)
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     resp = await client.patch(
@@ -59,14 +52,8 @@ async def test_update_cart_item_nonexistent_product_returns_404(client):
 
 
 async def test_update_cart_item_not_in_cart_returns_404(client):
-    add_resp = await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "quantity": 1,
-        },
-    )
-
+    # Cart holds TEST_PRODUCT; updating TEST_PRODUCT_2 (not in cart) is a 404.
+    add_resp = await _add(client, TEST_PRODUCT_ID, 1, variant_id=TEST_VARIANT_1_ID)
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     resp = await client.patch(
@@ -78,82 +65,54 @@ async def test_update_cart_item_not_in_cart_returns_404(client):
 
 
 async def test_update_cart_item_invalid_store_order_returns_404(client):
-    await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "quantity": 1,
-        },
-    )
+    await _add(client, TEST_PRODUCT_2_ID, 1)
 
     resp = await client.patch(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}?store_order_id={uuid.uuid4()}&quantity=5"
+        f"/api/v1/cart/item/{TEST_PRODUCT_2_ID}"
+        f"?store_order_id={uuid.uuid4()}&quantity=5"
     )
 
     assert resp.status_code == 404
 
 
 async def test_update_cart_item_updates_totals(client):
-    add_resp = await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "quantity": 1,
-        },
-    )
-
+    add_resp = await _add(client, TEST_PRODUCT_2_ID, 1)
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     resp = await client.patch(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"/api/v1/cart/item/{TEST_PRODUCT_2_ID}"
         f"?store_order_id={store_order_id}&quantity=3"
     )
 
     assert resp.status_code == 200
 
     data = resp.json()
-
     item = data["stores"][0]["items"][0]
 
     assert item["quantity"] == 3
 
     expected_total = Decimal(item["unit_price"]) * Decimal(item["quantity"])
-
     assert Decimal(data["total_amount"]) == expected_total
 
 
 async def test_update_cart_item_quantity_zero_returns_422(client):
-    add_resp = await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "quantity": 2,
-        },
-    )
-
+    add_resp = await _add(client, TEST_PRODUCT_2_ID, 2)
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     resp = await client.patch(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"/api/v1/cart/item/{TEST_PRODUCT_2_ID}"
         f"?store_order_id={store_order_id}&quantity=0"
     )
 
     assert resp.status_code == 422
 
 
-async def test_update_cart_item_quantity_negative_returns_400(client):
-    add_resp = await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "quantity": 2,
-        },
-    )
-
+async def test_update_cart_item_quantity_negative_returns_422(client):
+    add_resp = await _add(client, TEST_PRODUCT_2_ID, 2)
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     resp = await client.patch(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"/api/v1/cart/item/{TEST_PRODUCT_2_ID}"
         f"?store_order_id={store_order_id}&quantity=-1"
     )
 
@@ -161,14 +120,7 @@ async def test_update_cart_item_quantity_negative_returns_400(client):
 
 
 async def test_update_cart_item_from_other_user_cart_returns_404(client):
-    add_resp = await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "quantity": 2,
-        },
-    )
-
+    add_resp = await _add(client, TEST_PRODUCT_2_ID, 2)
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     other_user = User(
@@ -186,7 +138,7 @@ async def test_update_cart_item_from_other_user_cart_returns_404(client):
 
     try:
         resp = await client.patch(
-            f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+            f"/api/v1/cart/item/{TEST_PRODUCT_2_ID}"
             f"?store_order_id={store_order_id}&quantity=5"
         )
     finally:
@@ -195,46 +147,46 @@ async def test_update_cart_item_from_other_user_cart_returns_404(client):
     assert resp.status_code == 404
 
 
-async def test_update_cart_item_changes_variant(client):
-    add_resp = await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "variant_id": str(TEST_VARIANT_1_ID),
-            "quantity": 2,
-        },
-    )
+async def test_update_targets_the_named_variant(client):
+    # Two variants of the same product are separate lines; updating one must not
+    # touch the other.
+    add_resp = await _add(client, TEST_PRODUCT_ID, 2, variant_id=TEST_VARIANT_1_ID)
+    await _add(client, TEST_PRODUCT_ID, 1, variant_id=TEST_VARIANT_2_ID)
 
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     resp = await client.patch(
         f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
         f"?store_order_id={store_order_id}"
-        f"&quantity=2"
-        f"&variant_id={TEST_VARIANT_2_ID}"
+        f"&variant_id={TEST_VARIANT_1_ID}"
+        f"&quantity=5"
     )
 
     assert resp.status_code == 200
 
-    data = resp.json()
-    item = data["stores"][0]["items"][0]
+    items = {i["variant_id"]: i for i in resp.json()["stores"][0]["items"]}
 
-    assert item["variant_id"] == str(TEST_VARIANT_2_ID)
-    assert item["quantity"] == 2
-
-    assert Decimal(item["unit_price"]) == Decimal("15.00")
+    assert items[str(TEST_VARIANT_1_ID)]["quantity"] == 5
+    assert items[str(TEST_VARIANT_2_ID)]["quantity"] == 1
 
 
-async def test_update_cart_item_keeps_variant_when_not_sent(client):
-    add_resp = await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "variant_id": str(TEST_VARIANT_1_ID),
-            "quantity": 2,
-        },
+async def test_update_exceeding_stock_returns_409(client):
+    # TEST_VARIANT_1 has stock 50.
+    add_resp = await _add(client, TEST_PRODUCT_ID, 2, variant_id=TEST_VARIANT_1_ID)
+    store_order_id = add_resp.json()["stores"][0]["id"]
+
+    resp = await client.patch(
+        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
+        f"?store_order_id={store_order_id}"
+        f"&variant_id={TEST_VARIANT_1_ID}"
+        f"&quantity=51"
     )
 
+    assert resp.status_code == 409
+
+
+async def test_update_multivariant_without_variant_returns_409(client):
+    add_resp = await _add(client, TEST_PRODUCT_ID, 2, variant_id=TEST_VARIANT_1_ID)
     store_order_id = add_resp.json()["stores"][0]["id"]
 
     resp = await client.patch(
@@ -242,64 +194,4 @@ async def test_update_cart_item_keeps_variant_when_not_sent(client):
         f"?store_order_id={store_order_id}&quantity=5"
     )
 
-    item = resp.json()["stores"][0]["items"][0]
-
-    assert item["variant_id"] == str(TEST_VARIANT_1_ID)
-    assert resp.status_code == 200
-
-
-async def test_update_cart_item_updates_price_when_variant_changes(client):
-    add_resp = await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "variant_id": str(TEST_VARIANT_1_ID),
-            "quantity": 1,
-        },
-    )
-
-    store_order_id = add_resp.json()["stores"][0]["id"]
-
-    old_price = Decimal(add_resp.json()["stores"][0]["items"][0]["unit_price"])
-
-    resp = await client.patch(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
-        f"?store_order_id={store_order_id}"
-        f"&quantity=1"
-        f"&variant_id={TEST_VARIANT_2_ID}"
-    )
-
-    assert resp.status_code == 200
-
-    new_item = resp.json()["stores"][0]["items"][0]
-
-    assert Decimal(new_item["unit_price"]) != old_price
-
-
-async def test_update_cart_item_variant_updates_totals(client):
-    add_resp = await client.post(
-        "/api/v1/cart/item",
-        json={
-            "product_id": str(TEST_PRODUCT_ID),
-            "variant_id": str(TEST_VARIANT_1_ID),
-            "quantity": 2,
-        },
-    )
-
-    store_order_id = add_resp.json()["stores"][0]["id"]
-
-    resp = await client.patch(
-        f"/api/v1/cart/item/{TEST_PRODUCT_ID}"
-        f"?store_order_id={store_order_id}"
-        f"&quantity=2"
-        f"&variant_id={TEST_VARIANT_2_ID}"
-    )
-
-    assert resp.status_code == 200
-
-    data = resp.json()
-
-    item = data["stores"][0]["items"][0]
-
-    expected_total = Decimal(item["unit_price"]) * Decimal(item["quantity"])
-    assert Decimal(data["total_amount"]) == expected_total
+    assert resp.status_code == 409
