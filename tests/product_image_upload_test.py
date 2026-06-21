@@ -7,7 +7,7 @@ from app.main import app
 from app.api.deps import get_blob_storage_service
 from app.infrastructure.azure_blob_storage import BlobStorageService
 
-from tests.factories.product_factory import TEST_PRODUCT_ID
+from tests.factories.product_factory import TEST_PRODUCT_ID, TEST_VARIANT_1_ID
 
 
 class _FakeStorage:
@@ -29,7 +29,8 @@ async def test_upload_url_returns_sas_and_clean_blob_url(client):
     _use_fake_storage()
 
     resp = await client.post(
-        f"/api/v1/products/{TEST_PRODUCT_ID}/images/upload-url",
+        f"/api/v1/products/{TEST_PRODUCT_ID}/variants/{TEST_VARIANT_1_ID}"
+        f"/images/upload-url",
         json={"filename": "photo.jpg", "content_type": "image/jpeg"},
     )
 
@@ -46,7 +47,8 @@ async def test_upload_url_wrong_product_returns_404(client):
     fake_product = uuid.uuid4()
 
     resp = await client.post(
-        f"/api/v1/products/{fake_product}/images/upload-url",
+        f"/api/v1/products/{fake_product}/variants/{TEST_VARIANT_1_ID}"
+        f"/images/upload-url",
         json={"filename": "photo.jpg", "content_type": "image/jpeg"},
     )
 
@@ -57,13 +59,14 @@ async def test_blob_url_round_trips_through_add_image(client):
     _use_fake_storage()
 
     up = await client.post(
-        f"/api/v1/products/{TEST_PRODUCT_ID}/images/upload-url",
+        f"/api/v1/products/{TEST_PRODUCT_ID}/variants/{TEST_VARIANT_1_ID}"
+        f"/images/upload-url",
         json={"filename": "photo.jpg", "content_type": "image/jpeg"},
     )
     blob_url = up.json()["blob_url"]
 
     resp = await client.post(
-        f"/api/v1/products/{TEST_PRODUCT_ID}/images",
+        f"/api/v1/products/{TEST_PRODUCT_ID}/variants/{TEST_VARIANT_1_ID}/images",
         json={"image_url": blob_url, "is_primary": True},
     )
 
@@ -85,7 +88,8 @@ async def test_upload_url_returns_503_when_unconfigured(client):
     )
 
     resp = await client.post(
-        f"/api/v1/products/{TEST_PRODUCT_ID}/images/upload-url",
+        f"/api/v1/products/{TEST_PRODUCT_ID}/variants/{TEST_VARIANT_1_ID}"
+        f"/images/upload-url",
         json={"filename": "photo.jpg", "content_type": "image/jpeg"},
     )
 

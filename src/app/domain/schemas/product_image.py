@@ -21,7 +21,7 @@ class ProductImageUploadResponseDTO(BaseModel):
 
 class ProductImageResponseDTO(BaseModel):
     id: UUID
-    product_id: UUID
+    variant_id: UUID
     image_url: str
     is_primary: bool
 

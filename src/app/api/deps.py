@@ -19,6 +19,7 @@ from app.infrastructure.order_repository_sqlalchemy import SQLAlchemyOrderReposi
 from app.infrastructure.search_repository_sqlalchemy import (
     SQLAlchemyProductSearchRepository,
 )
+from app.infrastructure.cart_repository_sqlalchemy import SQLAlchemyCartRepository
 from app.infrastructure.notification_repository_sqlalchemy import SQLAlchemyNotificationRepository
 
 from app.services.auth_service import AuthService
@@ -30,6 +31,8 @@ from app.services.product_image_service import ProductImageService
 from app.services.product_variant_service import ProductVariantService
 from app.services.order_service import OrderService
 from app.services.search_service import SearchService
+from app.services.cart_service import CartService
+from app.services.store_order_service import StoreOrderService
 from app.services.notification_service import NotificationService
 
 
@@ -70,6 +73,7 @@ async def get_product_service(
     return ProductService(
         repository=SQLAlchemyProductRepository(db),
         category_repository=SQLAlchemyCategoryRepository(db),
+        variant_repository=SQLAlchemyProductVariantRepository(db),
     )
 
 
@@ -114,6 +118,38 @@ async def get_search_service(
     db: AsyncSession = Depends(get_db),
 ) -> SearchService:
     return SearchService(SQLAlchemyProductSearchRepository(db))
+
+
+async def get_cart_service(
+    db: AsyncSession = Depends(get_db),
+) -> CartService:
+    cart_repository = SQLAlchemyCartRepository(db)
+    store_order_service = StoreOrderService(
+        cart_repository=cart_repository,
+        variant_repository=SQLAlchemyProductVariantRepository(db),
+    )
+    return CartService(
+        cart_repository=cart_repository,
+        order_repository=SQLAlchemyOrderRepository(db),
+        product_repository=SQLAlchemyProductRepository(db),
+        store_order_service=store_order_service,
+    )
+
+
+async def get_cart_service(
+    db: AsyncSession = Depends(get_db),
+) -> CartService:
+    cart_repository = SQLAlchemyCartRepository(db)
+    store_order_service = StoreOrderService(
+        cart_repository=cart_repository,
+        variant_repository=SQLAlchemyProductVariantRepository(db),
+    )
+    return CartService(
+        cart_repository=cart_repository,
+        order_repository=SQLAlchemyOrderRepository(db),
+        product_repository=SQLAlchemyProductRepository(db),
+        store_order_service=store_order_service,
+    )
 
 async def get_notification_service(
     db: AsyncSession = Depends(get_db),

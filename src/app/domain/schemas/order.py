@@ -1,13 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from uuid import UUID
 from decimal import Decimal
 from datetime import datetime
-
-
-class OrderItemCreateDTO(BaseModel):
-    product_id: UUID
-    variant_id: UUID | None = None
-    quantity: int = Field(..., gt=0)
 
 
 class OrderItemResponseDTO(BaseModel):
@@ -35,10 +29,6 @@ class StoreOrderResponseDTO(BaseModel):
 
 class StoreOrderStatusUpdateDTO(BaseModel):
     seller_status: str
-
-
-class MainOrderCreateDTO(BaseModel):
-    items: list[OrderItemCreateDTO] = Field(..., min_length=1)
 
 
 class MainOrderResponseDTO(BaseModel):

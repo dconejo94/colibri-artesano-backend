@@ -13,6 +13,7 @@ from app.api.v1.orders import router as orders_router
 from app.api.v1.users import router as users_router
 from app.api.v1.vendors import router as vendors_router
 from app.api.v1.notifications import router as notifications_router
+from app.api.v1.carts import router as cart_router
 
 api_router = APIRouter(
     prefix="/api/v1",
@@ -27,3 +28,4 @@ api_router.include_router(orders_router)
 api_router.include_router(users_router)
 api_router.include_router(vendors_router)
 api_router.include_router(notifications_router)
+api_router.include_router(cart_router)

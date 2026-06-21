@@ -19,3 +19,9 @@ class ProductVariant(Base):
     stock_quantity = Column(Integer, default=0)
 
     product = relationship("Product", back_populates="variants")
+    images = relationship(
+        "ProductImage",
+        back_populates="variant",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
