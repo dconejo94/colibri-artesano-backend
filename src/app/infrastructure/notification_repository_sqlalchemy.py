@@ -26,7 +26,6 @@ class SQLAlchemyNotificationRepository(NotificationRepository):
         return notification
 
     async def save_fcm_token(self, fcm_token: FCMToken) -> FCMToken:
-        # Si el token ya existe para otro user, lo pisa (un token = un dispositivo)
         existing = await self.db.execute(
             select(FCMToken).where(FCMToken.token == fcm_token.token)
         )

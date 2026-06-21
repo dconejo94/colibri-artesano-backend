@@ -20,3 +20,10 @@ async def get_notifications(
 ):
     return await service.get_notifications(current_user.id)
 
+@router.post("/token", status_code=204)
+async def register_fcm_token(
+    dto: FCMTokenDTO,
+    current_user = CurrentUser,
+    service: NotificationService = Depends(get_notification_service)
+):
+    await service.register_fcm_token(current_user.id, dto.token)
