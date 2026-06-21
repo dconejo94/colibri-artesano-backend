@@ -247,7 +247,7 @@ async def test_vendor_can_request_participation(auth_client: AsyncClient):
     resp = await auth_client.post(
         f"{_EVENTS}/{event['id']}/participants", headers=_auth(vendor_token)
     )
-    assert resp.status_code == 200
+    assert resp.status_code == 201
     data = resp.json()
     assert data["status"] == "pending"
 
