@@ -123,6 +123,8 @@ async def get_event_service(
     db: AsyncSession = Depends(get_db),
 ) -> EventService:
     return EventService(SQLAlchemyEventRepository(db))
+
+
 async def get_cart_service(
     db: AsyncSession = Depends(get_db),
 ) -> CartService:
