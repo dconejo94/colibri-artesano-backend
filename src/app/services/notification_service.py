@@ -1,4 +1,3 @@
-# app/services/notification_service.py
 from uuid import UUID
 from app.domain.models.notification import Notification
 from app.domain.schemas.notification import NotificationResponseDTO, FCMTokenDTO
@@ -64,8 +63,10 @@ class NotificationService:
     async def notify_new_product(
         self, user_ids: list[UUID], product_id: UUID, store_name: str, product_name: str
     ) -> None:
-        for user_id in user_ids:
-            await self.repository.create(
+        if not user_ids:
+            return
+        await self.repository.create_many(
+            [
                 Notification(
                     user_id=user_id,
                     title=f"Nuevo producto de {store_name}",
@@ -73,7 +74,9 @@ class NotificationService:
                     type="new_product",
                     reference_id=product_id,
                 )
-            )
+                for user_id in user_ids
+            ]
+        )
 
     async def _build_paginated_response(
         self, notifications: list[Notification], total: int, page: int, limit: int

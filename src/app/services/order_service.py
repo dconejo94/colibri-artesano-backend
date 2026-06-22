@@ -50,13 +50,15 @@ class OrderService:
                         f"Insufficient stock for variant {item.variant_id}"
                     )
 
-        await self.notification_service.notify_order_confirmed(
-            user_id=buyer_id,
-            order_id=cart.id,
-        )
         cart.status = "placed"
         cart_id = cart.id
         await self.order_repo.flush()
+
+        await self.notification_service.notify_order_confirmed(
+            user_id=buyer_id,
+            order_id=cart_id,
+        )
+
         return await self.order_repo.get_main_order_by_id(cart_id)
 
     async def get_order(self, order_id: UUID) -> MainOrder:

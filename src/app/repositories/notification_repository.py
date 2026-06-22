@@ -1,4 +1,3 @@
-# app/repositories/notification_repository.py
 from abc import ABC, abstractmethod
 from uuid import UUID
 from app.domain.models.notification import Notification
@@ -23,7 +22,11 @@ class NotificationRepository(ABC):
         pass
 
     @abstractmethod
-    async def save_fcm_token(self, fcm_token: FCMToken) -> FCMToken:
+    async def create_many(self, notifications: list[Notification]) -> None:
+        pass
+
+    @abstractmethod
+    async def save_fcm_token(self, user_id: UUID, token: str) -> FCMToken:
         pass
 
     @abstractmethod
