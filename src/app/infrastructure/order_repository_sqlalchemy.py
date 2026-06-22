@@ -98,3 +98,6 @@ class SQLAlchemyOrderRepository(OrderRepository):
     async def buyer_exists(self, buyer_id: UUID) -> bool:
         result = await self.db.execute(select(func.count()).where(User.id == buyer_id))
         return (result.scalar() or 0) > 0
+
+    async def flush(self) -> None:
+        await self.db.flush()
