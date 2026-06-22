@@ -58,21 +58,23 @@ class SQLAlchemyNotificationRepository(NotificationRepository):
         await self.db.refresh(notification)
         return notification
 
-    async def save_fcm_token(self, fcm_token: FCMToken) -> FCMToken:
+    async def save_fcm_token(self, user_id: UUID, token: str) -> FCMToken:
         existing = await self.db.execute(
-            select(FCMToken).where(FCMToken.token == fcm_token.token)
+            select(FCMToken).where(FCMToken.token == token)
         )
         existing = existing.scalars().first()
 
         if existing:
-            existing.user_id = fcm_token.user_id
-            await self.db.flush()
+            if existing.user_id != user_id:
+                existing.user_id = user_id
+                await self.db.flush()
             return existing
 
-        self.db.add(fcm_token)
+        new_token = FCMToken(user_id=user_id, token=token)
+        self.db.add(new_token)
         await self.db.flush()
-        await self.db.refresh(fcm_token)
-        return fcm_token
+        await self.db.refresh(new_token)
+        return new_token
 
     async def get_fcm_tokens_by_user(self, user_id: UUID) -> list[FCMToken]:
         result = await self.db.execute(

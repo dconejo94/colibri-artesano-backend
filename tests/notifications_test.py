@@ -118,6 +118,76 @@ async def test_register_fcm_token_missing_body(client):
     assert resp.status_code == 422
 
 
+async def test_register_fcm_token_reassigns_existing_token(client, follower_client):
+    token = "shared-fcm-token"
+
+    resp = await client.post(
+        "/api/v1/notifications/token",
+        json={"token": token},
+    )
+    assert resp.status_code == 204
+
+    resp = await follower_client.post(
+        "/api/v1/notifications/token",
+        json={"token": token},
+    )
+    assert resp.status_code == 204
+
+    resp = await client.get("/api/v1/notifications/tokens")
+    assert resp.status_code == 200
+    assert token not in [t["token"] for t in resp.json()]
+
+    resp = await follower_client.get("/api/v1/notifications/tokens")
+    assert resp.status_code == 200
+    assert token in [t["token"] for t in resp.json()]
+
+
+# ── GET /notifications/tokens ─────────────────────────────────────────────────────
+
+
+async def test_get_notification_tokens_returns_user_tokens(client):
+    token = "token-123"
+
+    await client.post(
+        "/api/v1/notifications/token",
+        json={"token": token},
+    )
+
+    resp = await client.get("/api/v1/notifications/tokens")
+
+    assert resp.status_code == 200
+
+    data = resp.json()
+
+    assert len(data) == 1
+    assert data[0]["token"] == token
+
+
+async def test_get_notification_tokens_returns_empty_list(client):
+    resp = await client.get("/api/v1/notifications/tokens")
+
+    assert resp.status_code == 200
+    assert resp.json() == []
+
+
+async def test_get_notification_tokens_isolation(client, follower_client):
+    await client.post(
+        "/api/v1/notifications/token",
+        json={"token": "user1-token"},
+    )
+
+    await follower_client.post(
+        "/api/v1/notifications/token",
+        json={"token": "user2-token"},
+    )
+
+    resp = await client.get("/api/v1/notifications/tokens")
+    tokens = [t["token"] for t in resp.json()]
+
+    assert "user1-token" in tokens
+    assert "user2-token" not in tokens
+
+
 # ── Triggers ─────────────────────────────────────────────────────
 
 

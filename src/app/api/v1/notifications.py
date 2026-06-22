@@ -59,3 +59,11 @@ async def mark_notification_as_read(
         await service.mark_notification_as_read(current_user.id, notification_id)
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/tokens", response_model=list[FCMTokenDTO], status_code=200)
+async def get_user_notification_tokens(
+    current_user: CurrentUser,
+    service: NotificationService = Depends(get_notification_service),
+):
+    return await service.get_user_notification_tokens(current_user.id)

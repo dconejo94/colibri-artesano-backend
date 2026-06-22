@@ -101,4 +101,3 @@ class SQLAlchemyOrderRepository(OrderRepository):
 
     async def flush(self) -> None:
         await self.db.flush()
-        self.db.expire_all()

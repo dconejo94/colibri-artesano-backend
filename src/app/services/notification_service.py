@@ -1,8 +1,7 @@
 # app/services/notification_service.py
 from uuid import UUID
 from app.domain.models.notification import Notification
-from app.domain.models.fcm_token import FCMToken
-from app.domain.schemas.notification import NotificationResponseDTO
+from app.domain.schemas.notification import NotificationResponseDTO, FCMTokenDTO
 from app.repositories.notification_repository import NotificationRepository
 from app.domain.schemas.paginated_response import PaginatedResponse
 
@@ -34,8 +33,7 @@ class NotificationService:
         return await self._build_paginated_response(notifications, total, page, limit)
 
     async def register_fcm_token(self, user_id: UUID, token: str) -> None:
-        fcm_token = FCMToken(user_id=user_id, token=token)
-        await self.repository.save_fcm_token(fcm_token)
+        await self.repository.save_fcm_token(user_id=user_id, token=token)
 
     async def mark_notification_as_read(
         self, user_id: UUID, notification_id: UUID
@@ -59,6 +57,10 @@ class NotificationService:
             )
         )
 
+    async def get_user_notification_tokens(self, user_id: UUID) -> list[FCMTokenDTO]:
+        tokens = await self.repository.get_fcm_tokens_by_user(user_id)
+        return [FCMTokenDTO.model_validate(token) for token in tokens]
+
     async def notify_new_product(
         self, user_ids: list[UUID], product_id: UUID, store_name: str, product_name: str
     ) -> None:
@@ -70,20 +72,6 @@ class NotificationService:
                     body=f'{store_name} publicó "{product_name}"',
                     type="new_product",
                     reference_id=product_id,
-                )
-            )
-
-    async def notify_new_event(
-        self, user_ids: list[UUID], event_id: UUID, event_name: str
-    ) -> None:
-        for user_id in user_ids:
-            await self.repository.create(
-                Notification(
-                    user_id=user_id,
-                    title="Nuevo evento publicado",
-                    body=f'Nuevo "{event_name}"',
-                    type="new_event",
-                    reference_id=event_id,
                 )
             )
 
