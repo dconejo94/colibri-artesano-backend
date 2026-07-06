@@ -7,12 +7,17 @@ from uuid import UUID
 
 import bcrypt
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.core.database import get_db
+from app.core.exceptions import (
+    ForbiddenException,
+    NotFoundException,
+    UnauthorizedException,
+)
 from app.domain.models.user import User
 
 logger = logging.getLogger(__name__)
@@ -126,20 +131,12 @@ async def get_current_user(
 
     try:
         user_id = decode_token(token, expected_type=ACCESS_TOKEN_TYPE)
-    except TokenError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(exc),
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from None
+    except TokenError:
+        raise UnauthorizedException("No se pudo validar las credenciales.") from None
 
     user = await SQLAlchemyUserRepository(db).get_by_id(user_id)
     if user is None or not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UnauthorizedException("No se pudo validar las credenciales.")
     return user
 
 
@@ -168,13 +165,17 @@ async def get_current_user_optional(
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
+async def require_admin_role(user: User = Depends(get_current_user)) -> User:
+    """Require the authenticated user to have admin privileges."""
+    if not getattr(user, "is_admin", False):
+        raise ForbiddenException("Se requiere rol de administrador.")
+    return user
+
+
 async def require_vendor_role(user: CurrentUser) -> User:
     """Require the authenticated user to have the vendor role."""
     if user.role != "vendor":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Vendor role required",
-        )
+        raise ForbiddenException("Se requiere rol de vendedor.")
     return user
 
 
@@ -188,14 +189,9 @@ async def require_store_owner(
 
     store = await SQLAlchemyStoreRepository(db).get_by_id(store_id)
     if store is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Store not found"
-        )
+        raise NotFoundException("Store", str(store_id))
     if store.owner_id != user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not own this store",
-        )
+        raise ForbiddenException("No tienes permiso para administrar esta tienda.")
     return user
 
 
@@ -212,13 +208,8 @@ async def require_product_owner(
 
     product = await SQLAlchemyProductRepository(db).get_by_id(product_id)
     if product is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
-        )
+        raise NotFoundException("Product", str(product_id))
     store = await SQLAlchemyStoreRepository(db).get_by_id(product.store_id)
     if store is None or store.owner_id != user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not own this product",
-        )
+        raise ForbiddenException("No tienes permiso para administrar este producto.")
     return user

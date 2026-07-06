@@ -2,13 +2,35 @@
 
 import uuid
 
-from tests.factories.product_factory import TEST_CATEGORY_ID
+from sqlalchemy import select
+
+from app.domain.models.user import User
+from tests.conftest import TestingSessionLocal
+from tests.factories.product_factory import TEST_CATEGORY_ID, TEST_USER_ID
 
 
 # ── Create ────────────────────────────────────────────────────────
 
 
+async def _grant_admin_access():
+    async with TestingSessionLocal() as db:
+        user = (
+            await db.execute(select(User).where(User.id == TEST_USER_ID))
+        ).scalar_one()
+        user.is_admin = True
+        await db.commit()
+
+
+async def test_create_category_requires_admin(client):
+    body = {"name": "Ceramica", "slug": "ceramica"}
+    resp = await client.post("/api/v1/categories/", json=body)
+
+    assert resp.status_code == 403
+    assert resp.json()["detail"] == "Se requiere rol de administrador."
+
+
 async def test_create_category_success(client):
+    await _grant_admin_access()
     body = {"name": "Ceramica", "slug": "ceramica"}
     resp = await client.post("/api/v1/categories/", json=body)
 
@@ -20,6 +42,7 @@ async def test_create_category_success(client):
 
 
 async def test_create_category_duplicate_slug(client):
+    await _grant_admin_access()
     body = {"name": "Artesania Dup", "slug": "artesania"}
     resp = await client.post("/api/v1/categories/", json=body)
 
@@ -27,6 +50,7 @@ async def test_create_category_duplicate_slug(client):
 
 
 async def test_create_category_missing_fields(client):
+    await _grant_admin_access()
     resp = await client.post("/api/v1/categories/", json={"name": "NoSlug"})
 
     assert resp.status_code == 422
@@ -62,6 +86,7 @@ async def test_get_category_not_found(client):
 
 
 async def test_update_category(client):
+    await _grant_admin_access()
     resp = await client.put(
         f"/api/v1/categories/{TEST_CATEGORY_ID}",
         json={"name": "Updated Name"},
@@ -73,6 +98,7 @@ async def test_update_category(client):
 
 
 async def test_update_category_not_found(client):
+    await _grant_admin_access()
     fake_id = uuid.uuid4()
     resp = await client.put(f"/api/v1/categories/{fake_id}", json={"name": "Nope"})
 
@@ -83,6 +109,7 @@ async def test_update_category_not_found(client):
 
 
 async def test_delete_category(client):
+    await _grant_admin_access()
     body = {"name": "ToDelete", "slug": "to-delete"}
     create_resp = await client.post("/api/v1/categories/", json=body)
     cat_id = create_resp.json()["id"]
@@ -95,6 +122,7 @@ async def test_delete_category(client):
 
 
 async def test_delete_category_not_found(client):
+    await _grant_admin_access()
     fake_id = uuid.uuid4()
     resp = await client.delete(f"/api/v1/categories/{fake_id}")
 

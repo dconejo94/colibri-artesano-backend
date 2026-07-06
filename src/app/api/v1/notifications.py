@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query
 
 from app.core.security import CurrentUser
 
@@ -9,7 +9,6 @@ from app.api.deps import get_notification_service
 from app.services.notification_service import NotificationService
 from app.domain.schemas.paginated_response import PaginatedResponse
 
-from app.core.exceptions import NotFoundException
 
 router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
@@ -55,10 +54,7 @@ async def mark_notification_as_read(
     current_user: CurrentUser,
     service: NotificationService = Depends(get_notification_service),
 ):
-    try:
-        await service.mark_notification_as_read(current_user.id, notification_id)
-    except NotFoundException as e:
-        raise HTTPException(status_code=404, detail=str(e))
+    await service.mark_notification_as_read(current_user.id, notification_id)
 
 
 @router.get("/tokens", response_model=list[FCMTokenDTO], status_code=200)

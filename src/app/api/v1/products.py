@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query
 
 from app.services.product_service import ProductService
 from app.services.product_image_service import ProductImageService
@@ -29,7 +29,10 @@ from app.domain.schemas.product_variant import (
     ProductVariantResponseDTO,
 )
 from app.domain.schemas.paginated_response import PaginatedResponse
-from app.core.exceptions import NotFoundException, InvalidImageUrlError
+from app.core.exceptions import (
+    InvalidImageUrlError,
+    ServiceUnavailableException,
+)
 from app.core.security import require_product_owner
 from app.infrastructure.azure_blob_storage import (
     BlobStorageService,
@@ -63,10 +66,7 @@ async def get_product(
     product_id: UUID,
     service: ProductService = Depends(get_product_service),
 ):
-    try:
-        return await service.get_product_by_id(product_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Product not found")
+    return await service.get_product_by_id(product_id)
 
 
 @router.put("/{product_id}", response_model=ProductResponseDTO)
@@ -76,10 +76,7 @@ async def update_product(
     _: object = Depends(require_product_owner),
     service: ProductService = Depends(get_product_service),
 ):
-    try:
-        return await service.update_product(product_id, dto)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Product not found")
+    return await service.update_product(product_id, dto)
 
 
 @router.delete("/{product_id}", status_code=204)
@@ -88,10 +85,7 @@ async def delete_product(
     _: object = Depends(require_product_owner),
     service: ProductService = Depends(get_product_service),
 ):
-    try:
-        await service.delete_product(product_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Product not found")
+    await service.delete_product(product_id)
 
 
 @router.post(
@@ -109,10 +103,10 @@ async def create_image_upload_url(
         upload_url, blob_url, expires_at = storage.generate_upload_sas(
             variant_id, dto.filename, dto.content_type
         )
-    except StorageNotConfiguredError:
-        raise HTTPException(status_code=503, detail="Image uploads are not configured")
+    except StorageNotConfiguredError as exc:
+        raise ServiceUnavailableException(str(exc)) from None
     except InvalidImageError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+        raise InvalidImageUrlError(str(exc)) from None
     return ProductImageUploadResponseDTO(
         upload_url=upload_url, blob_url=blob_url, expires_at=expires_at
     )
@@ -130,10 +124,7 @@ async def add_product_image(
     _: object = Depends(require_product_owner),
     service: ProductImageService = Depends(get_product_image_service),
 ):
-    try:
-        return await service.add_image(variant_id, dto)
-    except InvalidImageUrlError as exc:
-        raise HTTPException(status_code=400, detail=exc.detail)
+    return await service.add_image(variant_id, dto)
 
 
 @router.get(
@@ -156,10 +147,7 @@ async def delete_product_image(
     _: object = Depends(require_product_owner),
     service: ProductImageService = Depends(get_product_image_service),
 ):
-    try:
-        await service.delete_image(variant_id, image_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Image not found")
+    await service.delete_image(variant_id, image_id)
 
 
 @router.patch(
@@ -173,11 +161,8 @@ async def set_primary_image(
     _: object = Depends(require_product_owner),
     service: ProductImageService = Depends(get_product_image_service),
 ):
-    try:
-        await service.set_primary(variant_id, image_id)
-        return {"detail": "Primary image updated"}
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Image not found")
+    await service.set_primary(variant_id, image_id)
+    return {"detail": "Primary image updated"}
 
 
 @router.post(
@@ -216,10 +201,7 @@ async def update_product_variant(
     _: object = Depends(require_product_owner),
     service: ProductVariantService = Depends(get_product_variant_service),
 ):
-    try:
-        return await service.update_variant(product_id, variant_id, dto)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Variant not found")
+    return await service.update_variant(product_id, variant_id, dto)
 
 
 @router.delete("/{product_id}/variants/{variant_id}", status_code=204)
@@ -229,7 +211,4 @@ async def delete_product_variant(
     _: object = Depends(require_product_owner),
     service: ProductVariantService = Depends(get_product_variant_service),
 ):
-    try:
-        await service.delete_variant(product_id, variant_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Variant not found")
+    await service.delete_variant(product_id, variant_id)
