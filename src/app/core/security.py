@@ -167,7 +167,7 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 async def require_admin_role(user: User = Depends(get_current_user)) -> User:
     """Require the authenticated user to have admin privileges."""
-    if not getattr(user, "is_admin", False):
+    if not user.is_admin:
         raise ForbiddenException("Se requiere rol de administrador.")
     return user
 

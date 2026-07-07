@@ -62,13 +62,15 @@ class BlobStorageService:
 
     def _require_configured(self) -> None:
         if not self.is_configured:
-            raise StorageNotConfiguredError("Azure Blob Storage is not configured")
+            raise StorageNotConfiguredError(
+                "El almacenamiento de imágenes no está configurado"
+            )
 
     def _resolve_extension(self, filename: str, content_type: str) -> str:
         """Pick a safe extension, validating the image is an allowed type."""
         normalized_type = content_type.strip().lower()
         if normalized_type not in _CONTENT_TYPE_EXT:
-            raise InvalidImageError(f"Unsupported content type: {content_type}")
+            raise InvalidImageError(f"Tipo de contenido no soportado: {content_type}")
 
         ext = PurePosixPath(filename).suffix.lower()
         if ext not in _ALLOWED_EXTENSIONS:

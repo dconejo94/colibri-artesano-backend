@@ -58,7 +58,7 @@ class StoreOrderService:
 
         current_quantity = existing.quantity if existing else 0
         if current_quantity + quantity > variant.stock_quantity:
-            raise ConflictException(f"Insufficient stock for variant '{variant.id}'")
+            raise ConflictException(f"Stock insuficiente para la variante '{variant.id}'")
 
         if existing:
             existing.quantity += quantity
@@ -93,7 +93,7 @@ class StoreOrderService:
             raise NotFoundException("OrderItem", str(product_id))
 
         if quantity > variant.stock_quantity:
-            raise ConflictException(f"Insufficient stock for variant '{variant.id}'")
+            raise ConflictException(f"Stock insuficiente para la variante '{variant.id}'")
 
         old_amount = line.quantity * line.unit_price
         line.quantity = quantity
@@ -132,9 +132,10 @@ class StoreOrderService:
         if len(variants) == 1:
             return variants[0]
         if not variants:
-            raise ConflictException(f"Product '{product_id}' has no variants")
+            raise ConflictException(f"El producto '{product_id}' no tiene variantes")
         raise ConflictException(
-            f"Product '{product_id}' has multiple variants; variant_id is required"
+            f"El producto '{product_id}' tiene múltiples variantes; "
+            "se requiere variant_id"
         )
 
     async def _validate_variant_is_valid(

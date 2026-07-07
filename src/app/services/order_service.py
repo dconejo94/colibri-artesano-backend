@@ -40,14 +40,14 @@ class OrderService:
             store_order.items for store_order in cart.store_orders
         )
         if not has_items:
-            raise ConflictException("Cart is empty")
+            raise ConflictException("El carrito está vacío")
 
         for store_order in cart.store_orders:
             for item in store_order.items:
                 variant = await self.variant_repo.get_by_id(item.variant_id)
                 if not variant or variant.stock_quantity < item.quantity:
                     raise ConflictException(
-                        f"Insufficient stock for variant {item.variant_id}"
+                        f"Stock insuficiente para la variante {item.variant_id}"
                     )
 
         cart.status = "placed"
@@ -61,9 +61,10 @@ class OrderService:
 
         return await self.order_repo.get_main_order_by_id(cart_id)
 
-    async def get_order(self, order_id: UUID) -> MainOrder:
+    async def get_order(self, order_id: UUID, buyer_id: UUID) -> MainOrder:
         order = await self.order_repo.get_main_order_by_id(order_id)
-        if not order:
+        # Hide other buyers' orders behind a 404 rather than leaking their existence.
+        if not order or order.buyer_id != buyer_id:
             raise NotFoundException("Order", str(order_id))
         return order
 

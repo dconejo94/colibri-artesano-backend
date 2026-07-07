@@ -1,6 +1,7 @@
 import os
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
@@ -64,13 +65,49 @@ async def forbidden_exception_handler(request: Request, exc: ForbiddenException)
 async def authentication_exception_handler(
     request: Request, exc: AuthenticationException
 ):
-    return JSONResponse(status_code=401, content={"detail": exc.detail})
+    return JSONResponse(
+        status_code=401,
+        content={"detail": exc.detail},
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 
 @app.exception_handler(ValidationException)
 async def validation_exception_handler(request: Request, exc: ValidationException):
     detail = [
         {"loc": ["body", field], "msg": msg} for field, msg in exc.field_errors.items()
+    ]
+    return JSONResponse(status_code=422, content={"detail": detail})
+
+
+# Pydantic error "type" -> Spanish message, for FastAPI's automatic request
+# body/query validation (as opposed to ValidationException, which services
+# raise directly for business-rule validation).
+_PYDANTIC_ERROR_MESSAGES = {
+    "missing": "Este campo es obligatorio.",
+    "string_type": "Debe ser una cadena de texto.",
+    "int_type": "Debe ser un número entero.",
+    "int_parsing": "Debe ser un número entero.",
+    "float_type": "Debe ser un número.",
+    "float_parsing": "Debe ser un número.",
+    "bool_type": "Debe ser un valor booleano.",
+    "bool_parsing": "Debe ser un valor booleano.",
+    "uuid_parsing": "Debe ser un identificador válido.",
+    "value_error": "Valor inválido.",
+    "json_invalid": "El cuerpo de la solicitud no es un JSON válido.",
+}
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_exception_handler(
+    request: Request, exc: RequestValidationError
+):
+    detail = [
+        {
+            "loc": list(error["loc"]),
+            "msg": _PYDANTIC_ERROR_MESSAGES.get(error["type"], "Valor inválido."),
+        }
+        for error in exc.errors()
     ]
     return JSONResponse(status_code=422, content={"detail": detail})
 

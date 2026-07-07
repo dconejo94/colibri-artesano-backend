@@ -9,7 +9,6 @@ from app.domain.schemas.order import (
     MainOrderResponseDTO,
 )
 from app.domain.schemas.paginated_response import PaginatedResponse
-from app.core.exceptions import NotFoundException
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
@@ -41,8 +40,4 @@ async def get_order(
     current_user: CurrentUser,
     service: OrderService = Depends(get_order_service),
 ):
-    order = await service.get_order(order_id)
-    # Hide other buyers' orders behind a 404 rather than leaking their existence.
-    if order.buyer_id != current_user.id:
-        raise NotFoundException("Order", str(order_id))
-    return order
+    return await service.get_order(order_id, current_user.id)
