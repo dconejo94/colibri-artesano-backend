@@ -13,9 +13,7 @@ class CategoryService:
     async def create_category(self, dto: CategoryCreateDTO) -> Category:
         existing = await self.repository.get_by_slug(dto.slug)
         if existing:
-            raise ConflictException(
-                f"Ya existe una categoría con el slug '{dto.slug}'"
-            )
+            raise ConflictException(f"Ya existe una categoría con el slug '{dto.slug}'")
         category = Category(name=dto.name, slug=dto.slug)
         return await self.repository.create(category)
 

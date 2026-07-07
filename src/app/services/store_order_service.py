@@ -58,7 +58,9 @@ class StoreOrderService:
 
         current_quantity = existing.quantity if existing else 0
         if current_quantity + quantity > variant.stock_quantity:
-            raise ConflictException(f"Stock insuficiente para la variante '{variant.id}'")
+            raise ConflictException(
+                f"Stock insuficiente para la variante '{variant.id}'"
+            )
 
         if existing:
             existing.quantity += quantity
@@ -93,7 +95,9 @@ class StoreOrderService:
             raise NotFoundException("OrderItem", str(product_id))
 
         if quantity > variant.stock_quantity:
-            raise ConflictException(f"Stock insuficiente para la variante '{variant.id}'")
+            raise ConflictException(
+                f"Stock insuficiente para la variante '{variant.id}'"
+            )
 
         old_amount = line.quantity * line.unit_price
         line.quantity = quantity
