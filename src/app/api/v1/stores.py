@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query
 
 from app.services.store_service import StoreService
 from app.services.product_service import ProductService
@@ -23,7 +23,6 @@ from app.domain.schemas.product import (
 )
 from app.domain.schemas.vendor import StoreProfileDTO
 from app.domain.schemas.order import StoreOrderResponseDTO, StoreOrderStatusUpdateDTO
-from app.core.exceptions import NotFoundException, ConflictException
 from app.core.security import (
     require_vendor_role,
     require_store_owner,
@@ -41,10 +40,7 @@ async def create_store(
     _: object = Depends(require_vendor_role),
     service: StoreService = Depends(get_store_service),
 ):
-    try:
-        return await service.create_store(dto)
-    except ConflictException as e:
-        raise HTTPException(status_code=409, detail=e.detail)
+    return await service.create_store(dto)
 
 
 @router.get("/", response_model=PaginatedResponse[StoreResponseDTO])
@@ -62,10 +58,7 @@ async def get_store_by_owner(
     owner_id: UUID,
     service: StoreService = Depends(get_store_service),
 ):
-    try:
-        return await service.get_store_by_owner_id(owner_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Store not found for owner")
+    return await service.get_store_by_owner_id(owner_id)
 
 
 @router.get("/{store_id}/profile", response_model=StoreProfileDTO)
@@ -75,11 +68,8 @@ async def get_store_profile(
     service: StoreService = Depends(get_store_service),
 ):
     """Public profile for a store: name, description, active product count, and followers."""
-    try:
-        current_user_id = current_user.id if current_user else None
-        return await service.get_store_profile(store_id, current_user_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Store not found")
+    current_user_id = current_user.id if current_user else None
+    return await service.get_store_profile(store_id, current_user_id)
 
 
 @router.post("/{store_id}/follow", status_code=204)
@@ -88,12 +78,7 @@ async def follow_store(
     current_user: User = Depends(get_current_user),
     service: StoreService = Depends(get_store_service),
 ):
-    try:
-        await service.follow_store(store_id, current_user.id)
-    except ConflictException as e:
-        raise HTTPException(status_code=409, detail=e.detail)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Store not found")
+    await service.follow_store(store_id, current_user.id)
 
 
 @router.delete("/{store_id}/follow", status_code=204)
@@ -102,10 +87,7 @@ async def unfollow_store(
     current_user: User = Depends(get_current_user),
     service: StoreService = Depends(get_store_service),
 ):
-    try:
-        await service.unfollow_store(store_id, current_user.id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Store not found")
+    await service.unfollow_store(store_id, current_user.id)
 
 
 @router.get("/{store_id}", response_model=StoreResponseDTO)
@@ -113,10 +95,7 @@ async def get_store(
     store_id: UUID,
     service: StoreService = Depends(get_store_service),
 ):
-    try:
-        return await service.get_store_by_id(store_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Store not found")
+    return await service.get_store_by_id(store_id)
 
 
 @router.put("/{store_id}", response_model=StoreResponseDTO)
@@ -126,10 +105,7 @@ async def update_store(
     _: object = Depends(require_store_owner),
     service: StoreService = Depends(get_store_service),
 ):
-    try:
-        return await service.update_store(store_id, dto)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Store not found")
+    return await service.update_store(store_id, dto)
 
 
 @router.delete("/{store_id}", status_code=204)
@@ -138,10 +114,7 @@ async def delete_store(
     _: object = Depends(require_store_owner),
     service: StoreService = Depends(get_store_service),
 ):
-    try:
-        await service.delete_store(store_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Store not found")
+    await service.delete_store(store_id)
 
 
 @router.get(
@@ -156,10 +129,7 @@ async def list_store_products(
     service: ProductService = Depends(get_product_service),
     store_service: StoreService = Depends(get_store_service),
 ):
-    try:
-        await store_service.get_store_by_id(store_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Store not found")
+    await store_service.get_store_by_id(store_id)
 
     return await service.list_products(
         page=page, limit=limit, store_id=store_id, category_id=category_id
@@ -177,10 +147,7 @@ async def create_store_product(
     _: object = Depends(require_store_owner),
     service: ProductService = Depends(get_product_service),
 ):
-    try:
-        return await service.create_product(store_id=store_id, dto=dto)
-    except NotFoundException as e:
-        raise HTTPException(status_code=404, detail=str(e))
+    return await service.create_product(store_id=store_id, dto=dto)
 
 
 @router.get(
@@ -208,7 +175,4 @@ async def update_store_order_status(
     _: object = Depends(require_store_owner),
     service: OrderService = Depends(get_order_service),
 ):
-    try:
-        return await service.update_store_order_status(store_order_id, dto)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Store order not found")
+    return await service.update_store_order_status(store_order_id, dto)

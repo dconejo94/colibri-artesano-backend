@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request
 
 from app.api.deps import get_auth_service
 from app.config import settings
-from app.core.exceptions import AuthenticationException, ConflictException
 from app.core.rate_limit import limiter
 from app.domain.schemas.auth import (
     AccessTokenResponseDTO,
@@ -23,10 +22,7 @@ async def register(
     dto: RegisterDTO,
     service: AuthService = Depends(get_auth_service),
 ):
-    try:
-        return await service.register(dto)
-    except ConflictException as e:
-        raise HTTPException(status_code=409, detail=e.detail)
+    return await service.register(dto)
 
 
 @router.post("/login", response_model=TokenResponseDTO)
@@ -36,10 +32,7 @@ async def login(
     dto: LoginDTO,
     service: AuthService = Depends(get_auth_service),
 ):
-    try:
-        return await service.login(dto)
-    except AuthenticationException as e:
-        raise HTTPException(status_code=401, detail=e.detail)
+    return await service.login(dto)
 
 
 @router.post("/refresh", response_model=AccessTokenResponseDTO)
@@ -49,7 +42,4 @@ async def refresh(
     dto: RefreshDTO,
     service: AuthService = Depends(get_auth_service),
 ):
-    try:
-        return await service.refresh(dto)
-    except AuthenticationException as e:
-        raise HTTPException(status_code=401, detail=e.detail)
+    return await service.refresh(dto)

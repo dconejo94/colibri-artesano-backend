@@ -30,7 +30,7 @@ class AuthService:
 
     async def register(self, dto: RegisterDTO) -> TokenResponseDTO:
         if await self.users.get_by_email(dto.email) is not None:
-            raise ConflictException("Email already registered")
+            raise ConflictException("El correo electrónico ya está registrado")
 
         user = User(
             email=dto.email,
@@ -48,20 +48,22 @@ class AuthService:
     async def login(self, dto: LoginDTO) -> TokenResponseDTO:
         user = await self.users.get_by_email(dto.email)
         if user is None or not verify_password(dto.password, user.password_hash):
-            raise AuthenticationException("Invalid email or password")
+            raise AuthenticationException("Correo electrónico o contraseña inválidos")
         if not user.is_active:
-            raise AuthenticationException("Account is inactive")
+            raise AuthenticationException("La cuenta está inactiva")
         return self._issue_tokens(user)
 
     async def refresh(self, dto: RefreshDTO) -> AccessTokenResponseDTO:
         try:
             user_id = decode_token(dto.refresh_token, expected_type=REFRESH_TOKEN_TYPE)
-        except TokenError as exc:
-            raise AuthenticationException(str(exc))
+        except TokenError:
+            raise AuthenticationException(
+                "No se pudo validar las credenciales."
+            ) from None
 
         user = await self.users.get_by_id(user_id)
         if user is None or not user.is_active:
-            raise AuthenticationException("Invalid refresh token")
+            raise AuthenticationException("Token de actualización inválido")
 
         return AccessTokenResponseDTO(access_token=create_access_token(user.id))
 

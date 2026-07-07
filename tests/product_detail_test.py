@@ -24,7 +24,7 @@ async def test_get_product_by_id_not_found(client):
     assert response.status_code == 404
 
     data = response.json()
-    assert data["detail"] == "Product not found"
+    assert data["detail"] == "Producto no encontrado."
 
 
 async def test_get_product_by_id_response_schema(client):

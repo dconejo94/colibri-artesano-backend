@@ -10,12 +10,11 @@ TODO: remove this file once the mobile app has migrated to the new path.
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 
 from app.services.store_service import StoreService
 from app.api.deps import get_store_service
 from app.domain.schemas.vendor import VendorProfileDTO
-from app.core.exceptions import NotFoundException
 
 router = APIRouter(prefix="/vendors", tags=["Vendors (deprecated)"])
 
@@ -30,7 +29,4 @@ async def get_vendor_profile_legacy(
     store_id: UUID,
     service: StoreService = Depends(get_store_service),
 ):
-    try:
-        return await service.get_store_profile(store_id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Store not found")
+    return await service.get_store_profile(store_id)
