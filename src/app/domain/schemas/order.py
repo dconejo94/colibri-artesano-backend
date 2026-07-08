@@ -1,7 +1,11 @@
 from pydantic import BaseModel
+from typing import Literal
 from uuid import UUID
 from decimal import Decimal
 from datetime import datetime
+
+# The seller-facing status lifecycle a store order moves through.
+SellerStatus = Literal["pending", "processing", "shipped", "delivered"]
 
 
 class OrderItemResponseDTO(BaseModel):
@@ -28,7 +32,7 @@ class StoreOrderResponseDTO(BaseModel):
 
 
 class StoreOrderStatusUpdateDTO(BaseModel):
-    seller_status: str
+    seller_status: SellerStatus
 
 
 class MainOrderResponseDTO(BaseModel):

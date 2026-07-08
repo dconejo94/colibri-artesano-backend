@@ -175,4 +175,4 @@ async def update_store_order_status(
     _: object = Depends(require_store_owner),
     service: OrderService = Depends(get_order_service),
 ):
-    return await service.update_store_order_status(store_order_id, dto)
+    return await service.update_store_order_status(store_id, store_order_id, dto)

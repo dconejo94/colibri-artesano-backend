@@ -85,10 +85,12 @@ class OrderService:
         return PaginatedResponse(items=items, page=page, limit=limit, total=total)
 
     async def update_store_order_status(
-        self, store_order_id: UUID, dto: StoreOrderStatusUpdateDTO
+        self, store_id: UUID, store_order_id: UUID, dto: StoreOrderStatusUpdateDTO
     ) -> StoreOrder:
         store_order = await self.order_repo.get_store_order_by_id(store_order_id)
-        if not store_order:
+        # 404 (not 403) when the order belongs to another store so we don't
+        # leak that a store order with this id exists.
+        if not store_order or store_order.store_id != store_id:
             raise NotFoundException("StoreOrder", str(store_order_id))
         store_order.seller_status = dto.seller_status
         await self.order_repo.update_store_order_status(store_order)

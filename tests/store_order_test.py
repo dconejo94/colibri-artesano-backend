@@ -53,3 +53,15 @@ async def test_update_store_order_not_found(client):
     )
 
     assert resp.status_code == 404
+
+
+async def test_update_store_order_rejects_unknown_status(client):
+    order = await _create_order(client)
+    store_order_id = order["store_orders"][0]["id"]
+
+    resp = await client.patch(
+        f"/api/v1/stores/{TEST_STORE_ID}/orders/{store_order_id}/status",
+        json={"seller_status": "banana"},
+    )
+
+    assert resp.status_code == 422
