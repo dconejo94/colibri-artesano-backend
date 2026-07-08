@@ -21,6 +21,7 @@ class ParticipantResponseDTO(BaseModel):
     id: UUID
     event_id: UUID
     store_id: UUID
+    store_name: str
     status: ParticipationStatus
     requested_by: UUID
     reviewed_by: UUID | None

@@ -63,6 +63,23 @@ class EventService:
             my_participation=my_participation,
         )
 
+    def _participant_to_response(
+        self, participant: EventParticipant
+    ) -> ParticipantResponseDTO:
+        # Built manually (not model_validate) because store_name isn't a column
+        # on EventParticipant — it comes from the eagerly-loaded `store`
+        # relationship, so the caller must ensure it's loaded first.
+        return ParticipantResponseDTO(
+            id=participant.id,
+            event_id=participant.event_id,
+            store_id=participant.store_id,
+            store_name=participant.store.name,
+            status=participant.status,
+            requested_by=participant.requested_by,
+            reviewed_by=participant.reviewed_by,
+            created_at=participant.created_at,
+        )
+
     # ── Events ────────────────────────────────────────────────────
 
     async def create_event(
@@ -138,7 +155,7 @@ class EventService:
             status=ParticipationStatus.pending,
         )
         created = await self.repository.add_participant(participant)
-        return ParticipantResponseDTO.model_validate(created)
+        return self._participant_to_response(created)
 
     async def withdraw_participation(
         self, event_id: UUID, store_id: UUID, user_id: UUID
@@ -155,7 +172,7 @@ class EventService:
         if event is None:
             raise NotFoundException("Event", str(event_id))
         participants = await self.repository.list_participants(event_id)
-        return [ParticipantResponseDTO.model_validate(p) for p in participants]
+        return [self._participant_to_response(p) for p in participants]
 
     async def review_participation(
         self,
@@ -170,4 +187,4 @@ class EventService:
         participant.status = dto.status
         participant.reviewed_by = reviewed_by
         updated = await self.repository.update_participant(participant)
-        return ParticipantResponseDTO.model_validate(updated)
+        return self._participant_to_response(updated)

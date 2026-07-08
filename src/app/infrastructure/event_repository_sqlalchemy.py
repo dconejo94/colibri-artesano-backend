@@ -60,6 +60,7 @@ class SQLAlchemyEventRepository(EventRepository):
         self.db.add(participant)
         await self.db.flush()
         await self.db.refresh(participant)
+        await self.db.refresh(participant, ["store"])
         return participant
 
     async def get_participant(
@@ -76,7 +77,11 @@ class SQLAlchemyEventRepository(EventRepository):
     async def list_participants(
         self, event_id: UUID, status: ParticipationStatus | None = None
     ) -> list[EventParticipant]:
-        stmt = select(EventParticipant).where(EventParticipant.event_id == event_id)
+        stmt = (
+            select(EventParticipant)
+            .options(selectinload(EventParticipant.store))
+            .where(EventParticipant.event_id == event_id)
+        )
         if status is not None:
             stmt = stmt.where(EventParticipant.status == status)
         result = await self.db.execute(stmt)
@@ -87,6 +92,7 @@ class SQLAlchemyEventRepository(EventRepository):
     ) -> EventParticipant:
         await self.db.flush()
         await self.db.refresh(participant)
+        await self.db.refresh(participant, ["store"])
         return participant
 
     async def delete_participant(self, participant: EventParticipant) -> None:
