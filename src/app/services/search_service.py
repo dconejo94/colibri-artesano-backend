@@ -67,6 +67,8 @@ class SearchService:
         items = await self.category_repository.search(query)
         return [CategoryResponseDTO.model_validate(item) for item in items]
 
-    async def autocomplete_categories(self, query: str) -> list[CategoryAutocompleteDTO]:
+    async def autocomplete_categories(
+        self, query: str
+    ) -> list[CategoryAutocompleteDTO]:
         items = await self.category_repository.autocomplete(query, _AUTOCOMPLETE_MAX)
         return [CategoryAutocompleteDTO.model_validate(item) for item in items]

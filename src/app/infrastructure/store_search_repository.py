@@ -18,7 +18,9 @@ class SQLAlchemyStoreSearchRepository(StoreSearchRepository):
             )
         )
 
-    async def search(self, query: str, page: int, limit: int) -> tuple[list[Store], int]:
+    async def search(
+        self, query: str, page: int, limit: int
+    ) -> tuple[list[Store], int]:
         if not query.strip():
             return [], 0
 
@@ -30,9 +32,7 @@ class SQLAlchemyStoreSearchRepository(StoreSearchRepository):
         total: int = count_result.scalar() or 0
 
         result = await self.db.execute(
-            base.order_by(Store.name)
-            .offset((page - 1) * limit)
-            .limit(limit)
+            base.order_by(Store.name).offset((page - 1) * limit).limit(limit)
         )
         items = list(result.scalars().all())
         return items, total
@@ -42,8 +42,6 @@ class SQLAlchemyStoreSearchRepository(StoreSearchRepository):
             return []
 
         result = await self.db.execute(
-            self._base_stmt(query)
-            .order_by(Store.name)
-            .limit(limit)
+            self._base_stmt(query).order_by(Store.name).limit(limit)
         )
         return list(result.scalars().all())

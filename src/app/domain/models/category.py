@@ -14,6 +14,7 @@ class Category(Base):
     slug = Column(String(100), unique=True, nullable=False)
 
     from sqlalchemy import Index
+
     __table_args__ = (
         Index(
             "ix_categories_name_trgm",

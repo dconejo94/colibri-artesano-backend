@@ -95,8 +95,7 @@ class SQLAlchemyOrderRepository(OrderRepository):
             func.count().label("total_orders"),
             func.coalesce(func.sum(StoreOrder.subtotal_amount), 0).label("total_sales"),
         ).where(
-            StoreOrder.store_id == store_id,
-            StoreOrder.seller_status == "delivered"
+            StoreOrder.store_id == store_id, StoreOrder.seller_status == "delivered"
         )
         result = await self.db.execute(stmt)
         row = result.first()

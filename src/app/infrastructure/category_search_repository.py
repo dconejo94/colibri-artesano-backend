@@ -22,10 +22,7 @@ class SQLAlchemyCategorySearchRepository(CategorySearchRepository):
         if not query.strip():
             return []
 
-        result = await self.db.execute(
-            self._base_stmt(query)
-            .order_by(Category.name)
-        )
+        result = await self.db.execute(self._base_stmt(query).order_by(Category.name))
         return list(result.scalars().all())
 
     async def autocomplete(self, query: str, limit: int = 10) -> list[Category]:
@@ -33,8 +30,6 @@ class SQLAlchemyCategorySearchRepository(CategorySearchRepository):
             return []
 
         result = await self.db.execute(
-            self._base_stmt(query)
-            .order_by(Category.name)
-            .limit(limit)
+            self._base_stmt(query).order_by(Category.name).limit(limit)
         )
         return list(result.scalars().all())

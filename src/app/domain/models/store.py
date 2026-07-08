@@ -39,6 +39,7 @@ class Store(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     from sqlalchemy import Index
+
     __table_args__ = (
         Index(
             "ix_stores_name_trgm",

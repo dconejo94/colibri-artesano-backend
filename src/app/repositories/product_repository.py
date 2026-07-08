@@ -49,5 +49,7 @@ class ProductRepository(ABC):
         pass
 
     @abstractmethod
-    async def list_favorite_products(self, user_id: UUID, page: int, limit: int) -> tuple[list[Product], int]:
+    async def list_favorite_products(
+        self, user_id: UUID, page: int, limit: int
+    ) -> tuple[list[Product], int]:
         pass

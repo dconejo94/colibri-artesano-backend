@@ -41,12 +41,10 @@ class SQLAlchemyProductRepository(ProductRepository):
             stmt = stmt.where(Product.is_active == is_active)
         if search:
             from sqlalchemy import or_
+
             pattern = f"%{search}%"
             stmt = stmt.where(
-                or_(
-                    Product.name.ilike(pattern),
-                    Product.description.ilike(pattern)
-                )
+                or_(Product.name.ilike(pattern), Product.description.ilike(pattern))
             )
         if min_price is not None:
             stmt = stmt.where(Product.base_price >= min_price)
@@ -102,22 +100,33 @@ class SQLAlchemyProductRepository(ProductRepository):
 
     async def favorite_product(self, user_id: UUID, product_id: UUID) -> None:
         from sqlalchemy.dialects.postgresql import insert
-        stmt = insert(ProductFavorite).values(user_id=user_id, product_id=product_id).on_conflict_do_nothing()
+
+        stmt = (
+            insert(ProductFavorite)
+            .values(user_id=user_id, product_id=product_id)
+            .on_conflict_do_nothing()
+        )
         await self.db.execute(stmt)
         await self.db.flush()
 
     async def unfavorite_product(self, user_id: UUID, product_id: UUID) -> None:
         from sqlalchemy import delete
+
         stmt = delete(ProductFavorite).where(
-            ProductFavorite.user_id == user_id,
-            ProductFavorite.product_id == product_id
+            ProductFavorite.user_id == user_id, ProductFavorite.product_id == product_id
         )
         await self.db.execute(stmt)
         await self.db.flush()
 
-    async def list_favorite_products(self, user_id: UUID, page: int, limit: int) -> tuple[list[Product], int]:
-        stmt = select(Product).join(ProductFavorite).where(ProductFavorite.user_id == user_id)
-        
+    async def list_favorite_products(
+        self, user_id: UUID, page: int, limit: int
+    ) -> tuple[list[Product], int]:
+        stmt = (
+            select(Product)
+            .join(ProductFavorite)
+            .where(ProductFavorite.user_id == user_id)
+        )
+
         count_result = await self.db.execute(
             select(func.count()).select_from(stmt.subquery())
         )

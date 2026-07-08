@@ -77,7 +77,14 @@ class ProductService:
         max_price: float | None = None,
     ) -> PaginatedResponse[ProductResponseDTO]:
         items, total = await self.repository.list_products(
-            page, limit, store_id=store_id, category_id=category_id, is_active=is_active, search=search, min_price=min_price, max_price=max_price
+            page,
+            limit,
+            store_id=store_id,
+            category_id=category_id,
+            is_active=is_active,
+            search=search,
+            min_price=min_price,
+            max_price=max_price,
         )
         return PaginatedResponse(items=items, page=page, limit=limit, total=total)
 
@@ -129,5 +136,7 @@ class ProductService:
     async def list_favorite_products(
         self, user_id: UUID, page: int, limit: int
     ) -> PaginatedResponse[ProductResponseDTO]:
-        items, total = await self.repository.list_favorite_products(user_id, page, limit)
+        items, total = await self.repository.list_favorite_products(
+            user_id, page, limit
+        )
         return PaginatedResponse(items=items, page=page, limit=limit, total=total)

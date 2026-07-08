@@ -123,9 +123,11 @@ class SQLAlchemyStoreRepository(StoreRepository):
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 
-    async def list_followed_stores(self, user_id: UUID, page: int, limit: int) -> tuple[list[Store], int]:
+    async def list_followed_stores(
+        self, user_id: UUID, page: int, limit: int
+    ) -> tuple[list[Store], int]:
         stmt = select(Store).where(Store.followers.any(User.id == user_id))
-        
+
         count_result = await self.db.execute(
             select(func.count()).select_from(stmt.subquery())
         )

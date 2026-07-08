@@ -31,6 +31,7 @@ class Product(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     from sqlalchemy import Index
+
     __table_args__ = (
         Index(
             "ix_products_name_trgm",

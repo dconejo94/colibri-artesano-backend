@@ -33,7 +33,7 @@ from app.core.exceptions import (
     InvalidImageUrlError,
     ServiceUnavailableException,
 )
-from app.core.security import require_product_owner
+from app.core.security import require_product_owner, get_current_user, User
 from app.infrastructure.azure_blob_storage import (
     BlobStorageService,
     InvalidImageError,
@@ -93,8 +93,6 @@ async def delete_product(
 ):
     await service.delete_product(product_id)
 
-
-from app.core.security import get_current_user, User
 
 @router.post("/{product_id}/favorite", status_code=204)
 async def favorite_product(

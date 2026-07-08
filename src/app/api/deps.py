@@ -19,6 +19,10 @@ from app.infrastructure.order_repository_sqlalchemy import SQLAlchemyOrderReposi
 from app.infrastructure.search_repository_sqlalchemy import (
     SQLAlchemyProductSearchRepository,
 )
+from app.infrastructure.store_search_repository import SQLAlchemyStoreSearchRepository
+from app.infrastructure.category_search_repository import (
+    SQLAlchemyCategorySearchRepository,
+)
 from app.infrastructure.event_repository_sqlalchemy import SQLAlchemyEventRepository
 from app.infrastructure.cart_repository_sqlalchemy import SQLAlchemyCartRepository
 from app.infrastructure.notification_repository_sqlalchemy import (
@@ -121,8 +125,6 @@ async def get_order_service(
     )
 
 
-from app.infrastructure.store_search_repository import SQLAlchemyStoreSearchRepository
-from app.infrastructure.category_search_repository import SQLAlchemyCategorySearchRepository
 
 async def get_search_service(
     db: AsyncSession = Depends(get_db),

@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 
 from app.domain.models.product import Product
+from app.domain.models.store import Store
+from app.domain.models.category import Category
 
 
 class ProductSearchRepository(ABC):
@@ -42,12 +44,13 @@ class ProductSearchRepository(ABC):
         must return an empty list.
         """
 
-from app.domain.models.store import Store
-from app.domain.models.category import Category
+
 
 class StoreSearchRepository(ABC):
     @abstractmethod
-    async def search(self, query: str, page: int, limit: int) -> tuple[list[Store], int]:
+    async def search(
+        self, query: str, page: int, limit: int
+    ) -> tuple[list[Store], int]:
         pass
 
     @abstractmethod

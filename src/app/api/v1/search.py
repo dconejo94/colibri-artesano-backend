@@ -82,7 +82,9 @@ async def search_products_legacy(
     limit: int = Query(10, ge=1, le=100, description="Results per page"),
     service: SearchService = Depends(get_search_service),
 ) -> PaginatedResponse[ProductListDTO]:
-    return await unified_search(q=q, scope="products", page=page, limit=limit, service=service)
+    return await unified_search(
+        q=q, scope="products", page=page, limit=limit, service=service
+    )
 
 
 @router.get("/products/autocomplete", response_model=list[ProductAutocompleteDTO])

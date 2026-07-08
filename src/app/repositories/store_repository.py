@@ -56,5 +56,7 @@ class StoreRepository(ABC):
         pass
 
     @abstractmethod
-    async def list_followed_stores(self, user_id: UUID, page: int, limit: int) -> tuple[list[Store], int]:
+    async def list_followed_stores(
+        self, user_id: UUID, page: int, limit: int
+    ) -> tuple[list[Store], int]:
         pass
