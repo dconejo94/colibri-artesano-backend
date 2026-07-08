@@ -13,4 +13,14 @@ class Category(Base):
     name = Column(String(100), nullable=False)
     slug = Column(String(100), unique=True, nullable=False)
 
+    from sqlalchemy import Index
+    __table_args__ = (
+        Index(
+            "ix_categories_name_trgm",
+            name,
+            postgresql_using="gin",
+            postgresql_ops={"name": "gin_trgm_ops"},
+        ),
+    )
+
     products = relationship("Product", back_populates="category")

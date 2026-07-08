@@ -84,6 +84,13 @@ class OrderService:
         )
         return PaginatedResponse(items=items, page=page, limit=limit, total=total)
 
+    async def get_store_sales_summary(self, store_id: UUID) -> dict:
+        total_orders, total_sales = await self.order_repo.get_store_sales_summary(store_id)
+        return {
+            "total_orders": total_orders,
+            "total_sales": total_sales,
+        }
+
     async def update_store_order_status(
         self, store_order_id: UUID, dto: StoreOrderStatusUpdateDTO
     ) -> StoreOrder:

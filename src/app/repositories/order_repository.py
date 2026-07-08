@@ -36,6 +36,11 @@ class OrderRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_store_sales_summary(self, store_id: UUID) -> tuple[int, float]:
+        """Returns (total_orders, total_sales_amount) for delivered orders."""
+        pass
+
+    @abstractmethod
     async def update_store_order_status(self, store_order: StoreOrder) -> StoreOrder:
         pass
 

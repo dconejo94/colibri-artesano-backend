@@ -38,6 +38,22 @@ class Store(Base):
     logo_url = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
+    from sqlalchemy import Index
+    __table_args__ = (
+        Index(
+            "ix_stores_name_trgm",
+            name,
+            postgresql_using="gin",
+            postgresql_ops={"name": "gin_trgm_ops"},
+        ),
+        Index(
+            "ix_stores_desc_trgm",
+            description,
+            postgresql_using="gin",
+            postgresql_ops={"description": "gin_trgm_ops"},
+        ),
+    )
+
     owner = relationship("User", back_populates="store")
     products = relationship(
         "Product",

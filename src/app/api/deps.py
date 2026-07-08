@@ -121,10 +121,17 @@ async def get_order_service(
     )
 
 
+from app.infrastructure.store_search_repository import SQLAlchemyStoreSearchRepository
+from app.infrastructure.category_search_repository import SQLAlchemyCategorySearchRepository
+
 async def get_search_service(
     db: AsyncSession = Depends(get_db),
 ) -> SearchService:
-    return SearchService(SQLAlchemyProductSearchRepository(db))
+    return SearchService(
+        repository=SQLAlchemyProductSearchRepository(db),
+        store_repository=SQLAlchemyStoreSearchRepository(db),
+        category_repository=SQLAlchemyCategorySearchRepository(db),
+    )
 
 
 async def get_event_service(

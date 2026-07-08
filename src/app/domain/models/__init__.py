@@ -11,3 +11,4 @@ from .event import Event as Event
 from .event import EventParticipant as EventParticipant
 from .fcm_token import FCMToken as FCMToken
 from .notification import Notification as Notification
+from .product_favorite import ProductFavorite as ProductFavorite

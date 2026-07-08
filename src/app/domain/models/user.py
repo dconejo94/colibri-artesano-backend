@@ -47,3 +47,6 @@ class User(Base):
     fcm_tokens = relationship(
         "FCMToken", back_populates="user", cascade="all, delete-orphan"
     )
+    favorite_products = relationship(
+        "ProductFavorite", back_populates="user", cascade="all, delete-orphan"
+    )

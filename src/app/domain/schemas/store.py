@@ -41,3 +41,11 @@ class StoreResponseDTO(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class StoreAutocompleteDTO(BaseModel):
+    id: UUID
+    name: str
+    logo_url: str | None = None
+
+    model_config = {"from_attributes": True}

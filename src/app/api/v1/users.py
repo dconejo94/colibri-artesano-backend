@@ -30,3 +30,31 @@ async def delete_me(
     service: UserService = Depends(get_user_service),
 ):
     await service.delete_me(current_user)
+
+from fastapi import Query
+from app.api.deps import get_product_service
+from app.services.product_service import ProductService
+from app.domain.schemas.paginated_response import PaginatedResponse
+from app.domain.schemas.product import ProductListDTO
+
+@router.get("/me/favorites/products", response_model=PaginatedResponse[ProductListDTO])
+async def list_favorite_products(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    current_user: User = Depends(get_current_user),
+    service: ProductService = Depends(get_product_service),
+):
+    return await service.list_favorite_products(current_user.id, page, limit)
+
+from app.api.deps import get_store_service
+from app.services.store_service import StoreService
+from app.domain.schemas.store import StoreResponseDTO
+
+@router.get("/me/followed_stores", response_model=PaginatedResponse[StoreResponseDTO])
+async def list_followed_stores(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    current_user: User = Depends(get_current_user),
+    service: StoreService = Depends(get_store_service),
+):
+    return await service.list_followed_stores(current_user.id, page, limit)

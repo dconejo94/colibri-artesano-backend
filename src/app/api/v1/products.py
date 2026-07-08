@@ -50,6 +50,9 @@ async def list_products(
     store_id: UUID | None = Query(None),
     category_id: UUID | None = Query(None),
     is_active: bool | None = Query(None),
+    search: str | None = Query(None),
+    min_price: float | None = Query(None, ge=0),
+    max_price: float | None = Query(None, ge=0),
     service: ProductService = Depends(get_product_service),
 ):
     return await service.list_products(
@@ -58,6 +61,9 @@ async def list_products(
         store_id=store_id,
         category_id=category_id,
         is_active=is_active,
+        search=search,
+        min_price=min_price,
+        max_price=max_price,
     )
 
 
@@ -86,6 +92,26 @@ async def delete_product(
     service: ProductService = Depends(get_product_service),
 ):
     await service.delete_product(product_id)
+
+
+from app.core.security import get_current_user, User
+
+@router.post("/{product_id}/favorite", status_code=204)
+async def favorite_product(
+    product_id: UUID,
+    current_user: User = Depends(get_current_user),
+    service: ProductService = Depends(get_product_service),
+):
+    await service.favorite_product(current_user.id, product_id)
+
+
+@router.delete("/{product_id}/favorite", status_code=204)
+async def unfavorite_product(
+    product_id: UUID,
+    current_user: User = Depends(get_current_user),
+    service: ProductService = Depends(get_product_service),
+):
+    await service.unfavorite_product(current_user.id, product_id)
 
 
 @router.post(

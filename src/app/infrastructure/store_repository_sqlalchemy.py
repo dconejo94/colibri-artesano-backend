@@ -122,3 +122,19 @@ class SQLAlchemyStoreRepository(StoreRepository):
         stmt = select(User).where(User.followed_stores.any(Store.id == store_id))
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
+
+    async def list_followed_stores(self, user_id: UUID, page: int, limit: int) -> tuple[list[Store], int]:
+        stmt = select(Store).where(Store.followers.any(User.id == user_id))
+        
+        count_result = await self.db.execute(
+            select(func.count()).select_from(stmt.subquery())
+        )
+        total = count_result.scalar()
+
+        result = await self.db.execute(
+            stmt.order_by(Store.created_at.desc())
+            .offset((page - 1) * limit)
+            .limit(limit)
+        )
+        items = list(result.scalars().all())
+        return items, total
