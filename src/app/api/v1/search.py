@@ -1,11 +1,9 @@
 from typing import Literal, Any
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query
 
 from app.services.search_service import SearchService
 from app.api.deps import get_search_service
 from app.domain.schemas.product import ProductListDTO
-from app.domain.schemas.store import StoreResponseDTO
-from app.domain.schemas.category import CategoryResponseDTO
 from app.domain.schemas.search import ProductAutocompleteDTO
 from app.domain.schemas.paginated_response import PaginatedResponse
 

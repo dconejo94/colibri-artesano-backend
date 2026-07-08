@@ -1,6 +1,5 @@
 from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.domain.models.store import Store
 from app.repositories.search_repository import StoreSearchRepository
