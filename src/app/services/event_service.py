@@ -107,16 +107,8 @@ class EventService:
         event = await self.repository.get_by_id(event_id)
         if event is None:
             raise NotFoundException("Event", str(event_id))
-        if dto.title is not None:
-            event.title = dto.title
-        if dto.description is not None:
-            event.description = dto.description
-        if dto.location is not None:
-            event.location = dto.location
-        if dto.event_date is not None:
-            event.event_date = dto.event_date
-        if dto.cover_image_url is not None:
-            event.cover_image_url = dto.cover_image_url
+        for field, value in dto.model_dump(exclude_unset=True).items():
+            setattr(event, field, value)
         updated = await self.repository.update(event)
         return self._to_response(updated)
 

@@ -9,6 +9,7 @@ from sqlalchemy import (
     DateTime,
     Text,
     Uuid,
+    Index,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -29,8 +30,6 @@ class Product(Base):
     base_price = Column(Numeric(10, 2), nullable=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-
-    from sqlalchemy import Index
 
     __table_args__ = (
         Index(

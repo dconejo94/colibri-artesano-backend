@@ -9,6 +9,7 @@ from sqlalchemy import (
     Uuid,
     Table,
     UniqueConstraint,
+    Index,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -37,8 +38,6 @@ class Store(Base):
     description = Column(Text, nullable=True)
     logo_url = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-
-    from sqlalchemy import Index
 
     __table_args__ = (
         Index(
