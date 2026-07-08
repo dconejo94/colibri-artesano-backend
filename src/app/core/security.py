@@ -28,6 +28,7 @@ _BCRYPT_MAX_BYTES = 72
 ACCESS_TOKEN_TYPE = "access"
 REFRESH_TOKEN_TYPE = "refresh"
 
+
 class _SpanishOAuth2PasswordBearer(OAuth2PasswordBearer):
     """OAuth2 bearer scheme that returns the app's Spanish auth error.
 

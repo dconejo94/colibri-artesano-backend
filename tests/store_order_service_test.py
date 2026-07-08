@@ -249,7 +249,9 @@ async def test_update_status_rejects_order_of_another_store():
     # order belongs to a different store — this must not be updatable.
     with pytest.raises(NotFoundException):
         await svc.update_store_order_status(
-            other_store_id, store_order.id, StoreOrderStatusUpdateDTO(seller_status="shipped")
+            other_store_id,
+            store_order.id,
+            StoreOrderStatusUpdateDTO(seller_status="shipped"),
         )
     assert svc.order_repo.updated is False
 
@@ -259,7 +261,9 @@ async def test_update_status_allows_owning_store():
     svc = _order_service(store_order)
 
     await svc.update_store_order_status(
-        store_order.store_id, store_order.id, StoreOrderStatusUpdateDTO(seller_status="shipped")
+        store_order.store_id,
+        store_order.id,
+        StoreOrderStatusUpdateDTO(seller_status="shipped"),
     )
 
     assert store_order.seller_status == "shipped"
