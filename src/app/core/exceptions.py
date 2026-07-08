@@ -11,7 +11,7 @@ class NotFoundException(BaseDomainException):
         "StoreOrder": "Pedido no encontrado.",
         "Order": "Pedido no encontrado.",
         "Product": "Producto no encontrado.",
-        "Category": "Categoria no encontrada.",
+        "Category": "Categoría no encontrada.",
         "User": "Usuario no encontrado.",
         "ProductVariant": "Variante no encontrada.",
         "ProductImage": "Imagen no encontrada.",

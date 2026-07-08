@@ -93,9 +93,35 @@ _PYDANTIC_ERROR_MESSAGES = {
     "bool_type": "Debe ser un valor booleano.",
     "bool_parsing": "Debe ser un valor booleano.",
     "uuid_parsing": "Debe ser un identificador válido.",
-    "value_error": "Valor inválido.",
+    "literal_error": "Valor no permitido.",
     "json_invalid": "El cuerpo de la solicitud no es un JSON válido.",
 }
+
+
+def _validation_message(error: dict) -> str:
+    """Localized message for a single pydantic error.
+
+    Constraint errors carry their limit in ``ctx``; surface it so the user
+    knows how to fix the input instead of a bare "Valor inválido.". Custom
+    validator errors ("value_error") already carry a written message.
+    """
+    error_type = error["type"]
+    ctx = error.get("ctx", {})
+    if error_type == "string_too_short":
+        return f"Debe tener al menos {ctx.get('min_length')} caracteres."
+    if error_type == "string_too_long":
+        return f"Debe tener como máximo {ctx.get('max_length')} caracteres."
+    if error_type == "greater_than":
+        return f"Debe ser mayor que {ctx.get('gt')}."
+    if error_type == "greater_than_equal":
+        return f"Debe ser mayor o igual que {ctx.get('ge')}."
+    if error_type == "less_than":
+        return f"Debe ser menor que {ctx.get('lt')}."
+    if error_type == "less_than_equal":
+        return f"Debe ser menor o igual que {ctx.get('le')}."
+    if error_type == "value_error":
+        return error["msg"].removeprefix("Value error, ")
+    return _PYDANTIC_ERROR_MESSAGES.get(error_type, "Valor inválido.")
 
 
 @app.exception_handler(RequestValidationError)
@@ -105,7 +131,7 @@ async def request_validation_exception_handler(
     detail = [
         {
             "loc": list(error["loc"]),
-            "msg": _PYDANTIC_ERROR_MESSAGES.get(error["type"], "Valor inválido."),
+            "msg": _validation_message(error),
         }
         for error in exc.errors()
     ]
