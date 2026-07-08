@@ -45,7 +45,6 @@ class ProductSearchRepository(ABC):
         """
 
 
-
 class StoreSearchRepository(ABC):
     @abstractmethod
     async def search(

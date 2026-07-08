@@ -125,7 +125,6 @@ async def get_order_service(
     )
 
 
-
 async def get_search_service(
     db: AsyncSession = Depends(get_db),
 ) -> SearchService:

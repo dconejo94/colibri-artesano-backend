@@ -37,7 +37,6 @@ async def delete_me(
     await service.delete_me(current_user)
 
 
-
 @router.get("/me/favorites/products", response_model=PaginatedResponse[ProductListDTO])
 async def list_favorite_products(
     page: int = Query(1, ge=1),
@@ -46,7 +45,6 @@ async def list_favorite_products(
     service: ProductService = Depends(get_product_service),
 ):
     return await service.list_favorite_products(current_user.id, page, limit)
-
 
 
 @router.get("/me/followed_stores", response_model=PaginatedResponse[StoreResponseDTO])
