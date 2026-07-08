@@ -8,7 +8,11 @@ from app.domain.schemas.product import ProductResponseDTO
 from app.repositories.product_repository import ProductRepository
 from app.repositories.product_variant_repository import ProductVariantRepository
 from app.repositories.category_repository import CategoryRepository
+from app.repositories.store_repository import StoreRepository
+
 from app.core.exceptions import NotFoundException
+
+from app.services.notification_service import NotificationService
 
 
 class ProductService:
@@ -17,10 +21,14 @@ class ProductService:
         repository: ProductRepository,
         category_repository: CategoryRepository,
         variant_repository: ProductVariantRepository,
+        store_repository: StoreRepository,
+        notification_service: NotificationService,
     ):
         self.repository = repository
         self.category_repo = category_repository
         self.variant_repo = variant_repository
+        self.notification_service = notification_service
+        self.store_repository = store_repository
 
     async def create_product(self, store_id: UUID, dto: ProductCreateDTO) -> Product:
         category = await self.category_repo.get_by_id(dto.category_id)
@@ -46,6 +54,13 @@ class ProductService:
                 price_modifier=0,
                 stock_quantity=0,
             )
+        )
+
+        followers = await self.store_repository.get_followers(store_id)
+        follower_ids = [user.id for user in followers]
+        store = await self.store_repository.get_by_id(store_id)
+        await self._send_notifications_to_customers(
+            follower_ids, created_product.id, store.name, created_product.name
         )
 
         return await self.get_product_by_id(created_product.id)
@@ -91,3 +106,10 @@ class ProductService:
         if not product:
             raise NotFoundException("Product", str(product_id))
         await self.repository.delete(product)
+
+    async def _send_notifications_to_customers(
+        self, user_ids: list[UUID], product_id: UUID, store_name: str, product_name: str
+    ) -> None:
+        await self.notification_service.notify_new_product(
+            user_ids, product_id, store_name, product_name
+        )

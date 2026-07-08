@@ -16,7 +16,7 @@ class StoreService:
     async def create_store(self, dto: StoreCreateDTO) -> Store:
         existing = await self.repository.get_by_owner_id(dto.owner_id)
         if existing:
-            raise ConflictException("User already owns a store")
+            raise ConflictException("El usuario ya tiene una tienda")
 
         store = Store(
             owner_id=dto.owner_id,
@@ -83,7 +83,7 @@ class StoreService:
             raise NotFoundException("Store", str(store_id))
         is_following = await self.repository.is_following(store_id, user_id)
         if is_following:
-            raise ConflictException("Already following store")
+            raise ConflictException("Ya sigues esta tienda")
         await self.repository.add_follower(store_id, user_id)
 
     async def unfollow_store(self, store_id: UUID, user_id: UUID) -> None:

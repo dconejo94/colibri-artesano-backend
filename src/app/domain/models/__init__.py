@@ -9,3 +9,5 @@ from .store_order import StoreOrder as StoreOrder
 from .order_item import OrderItem as OrderItem
 from .event import Event as Event
 from .event import EventParticipant as EventParticipant
+from .fcm_token import FCMToken as FCMToken
+from .notification import Notification as Notification

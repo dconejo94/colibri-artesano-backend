@@ -21,6 +21,9 @@ from app.infrastructure.search_repository_sqlalchemy import (
 )
 from app.infrastructure.event_repository_sqlalchemy import SQLAlchemyEventRepository
 from app.infrastructure.cart_repository_sqlalchemy import SQLAlchemyCartRepository
+from app.infrastructure.notification_repository_sqlalchemy import (
+    SQLAlchemyNotificationRepository,
+)
 
 from app.services.auth_service import AuthService
 from app.services.user_service import UserService
@@ -34,6 +37,8 @@ from app.services.search_service import SearchService
 from app.services.event_service import EventService
 from app.services.cart_service import CartService
 from app.services.store_order_service import StoreOrderService
+from app.services.notification_service import NotificationService
+
 
 from app.config import settings
 from app.infrastructure.azure_blob_storage import BlobStorageService
@@ -73,6 +78,8 @@ async def get_product_service(
         repository=SQLAlchemyProductRepository(db),
         category_repository=SQLAlchemyCategoryRepository(db),
         variant_repository=SQLAlchemyProductVariantRepository(db),
+        store_repository=SQLAlchemyStoreRepository(db),
+        notification_service=NotificationService(SQLAlchemyNotificationRepository(db)),
     )
 
 
@@ -110,6 +117,7 @@ async def get_order_service(
         order_repository=SQLAlchemyOrderRepository(db),
         product_repository=SQLAlchemyProductRepository(db),
         variant_repository=SQLAlchemyProductVariantRepository(db),
+        notification_service=NotificationService(SQLAlchemyNotificationRepository(db)),
     )
 
 
@@ -139,3 +147,9 @@ async def get_cart_service(
         product_repository=SQLAlchemyProductRepository(db),
         store_order_service=store_order_service,
     )
+
+
+async def get_notification_service(
+    db: AsyncSession = Depends(get_db),
+) -> NotificationService:
+    return NotificationService(SQLAlchemyNotificationRepository(db))

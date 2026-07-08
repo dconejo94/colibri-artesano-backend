@@ -41,3 +41,9 @@ class User(Base):
         back_populates="reviewer",
         foreign_keys="EventParticipant.reviewed_by",
     )
+    notifications = relationship(
+        "Notification", back_populates="user", cascade="all, delete-orphan"
+    )
+    fcm_tokens = relationship(
+        "FCMToken", back_populates="user", cascade="all, delete-orphan"
+    )

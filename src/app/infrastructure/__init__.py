@@ -19,3 +19,6 @@ from app.infrastructure.order_repository_sqlalchemy import (
 from app.infrastructure.search_repository_sqlalchemy import (
     SQLAlchemyProductSearchRepository as SQLAlchemyProductSearchRepository,
 )
+from app.infrastructure.notification_repository_sqlalchemy import (
+    SQLAlchemyNotificationRepository as SQLAlchemyNotificationRepository,
+)

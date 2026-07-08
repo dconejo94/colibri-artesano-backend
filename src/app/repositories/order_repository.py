@@ -42,3 +42,7 @@ class OrderRepository(ABC):
     @abstractmethod
     async def buyer_exists(self, buyer_id: UUID) -> bool:
         pass
+
+    @abstractmethod
+    async def flush(self) -> None:
+        pass
