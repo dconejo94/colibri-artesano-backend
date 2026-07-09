@@ -23,12 +23,13 @@ def _event_payload(**overrides):
         "title": "Feria Artesanal",
         "description": "Encuentro cultural de artesanos",
         "location": "Bogotá",
+        "latitude": 4.7110,
+        "longitude": -74.0721,
         "event_date": "2026-07-01T10:00:00+00:00",
         "cover_image_url": "https://example.com/event.jpg",
     }
     payload.update(overrides)
     return payload
-
 
 def _auth(token: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"}

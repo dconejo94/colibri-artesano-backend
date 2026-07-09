@@ -37,6 +37,10 @@ class EventCreateDTO(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     description: str | None = None
     location: str | None = Field(None, max_length=255)
+
+    latitude: float = Field(..., ge=-90, le=90)
+    longitude: float = Field(..., ge=-180, le=180)
+
     event_date: AwareDatetime
     cover_image_url: str | None = None
 
@@ -45,15 +49,22 @@ class EventUpdateDTO(BaseModel):
     title: str | None = Field(None, min_length=1, max_length=200)
     description: str | None = None
     location: str | None = Field(None, max_length=255)
+
+    latitude: float | None = Field(None, ge=-90, le=90)
+    longitude: float | None = Field(None, ge=-180, le=180)
+
     event_date: AwareDatetime | None = None
     cover_image_url: str | None = None
-
 
 class EventResponseDTO(BaseModel):
     id: UUID
     title: str
     description: str | None
     location: str | None
+
+    latitude: float
+    longitude: float
+
     event_date: AwareDatetime
     cover_image_url: str | None
     created_by: UUID
@@ -62,7 +73,6 @@ class EventResponseDTO(BaseModel):
     my_participation: ParticipationStatus | None = None
 
     model_config = {"from_attributes": True}
-
 
 # ── Participation ─────────────────────────────────────────────────
 

@@ -55,6 +55,8 @@ class EventService:
             title=event.title,
             description=event.description,
             location=event.location,
+            latitude=event.latitude,
+            longitude=event.longitude,
             event_date=self._ensure_tz(event.event_date),
             cover_image_url=event.cover_image_url,
             created_by=event.created_by,
@@ -89,6 +91,8 @@ class EventService:
             title=dto.title,
             description=dto.description,
             location=dto.location,
+            latitude=dto.latitude,
+            longitude=dto.longitude,
             event_date=dto.event_date,
             cover_image_url=dto.cover_image_url,
             created_by=creator_id,
@@ -117,6 +121,30 @@ class EventService:
         if event is None:
             raise NotFoundException("Event", str(event_id))
         return self._to_response(event, user_role, user_store_id)
+
+    async def list_upcoming(self,
+        page: int,
+        limit: int,
+        user_role: str | None = None,
+        user_store_id: UUID | None = None,
+    ) -> PaginatedResponse[EventResponseDTO]:
+        events, total = await self.repository.list_upcoming(page, limit)
+        items = [self._to_response(e, user_role, user_store_id) for e in events]
+        return PaginatedResponse(items=items, page=page, limit=limit, total=total)
+
+    async def list_nearby(
+        self,
+        lat: float,
+        lng: float,
+        radius_km: float,
+        page: int,
+        limit: int,
+        user_role: str | None = None,
+        user_store_id: UUID | None = None,
+    ) -> PaginatedResponse[EventResponseDTO]:
+        events, total = await self.repository.list_nearby(page, limit, lat, lng, radius_km)
+        items = [self._to_response(e, user_role, user_store_id) for e in events]
+        return PaginatedResponse(items=items, page=page, limit=limit, total=total)
 
     async def update_event(
         self, event_id: UUID, dto: EventUpdateDTO

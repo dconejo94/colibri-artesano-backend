@@ -1,5 +1,6 @@
 import uuid
 from enum import Enum as PyEnum
+from sqlalchemy import Float
 
 from sqlalchemy import (
     Column,
@@ -30,6 +31,8 @@ class Event(Base):
     title = Column(String(200), nullable=False)
     description = Column(Text, nullable=True)
     location = Column(String(255), nullable=True)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
     event_date = Column(DateTime(timezone=True), nullable=False)
     cover_image_url = Column(String, nullable=True)
     created_by = Column(Uuid, ForeignKey("users.id"), nullable=False)

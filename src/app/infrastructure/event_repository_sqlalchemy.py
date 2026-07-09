@@ -7,6 +7,8 @@ from sqlalchemy.orm import selectinload
 from app.domain.models.event import Event, EventParticipant, ParticipationStatus
 from app.repositories.event_repository import EventRepository
 
+from datetime import datetime, timezone
+from math import radians, sin, cos, sqrt, asin
 
 class SQLAlchemyEventRepository(EventRepository):
     def __init__(self, db: AsyncSession):
@@ -43,6 +45,34 @@ class SQLAlchemyEventRepository(EventRepository):
             .limit(limit)
         )
         return list(result.scalars().all()), total
+
+    async def list_upcoming(self, page: int, limit: int) -> tuple[list[Event], int]:
+        now = datetime.now(timezone.utc)
+        count_result = await self.db.execute(
+            select(func.count())
+            .select_from(Event)
+            .where(Event.event_date >= now)
+        )
+
+        total = count_result.scalar() or 0
+
+        result = await self.db.execute(
+            select(Event)
+            .options(
+                selectinload(Event.participants)
+                .selectinload(EventParticipant.store)
+            )
+            .where(Event.event_date >= now)
+            .order_by(Event.event_date.asc())
+            .offset((page - 1) * limit)
+            .limit(limit)
+        )
+
+        return list(result.scalars().all()), total
+
+    async def list_nearby(self, page: int, limit: int, lat: float, lng: float, radius_km: float,) -> tuple[list[Event], int]:
+        result = await self.db.execute(select)
+        return
 
     async def get_by_id(self, event_id: UUID) -> Event | None:
         result = await self.db.execute(
