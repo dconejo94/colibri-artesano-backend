@@ -37,6 +37,7 @@ from app.services.product_service import ProductService
 from app.services.product_image_service import ProductImageService
 from app.services.product_variant_service import ProductVariantService
 from app.services.order_service import OrderService
+from app.services.payment_service import PaymentService
 from app.services.search_service import SearchService
 from app.services.event_service import EventService
 from app.services.cart_service import CartService
@@ -123,6 +124,12 @@ async def get_order_service(
         variant_repository=SQLAlchemyProductVariantRepository(db),
         notification_service=NotificationService(SQLAlchemyNotificationRepository(db)),
     )
+
+
+async def get_payment_service(
+    db: AsyncSession = Depends(get_db),
+) -> PaymentService:
+    return PaymentService(order_repository=SQLAlchemyOrderRepository(db))
 
 
 async def get_search_service(

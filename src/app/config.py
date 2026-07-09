@@ -30,6 +30,12 @@ class Settings(BaseSettings):
     # Rate limit applied to the login and register endpoints
     AUTH_RATE_LIMIT: str = "5/minute"
 
+    # Stripe (test mode). Payments endpoints return 503 until the key is set.
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_WEBHOOK_SECRET: str = ""
+    # CRC is not a Stripe-supported presentment currency, so charges are in USD.
+    STRIPE_CURRENCY: str = "usd"
+
     # Azure Blob Storage (product images).
     AZURE_STORAGE_ACCOUNT_NAME: str = ""
     AZURE_STORAGE_ACCOUNT_KEY: str = ""
