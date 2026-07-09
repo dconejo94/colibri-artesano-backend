@@ -10,6 +10,7 @@ from app.repositories.event_repository import EventRepository
 from datetime import datetime, timezone
 from math import radians, sin, cos, sqrt, asin
 
+
 class SQLAlchemyEventRepository(EventRepository):
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -28,9 +29,7 @@ class SQLAlchemyEventRepository(EventRepository):
 
         a = (
             sin(dlat / 2) ** 2
-            + cos(radians(lat1))
-            * cos(radians(lat2))
-            * sin(dlng / 2) ** 2
+            + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlng / 2) ** 2
         )
 
         c = 2 * asin(sqrt(a))
@@ -72,9 +71,7 @@ class SQLAlchemyEventRepository(EventRepository):
     async def list_upcoming(self, page: int, limit: int) -> tuple[list[Event], int]:
         now = datetime.now(timezone.utc)
         count_result = await self.db.execute(
-            select(func.count())
-            .select_from(Event)
-            .where(Event.event_date >= now)
+            select(func.count()).select_from(Event).where(Event.event_date >= now)
         )
 
         total = count_result.scalar() or 0
@@ -82,8 +79,7 @@ class SQLAlchemyEventRepository(EventRepository):
         result = await self.db.execute(
             select(Event)
             .options(
-                selectinload(Event.participants)
-                .selectinload(EventParticipant.store)
+                selectinload(Event.participants).selectinload(EventParticipant.store)
             )
             .where(Event.event_date >= now)
             .order_by(Event.event_date.asc())
@@ -106,10 +102,10 @@ class SQLAlchemyEventRepository(EventRepository):
 
         if dialect == "sqlite":
             result = await self.db.execute(
-                select(Event)
-                .options(
-                    selectinload(Event.participants)
-                    .selectinload(EventParticipant.store)
+                select(Event).options(
+                    selectinload(Event.participants).selectinload(
+                        EventParticipant.store
+                    )
                 )
             )
 
@@ -134,24 +130,15 @@ class SQLAlchemyEventRepository(EventRepository):
 
             return nearby[start:end], total
 
-        distance = (
-            6371
-            * func.acos(
-                func.cos(func.radians(lat))
-                * func.cos(func.radians(Event.latitude))
-                * func.cos(
-                    func.radians(Event.longitude)
-                    - func.radians(lng)
-                )
-                + func.sin(func.radians(lat))
-                * func.sin(func.radians(Event.latitude))
-            )
+        distance = 6371 * func.acos(
+            func.cos(func.radians(lat))
+            * func.cos(func.radians(Event.latitude))
+            * func.cos(func.radians(Event.longitude) - func.radians(lng))
+            + func.sin(func.radians(lat)) * func.sin(func.radians(Event.latitude))
         )
 
         count_result = await self.db.execute(
-            select(func.count())
-            .select_from(Event)
-            .where(distance <= radius_km)
+            select(func.count()).select_from(Event).where(distance <= radius_km)
         )
 
         total = count_result.scalar() or 0
@@ -159,8 +146,7 @@ class SQLAlchemyEventRepository(EventRepository):
         result = await self.db.execute(
             select(Event)
             .options(
-                selectinload(Event.participants)
-                .selectinload(EventParticipant.store)
+                selectinload(Event.participants).selectinload(EventParticipant.store)
             )
             .where(distance <= radius_km)
             .order_by(distance)

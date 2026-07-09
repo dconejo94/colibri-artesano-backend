@@ -31,6 +31,7 @@ def _event_payload(**overrides):
     payload.update(overrides)
     return payload
 
+
 def _auth(token: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"}
 
@@ -209,6 +210,7 @@ async def test_get_event_not_found(auth_client: AsyncClient):
     resp = await auth_client.get(f"{_EVENTS}/{uuid.uuid4()}", headers=_auth(token))
     assert resp.status_code == 404
 
+
 async def test_list_upcoming_returns_only_future_events(auth_client: AsyncClient):
     admin_token = await _create_admin(auth_client, "admin_upcoming@test.com")
 
@@ -239,6 +241,7 @@ async def test_list_upcoming_returns_only_future_events(auth_client: AsyncClient
 
     assert "Futuro" in titles
     assert "Pasado" not in titles
+
 
 async def test_list_nearby_returns_close_events(auth_client: AsyncClient):
     admin_token = await _create_admin(auth_client, "admin_near@test.com")
@@ -273,6 +276,7 @@ async def test_list_nearby_returns_close_events(auth_client: AsyncClient):
     assert "San Jose" in titles
     assert "Muy lejos" not in titles
 
+
 async def test_create_event_invalid_latitude(auth_client: AsyncClient):
     token = await _create_admin(auth_client, "admin_lat@test.com")
 
@@ -285,6 +289,7 @@ async def test_create_event_invalid_latitude(auth_client: AsyncClient):
     )
 
     assert resp.status_code == 422
+
 
 async def test_create_event_invalid_longitude(auth_client: AsyncClient):
     token = await _create_admin(auth_client, "admin_lng@test.com")
@@ -299,6 +304,7 @@ async def test_create_event_invalid_longitude(auth_client: AsyncClient):
 
     assert resp.status_code == 422
 
+
 async def test_nearby_invalid_radius_too_small(auth_client: AsyncClient):
     token = await _register_buyer(auth_client, "buyer_radius1@test.com")
 
@@ -309,6 +315,7 @@ async def test_nearby_invalid_radius_too_small(auth_client: AsyncClient):
 
     assert resp.status_code == 422
 
+
 async def test_nearby_invalid_radius_too_large(auth_client: AsyncClient):
     token = await _register_buyer(auth_client, "buyer_radius2@test.com")
 
@@ -318,6 +325,7 @@ async def test_nearby_invalid_radius_too_large(auth_client: AsyncClient):
     )
 
     assert resp.status_code == 422
+
 
 async def test_nearby_returns_empty_when_no_events(auth_client: AsyncClient):
     buyer_token = await _register_buyer(auth_client, "buyer_empty@test.com")
@@ -330,6 +338,7 @@ async def test_nearby_returns_empty_when_no_events(auth_client: AsyncClient):
     assert resp.status_code == 200
     assert resp.json()["items"] == []
 
+
 async def test_upcoming_pagination(auth_client: AsyncClient):
     admin_token = await _create_admin(auth_client, "admin_page@test.com")
 
@@ -338,7 +347,7 @@ async def test_upcoming_pagination(auth_client: AsyncClient):
             auth_client,
             admin_token,
             title=f"Evento {i}",
-            event_date=f"2030-01-0{i+1}T10:00:00+00:00",
+            event_date=f"2030-01-0{i + 1}T10:00:00+00:00",
         )
 
     buyer_token = await _register_buyer(auth_client, "buyer_page@test.com")
@@ -356,6 +365,7 @@ async def test_upcoming_pagination(auth_client: AsyncClient):
     assert data["limit"] == 2
     assert len(data["items"]) == 2
     assert data["total"] >= 3
+
 
 # ── my_participation (vendor detail) ─────────────────────────────
 

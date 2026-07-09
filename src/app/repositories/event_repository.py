@@ -26,11 +26,18 @@ class EventRepository(ABC):
     @abstractmethod
     async def list_upcoming(self, page: int, limit: int) -> tuple[list[Event], int]:
         pass
-    
+
     @abstractmethod
-    async def list_nearby(self, page: int, limit: int, lat: float, lng: float, radius_km: float,) -> tuple[list[Event], int]:
+    async def list_nearby(
+        self,
+        page: int,
+        limit: int,
+        lat: float,
+        lng: float,
+        radius_km: float,
+    ) -> tuple[list[Event], int]:
         pass
-    
+
     @abstractmethod
     async def get_by_id(self, event_id: UUID) -> Event | None:
         pass

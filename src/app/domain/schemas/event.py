@@ -56,6 +56,7 @@ class EventUpdateDTO(BaseModel):
     event_date: AwareDatetime | None = None
     cover_image_url: str | None = None
 
+
 class EventResponseDTO(BaseModel):
     id: UUID
     title: str
@@ -73,6 +74,7 @@ class EventResponseDTO(BaseModel):
     my_participation: ParticipationStatus | None = None
 
     model_config = {"from_attributes": True}
+
 
 # ── Participation ─────────────────────────────────────────────────
 

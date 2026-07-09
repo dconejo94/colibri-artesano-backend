@@ -122,7 +122,8 @@ class EventService:
             raise NotFoundException("Event", str(event_id))
         return self._to_response(event, user_role, user_store_id)
 
-    async def list_upcoming(self,
+    async def list_upcoming(
+        self,
         page: int,
         limit: int,
         user_role: str | None = None,
@@ -142,7 +143,9 @@ class EventService:
         user_role: str | None = None,
         user_store_id: UUID | None = None,
     ) -> PaginatedResponse[EventResponseDTO]:
-        events, total = await self.repository.list_nearby(page, limit, lat, lng, radius_km)
+        events, total = await self.repository.list_nearby(
+            page, limit, lat, lng, radius_km
+        )
         items = [self._to_response(e, user_role, user_store_id) for e in events]
         return PaginatedResponse(items=items, page=page, limit=limit, total=total)
 

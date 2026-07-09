@@ -42,6 +42,7 @@ async def list_events(
         user_store_id=store_id,
     )
 
+
 @router.get("/upcoming", response_model=PaginatedResponse[EventResponseDTO])
 async def list_upcoming(
     current_user: CurrentUser,
@@ -51,6 +52,7 @@ async def list_upcoming(
 ):
     store_id = current_user.store.id if current_user.store else None
     return await service.list_upcoming(page, limit, current_user.role, store_id)
+
 
 @router.get("/nearby", response_model=PaginatedResponse[EventResponseDTO])
 async def list_nearby(
@@ -63,7 +65,9 @@ async def list_nearby(
     service: EventService = Depends(get_event_service),
 ):
     store_id = current_user.store.id if current_user.store else None
-    return await service.list_nearby(lat, lng, radius_km, page, limit, current_user.role, store_id)
+    return await service.list_nearby(
+        lat, lng, radius_km, page, limit, current_user.role, store_id
+    )
 
 
 @router.get("/{event_id}", response_model=EventResponseDTO)
