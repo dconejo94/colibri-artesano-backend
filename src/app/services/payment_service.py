@@ -39,7 +39,9 @@ class PaymentService:
             amount=amount,
             currency=settings.STRIPE_CURRENCY,
             metadata={"order_id": str(cart.id)},
-            automatic_payment_methods={"enabled": True},
+            # The app only confirms card payments natively, so redirect-based
+            # methods are disabled — otherwise Stripe requires a return_url.
+            automatic_payment_methods={"enabled": True, "allow_redirects": "never"},
             idempotency_key=f"cart-{cart.id}-{amount}",
         )
 
