@@ -42,6 +42,29 @@ async def list_events(
         user_store_id=store_id,
     )
 
+@router.get("/upcoming", response_model=PaginatedResponse[EventResponseDTO])
+async def list_upcoming(
+    current_user: CurrentUser,
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    service: EventService = Depends(get_event_service),
+):
+    store_id = current_user.store.id if current_user.store else None
+    return await service.list_upcoming(page, limit, current_user.role, store_id)
+
+@router.get("/nearby", response_model=PaginatedResponse[EventResponseDTO])
+async def list_nearby(
+    current_user: CurrentUser,
+    lat: float,
+    lng: float,
+    radius_km: float,
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    service: EventService = Depends(get_event_service),
+):
+    store_id = current_user.store.id if current_user.store else None
+    return await service.list_nearby(lat, lng, radius_km, page, limit, current_user.role, store_id)
+
 
 @router.get("/{event_id}", response_model=EventResponseDTO)
 async def get_event(
@@ -59,28 +82,6 @@ async def get_event(
     except NotFoundException:
         raise HTTPException(status_code=404, detail="Event not found")
 
-@router.get("/list_upcoming", response_model=PaginatedResponse[EventResponseDTO])
-async def list_upcoming(
-    current_user: CurrentUser,
-    page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
-    service: EventService = Depends(get_event_service),
-):
-    store_id = current_user.store.id if current_user.store else None
-    return await service.list_upcoming(page, limit, current_user.role, store_id)
-
-@router.get("/list_nearby", response_model=PaginatedResponse[EventResponseDTO])
-async def list_nearby(
-    current_user: CurrentUser,
-    lat: float,
-    lng: float,
-    radius_km: float,
-    page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
-    service: EventService = Depends(get_event_service),
-):
-    store_id = current_user.store.id if current_user.store else None
-    return await service.list_nearby(lat, lng, radius_km, page, limit, current_user.role, store_id)
 
 # ── Events write (admin only) ─────────────────────────────────────
 

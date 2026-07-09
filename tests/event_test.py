@@ -209,6 +209,153 @@ async def test_get_event_not_found(auth_client: AsyncClient):
     resp = await auth_client.get(f"{_EVENTS}/{uuid.uuid4()}", headers=_auth(token))
     assert resp.status_code == 404
 
+async def test_list_upcoming_returns_only_future_events(auth_client: AsyncClient):
+    admin_token = await _create_admin(auth_client, "admin_upcoming@test.com")
+
+    await _create_event(
+        auth_client,
+        admin_token,
+        title="Pasado",
+        event_date="2020-01-01T10:00:00+00:00",
+    )
+
+    await _create_event(
+        auth_client,
+        admin_token,
+        title="Futuro",
+        event_date="2030-01-01T10:00:00+00:00",
+    )
+
+    buyer_token = await _register_buyer(auth_client, "buyer_upcoming@test.com")
+
+    resp = await auth_client.get(
+        f"{_EVENTS}/upcoming?page=1&limit=10",
+        headers=_auth(buyer_token),
+    )
+
+    assert resp.status_code == 200
+
+    titles = [e["title"] for e in resp.json()["items"]]
+
+    assert "Futuro" in titles
+    assert "Pasado" not in titles
+
+async def test_list_nearby_returns_close_events(auth_client: AsyncClient):
+    admin_token = await _create_admin(auth_client, "admin_near@test.com")
+
+    await _create_event(
+        auth_client,
+        admin_token,
+        title="San Jose",
+        latitude=9.9281,
+        longitude=-84.0907,
+    )
+
+    await _create_event(
+        auth_client,
+        admin_token,
+        title="Muy lejos",
+        latitude=40.7128,
+        longitude=-74.0060,
+    )
+
+    buyer_token = await _register_buyer(auth_client, "buyer_near@test.com")
+
+    resp = await auth_client.get(
+        f"{_EVENTS}/nearby?lat=9.9281&lng=-84.0907&radius_km=10&page=1&limit=10",
+        headers=_auth(buyer_token),
+    )
+
+    assert resp.status_code == 200
+
+    titles = [e["title"] for e in resp.json()["items"]]
+
+    assert "San Jose" in titles
+    assert "Muy lejos" not in titles
+
+async def test_create_event_invalid_latitude(auth_client: AsyncClient):
+    token = await _create_admin(auth_client, "admin_lat@test.com")
+
+    payload = _event_payload(latitude=200)
+
+    resp = await auth_client.post(
+        _EVENTS,
+        json=payload,
+        headers=_auth(token),
+    )
+
+    assert resp.status_code == 422
+
+async def test_create_event_invalid_longitude(auth_client: AsyncClient):
+    token = await _create_admin(auth_client, "admin_lng@test.com")
+
+    payload = _event_payload(longitude=-300)
+
+    resp = await auth_client.post(
+        _EVENTS,
+        json=payload,
+        headers=_auth(token),
+    )
+
+    assert resp.status_code == 422
+
+async def test_nearby_invalid_radius_too_small(auth_client: AsyncClient):
+    token = await _register_buyer(auth_client, "buyer_radius1@test.com")
+
+    resp = await auth_client.get(
+        f"{_EVENTS}/nearby?lat=9.9&lng=-84.0&radius=0",
+        headers=_auth(token),
+    )
+
+    assert resp.status_code == 422
+
+async def test_nearby_invalid_radius_too_large(auth_client: AsyncClient):
+    token = await _register_buyer(auth_client, "buyer_radius2@test.com")
+
+    resp = await auth_client.get(
+        f"{_EVENTS}/nearby?lat=9.9&lng=-84.0&radius=1000",
+        headers=_auth(token),
+    )
+
+    assert resp.status_code == 422
+
+async def test_nearby_returns_empty_when_no_events(auth_client: AsyncClient):
+    buyer_token = await _register_buyer(auth_client, "buyer_empty@test.com")
+
+    resp = await auth_client.get(
+        f"{_EVENTS}/nearby?lat=9.9&lng=-84.0&radius_km=5&page=1&limit=10",
+        headers=_auth(buyer_token),
+    )
+
+    assert resp.status_code == 200
+    assert resp.json()["items"] == []
+
+async def test_upcoming_pagination(auth_client: AsyncClient):
+    admin_token = await _create_admin(auth_client, "admin_page@test.com")
+
+    for i in range(3):
+        await _create_event(
+            auth_client,
+            admin_token,
+            title=f"Evento {i}",
+            event_date=f"2030-01-0{i+1}T10:00:00+00:00",
+        )
+
+    buyer_token = await _register_buyer(auth_client, "buyer_page@test.com")
+
+    resp = await auth_client.get(
+        f"{_EVENTS}/upcoming?page=1&limit=2",
+        headers=_auth(buyer_token),
+    )
+
+    assert resp.status_code == 200
+
+    data = resp.json()
+
+    assert data["page"] == 1
+    assert data["limit"] == 2
+    assert len(data["items"]) == 2
+    assert data["total"] >= 3
 
 # ── my_participation (vendor detail) ─────────────────────────────
 

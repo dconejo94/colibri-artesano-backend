@@ -14,6 +14,29 @@ class SQLAlchemyEventRepository(EventRepository):
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    def _haversine(
+        self,
+        lat1: float,
+        lng1: float,
+        lat2: float,
+        lng2: float,
+    ) -> float:
+        radius = 6371.0
+
+        dlat = radians(lat2 - lat1)
+        dlng = radians(lng2 - lng1)
+
+        a = (
+            sin(dlat / 2) ** 2
+            + cos(radians(lat1))
+            * cos(radians(lat2))
+            * sin(dlng / 2) ** 2
+        )
+
+        c = 2 * asin(sqrt(a))
+
+        return radius * c
+
     # ── Events ────────────────────────────────────────────────────
 
     async def create(self, event: Event) -> Event:
@@ -70,9 +93,82 @@ class SQLAlchemyEventRepository(EventRepository):
 
         return list(result.scalars().all()), total
 
-    async def list_nearby(self, page: int, limit: int, lat: float, lng: float, radius_km: float,) -> tuple[list[Event], int]:
-        result = await self.db.execute(select)
-        return
+    async def list_nearby(
+        self,
+        page: int,
+        limit: int,
+        lat: float,
+        lng: float,
+        radius_km: float,
+    ) -> tuple[list[Event], int]:
+
+        dialect = self.db.bind.dialect.name
+
+        if dialect == "sqlite":
+            result = await self.db.execute(
+                select(Event)
+                .options(
+                    selectinload(Event.participants)
+                    .selectinload(EventParticipant.store)
+                )
+            )
+
+            events = list(result.scalars().all())
+
+            nearby = [
+                event
+                for event in events
+                if self._haversine(
+                    lat,
+                    lng,
+                    event.latitude,
+                    event.longitude,
+                )
+                <= radius_km
+            ]
+
+            total = len(nearby)
+
+            start = (page - 1) * limit
+            end = start + limit
+
+            return nearby[start:end], total
+
+        distance = (
+            6371
+            * func.acos(
+                func.cos(func.radians(lat))
+                * func.cos(func.radians(Event.latitude))
+                * func.cos(
+                    func.radians(Event.longitude)
+                    - func.radians(lng)
+                )
+                + func.sin(func.radians(lat))
+                * func.sin(func.radians(Event.latitude))
+            )
+        )
+
+        count_result = await self.db.execute(
+            select(func.count())
+            .select_from(Event)
+            .where(distance <= radius_km)
+        )
+
+        total = count_result.scalar() or 0
+
+        result = await self.db.execute(
+            select(Event)
+            .options(
+                selectinload(Event.participants)
+                .selectinload(EventParticipant.store)
+            )
+            .where(distance <= radius_km)
+            .order_by(distance)
+            .offset((page - 1) * limit)
+            .limit(limit)
+        )
+
+        return list(result.scalars().all()), total
 
     async def get_by_id(self, event_id: UUID) -> Event | None:
         result = await self.db.execute(
