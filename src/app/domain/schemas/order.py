@@ -40,6 +40,9 @@ class MainOrderResponseDTO(BaseModel):
     buyer_id: UUID
     total_amount: Decimal
     status: str
+    payment_status: str = "pending"
+    payment_method: str | None = None
+    payment_reference: str | None = None
     created_at: datetime
     store_orders: list[StoreOrderResponseDTO] = []
 
