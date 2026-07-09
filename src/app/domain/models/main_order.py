@@ -14,7 +14,9 @@ class MainOrder(Base):
     buyer_id = Column(Uuid, ForeignKey("users.id"), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
     status = Column(String, default="cart")
-    payment_status = Column(String, nullable=False, default="pending", server_default="pending")
+    payment_status = Column(
+        String, nullable=False, default="pending", server_default="pending"
+    )
     payment_method = Column(String, nullable=True)
     # Stripe PaymentIntent id — the only payment data we persist; card details
     # never reach the backend (they go from the app straight to Stripe).
