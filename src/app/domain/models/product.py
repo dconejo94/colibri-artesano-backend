@@ -9,6 +9,7 @@ from sqlalchemy import (
     DateTime,
     Text,
     Uuid,
+    Index,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -30,6 +31,21 @@ class Product(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
+    __table_args__ = (
+        Index(
+            "ix_products_name_trgm",
+            name,
+            postgresql_using="gin",
+            postgresql_ops={"name": "gin_trgm_ops"},
+        ),
+        Index(
+            "ix_products_description_trgm",
+            description,
+            postgresql_using="gin",
+            postgresql_ops={"description": "gin_trgm_ops"},
+        ),
+    )
+
     store = relationship("Store", back_populates="products")
     category = relationship("Category", back_populates="products")
     variants = relationship(
@@ -37,6 +53,9 @@ class Product(Base):
         back_populates="product",
         cascade="all, delete-orphan",
         passive_deletes=True,
+    )
+    favorited_by = relationship(
+        "ProductFavorite", back_populates="product", cascade="all, delete-orphan"
     )
 
     @property

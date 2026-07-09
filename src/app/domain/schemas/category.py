@@ -18,3 +18,11 @@ class CategoryResponseDTO(BaseModel):
     slug: str
 
     model_config = {"from_attributes": True}
+
+
+class CategoryAutocompleteDTO(BaseModel):
+    id: UUID
+    name: str
+    slug: str
+
+    model_config = {"from_attributes": True}

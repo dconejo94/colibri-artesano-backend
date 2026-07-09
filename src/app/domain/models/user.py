@@ -28,9 +28,25 @@ class User(Base):
     followed_stores = relationship(
         "Store", secondary="follows", back_populates="followers"
     )
+    created_events = relationship(
+        "Event", back_populates="creator", foreign_keys="Event.created_by"
+    )
+    event_participation_requests = relationship(
+        "EventParticipant",
+        back_populates="requester",
+        foreign_keys="EventParticipant.requested_by",
+    )
+    event_participation_reviews = relationship(
+        "EventParticipant",
+        back_populates="reviewer",
+        foreign_keys="EventParticipant.reviewed_by",
+    )
     notifications = relationship(
         "Notification", back_populates="user", cascade="all, delete-orphan"
     )
     fcm_tokens = relationship(
         "FCMToken", back_populates="user", cascade="all, delete-orphan"
+    )
+    favorite_products = relationship(
+        "ProductFavorite", back_populates="user", cascade="all, delete-orphan"
     )

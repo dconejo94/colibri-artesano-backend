@@ -72,9 +72,19 @@ class ProductService:
         store_id: UUID | None = None,
         category_id: UUID | None = None,
         is_active: bool | None = None,
+        search: str | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
     ) -> PaginatedResponse[ProductResponseDTO]:
         items, total = await self.repository.list_products(
-            page, limit, store_id=store_id, category_id=category_id, is_active=is_active
+            page,
+            limit,
+            store_id=store_id,
+            category_id=category_id,
+            is_active=is_active,
+            search=search,
+            min_price=min_price,
+            max_price=max_price,
         )
         return PaginatedResponse(items=items, page=page, limit=limit, total=total)
 
@@ -113,3 +123,20 @@ class ProductService:
         await self.notification_service.notify_new_product(
             user_ids, product_id, store_name, product_name
         )
+
+    async def favorite_product(self, user_id: UUID, product_id: UUID) -> None:
+        product = await self.repository.get_by_id(product_id)
+        if not product:
+            raise NotFoundException("Product", str(product_id))
+        await self.repository.favorite_product(user_id, product_id)
+
+    async def unfavorite_product(self, user_id: UUID, product_id: UUID) -> None:
+        await self.repository.unfavorite_product(user_id, product_id)
+
+    async def list_favorite_products(
+        self, user_id: UUID, page: int, limit: int
+    ) -> PaginatedResponse[ProductResponseDTO]:
+        items, total = await self.repository.list_favorite_products(
+            user_id, page, limit
+        )
+        return PaginatedResponse(items=items, page=page, limit=limit, total=total)

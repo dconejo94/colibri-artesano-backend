@@ -19,6 +19,11 @@ from app.infrastructure.order_repository_sqlalchemy import SQLAlchemyOrderReposi
 from app.infrastructure.search_repository_sqlalchemy import (
     SQLAlchemyProductSearchRepository,
 )
+from app.infrastructure.store_search_repository import SQLAlchemyStoreSearchRepository
+from app.infrastructure.category_search_repository import (
+    SQLAlchemyCategorySearchRepository,
+)
+from app.infrastructure.event_repository_sqlalchemy import SQLAlchemyEventRepository
 from app.infrastructure.cart_repository_sqlalchemy import SQLAlchemyCartRepository
 from app.infrastructure.notification_repository_sqlalchemy import (
     SQLAlchemyNotificationRepository,
@@ -33,6 +38,7 @@ from app.services.product_image_service import ProductImageService
 from app.services.product_variant_service import ProductVariantService
 from app.services.order_service import OrderService
 from app.services.search_service import SearchService
+from app.services.event_service import EventService
 from app.services.cart_service import CartService
 from app.services.store_order_service import StoreOrderService
 from app.services.notification_service import NotificationService
@@ -122,7 +128,17 @@ async def get_order_service(
 async def get_search_service(
     db: AsyncSession = Depends(get_db),
 ) -> SearchService:
-    return SearchService(SQLAlchemyProductSearchRepository(db))
+    return SearchService(
+        repository=SQLAlchemyProductSearchRepository(db),
+        store_repository=SQLAlchemyStoreSearchRepository(db),
+        category_repository=SQLAlchemyCategorySearchRepository(db),
+    )
+
+
+async def get_event_service(
+    db: AsyncSession = Depends(get_db),
+) -> EventService:
+    return EventService(SQLAlchemyEventRepository(db))
 
 
 async def get_cart_service(

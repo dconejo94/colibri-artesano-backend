@@ -91,3 +91,9 @@ class StoreService:
         if not store:
             raise NotFoundException("Store", str(store_id))
         await self.repository.remove_follower(store_id, user_id)
+
+    async def list_followed_stores(
+        self, user_id: UUID, page: int, limit: int
+    ) -> PaginatedResponse[StoreResponseDTO]:
+        items, total = await self.repository.list_followed_stores(user_id, page, limit)
+        return PaginatedResponse(items=items, page=page, limit=limit, total=total)

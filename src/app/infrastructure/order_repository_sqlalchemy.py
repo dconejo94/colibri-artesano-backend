@@ -90,6 +90,17 @@ class SQLAlchemyOrderRepository(OrderRepository):
         )
         return result.scalars().first()
 
+    async def get_store_sales_summary(self, store_id: UUID) -> tuple[int, float]:
+        stmt = select(
+            func.count().label("total_orders"),
+            func.coalesce(func.sum(StoreOrder.subtotal_amount), 0).label("total_sales"),
+        ).where(
+            StoreOrder.store_id == store_id, StoreOrder.seller_status == "delivered"
+        )
+        result = await self.db.execute(stmt)
+        row = result.first()
+        return (row.total_orders, float(row.total_sales)) if row else (0, 0.0)
+
     async def update_store_order_status(self, store_order: StoreOrder):
         await self.db.flush()
         await self.db.refresh(store_order)

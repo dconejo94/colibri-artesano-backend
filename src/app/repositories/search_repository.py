@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 
 from app.domain.models.product import Product
+from app.domain.models.store import Store
+from app.domain.models.category import Category
 
 
 class ProductSearchRepository(ABC):
@@ -41,3 +43,25 @@ class ProductSearchRepository(ABC):
         (hard-capped at 10 by the service layer).  An empty *query* string
         must return an empty list.
         """
+
+
+class StoreSearchRepository(ABC):
+    @abstractmethod
+    async def search(
+        self, query: str, page: int, limit: int
+    ) -> tuple[list[Store], int]:
+        pass
+
+    @abstractmethod
+    async def autocomplete(self, query: str, limit: int = 10) -> list[Store]:
+        pass
+
+
+class CategorySearchRepository(ABC):
+    @abstractmethod
+    async def search(self, query: str) -> list[Category]:
+        pass
+
+    @abstractmethod
+    async def autocomplete(self, query: str, limit: int = 10) -> list[Category]:
+        pass

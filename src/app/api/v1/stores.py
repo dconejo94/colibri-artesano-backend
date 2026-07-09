@@ -164,6 +164,18 @@ async def list_store_orders(
     return await service.list_store_orders(store_id=store_id, page=page, limit=limit)
 
 
+@router.get(
+    "/{store_id}/sales",
+)
+async def get_store_sales_summary(
+    store_id: UUID,
+    _: object = Depends(require_store_owner),
+    service: OrderService = Depends(get_order_service),
+):
+    """Returns the total number of delivered orders and the sum of their subtotals."""
+    return await service.get_store_sales_summary(store_id)
+
+
 @router.patch(
     "/{store_id}/orders/{store_order_id}/status",
     response_model=StoreOrderResponseDTO,
