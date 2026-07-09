@@ -57,9 +57,9 @@ async def list_upcoming(
 @router.get("/nearby", response_model=PaginatedResponse[EventResponseDTO])
 async def list_nearby(
     current_user: CurrentUser,
-    lat: float,
-    lng: float,
-    radius_km: float,
+    lat: float = Query(..., ge=-90, le=90),
+    lng: float = Query(..., ge=-180, le=180),
+    radius_km: float = Query(..., gt=0, le=500),
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     service: EventService = Depends(get_event_service),

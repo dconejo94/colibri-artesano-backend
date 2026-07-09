@@ -309,7 +309,7 @@ async def test_nearby_invalid_radius_too_small(auth_client: AsyncClient):
     token = await _register_buyer(auth_client, "buyer_radius1@test.com")
 
     resp = await auth_client.get(
-        f"{_EVENTS}/nearby?lat=9.9&lng=-84.0&radius=0",
+        f"{_EVENTS}/nearby?lat=9.9&lng=-84.0&radius_km=0",
         headers=_auth(token),
     )
 
@@ -320,7 +320,29 @@ async def test_nearby_invalid_radius_too_large(auth_client: AsyncClient):
     token = await _register_buyer(auth_client, "buyer_radius2@test.com")
 
     resp = await auth_client.get(
-        f"{_EVENTS}/nearby?lat=9.9&lng=-84.0&radius=1000",
+        f"{_EVENTS}/nearby?lat=9.9&lng=-84.0&radius_km=1000",
+        headers=_auth(token),
+    )
+
+    assert resp.status_code == 422
+
+
+async def test_nearby_invalid_latitude(auth_client: AsyncClient):
+    token = await _register_buyer(auth_client, "buyer_nearby_lat@test.com")
+
+    resp = await auth_client.get(
+        f"{_EVENTS}/nearby?lat=200&lng=-84.0&radius_km=10",
+        headers=_auth(token),
+    )
+
+    assert resp.status_code == 422
+
+
+async def test_nearby_invalid_longitude(auth_client: AsyncClient):
+    token = await _register_buyer(auth_client, "buyer_nearby_lng@test.com")
+
+    resp = await auth_client.get(
+        f"{_EVENTS}/nearby?lat=9.9&lng=-300&radius_km=10",
         headers=_auth(token),
     )
 

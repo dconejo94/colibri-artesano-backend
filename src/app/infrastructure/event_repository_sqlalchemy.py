@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+from math import radians, sin, cos, sqrt, asin
 from uuid import UUID
 
 from sqlalchemy import select, func
@@ -7,8 +9,7 @@ from sqlalchemy.orm import selectinload
 from app.domain.models.event import Event, EventParticipant, ParticipationStatus
 from app.repositories.event_repository import EventRepository
 
-from datetime import datetime, timezone
-from math import radians, sin, cos, sqrt, asin
+EARTH_RADIUS_KM = 6371.0
 
 
 class SQLAlchemyEventRepository(EventRepository):
@@ -22,8 +23,6 @@ class SQLAlchemyEventRepository(EventRepository):
         lat2: float,
         lng2: float,
     ) -> float:
-        radius = 6371.0
-
         dlat = radians(lat2 - lat1)
         dlng = radians(lng2 - lng1)
 
@@ -32,9 +31,10 @@ class SQLAlchemyEventRepository(EventRepository):
             + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlng / 2) ** 2
         )
 
-        c = 2 * asin(sqrt(a))
+        # Clamp for float rounding: `a` is mathematically bounded to [0, 1].
+        c = 2 * asin(sqrt(min(1.0, a)))
 
-        return radius * c
+        return EARTH_RADIUS_KM * c
 
     # ── Events ────────────────────────────────────────────────────
 
@@ -98,6 +98,8 @@ class SQLAlchemyEventRepository(EventRepository):
         radius_km: float,
     ) -> tuple[list[Event], int]:
 
+        # SQLite (used in tests) has no trig functions, so distance is
+        # computed in Python there; Postgres computes it in SQL below.
         dialect = self.db.bind.dialect.name
 
         if dialect == "sqlite":
@@ -130,12 +132,18 @@ class SQLAlchemyEventRepository(EventRepository):
 
             return nearby[start:end], total
 
-        distance = 6371 * func.acos(
-            func.cos(func.radians(lat))
-            * func.cos(func.radians(Event.latitude))
-            * func.cos(func.radians(Event.longitude) - func.radians(lng))
-            + func.sin(func.radians(lat)) * func.sin(func.radians(Event.latitude))
+        dlat = func.radians(Event.latitude - lat)
+        dlng = func.radians(Event.longitude - lng)
+
+        a = func.sin(dlat / 2) * func.sin(dlat / 2) + func.cos(
+            func.radians(lat)
+        ) * func.cos(func.radians(Event.latitude)) * func.sin(dlng / 2) * func.sin(
+            dlng / 2
         )
+
+        # `a` is mathematically bounded to [0, 1]; clamp for float rounding
+        # so sqrt/asin never sees an out-of-domain value near the poles.
+        distance = 2 * EARTH_RADIUS_KM * func.asin(func.sqrt(func.least(1.0, a)))
 
         count_result = await self.db.execute(
             select(func.count()).select_from(Event).where(distance <= radius_km)
