@@ -152,8 +152,9 @@ async def test_create_intent_empty_cart_returns_409(client, stripe_configured):
     assert resp.status_code == 409
 
 
-async def test_create_intent_without_stripe_key_returns_503(client):
-    # Default settings leave STRIPE_SECRET_KEY empty.
+async def test_create_intent_without_stripe_key_returns_503(client, monkeypatch):
+    # Force the unconfigured state: a developer's .env may hold a real key.
+    monkeypatch.setattr(settings, "STRIPE_SECRET_KEY", "")
     await _add_to_cart(client)
 
     resp = await client.post("/api/v1/payments/create-intent")
