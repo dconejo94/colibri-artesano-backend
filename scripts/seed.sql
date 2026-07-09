@@ -203,27 +203,72 @@ ON CONFLICT (id) DO NOTHING;
 -- ── Events (created by Daniel, the seed admin) ───────────────────────────────
 -- Costa Rica does not observe DST, so a fixed -06:00 offset is always correct.
 
-INSERT INTO events (id, title, description, location, event_date, cover_image_url, created_by) VALUES
-  ('ee000000-0000-0000-0000-000000000001', 'Feria de Artesanía de Guadalupe',
-   'Encuentro de artesanos locales con venta directa, demostraciones de técnicas tradicionales y música en vivo.',
-   'Parque Central de Guadalupe, Goicoechea', '2026-08-15 09:00:00-06', 'https://picsum.photos/seed/feria-guadalupe/800/400',
-   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
-  ('ee000000-0000-0000-0000-000000000002', 'Expo Textiles de Sarchí',
-   'Exposición y venta de textiles tejidos a mano, con talleres abiertos al público sobre tinte natural.',
-   'Plaza de la Cultura, Sarchí, Alajuela', '2026-09-05 10:00:00-06', 'https://picsum.photos/seed/expo-sarchi/800/400',
-   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
-  ('ee000000-0000-0000-0000-000000000003', 'Feria Navideña de Artesanos',
-   'Feria de fin de año dedicada a piezas artesanales para regalar: cerámica, joyería y textiles.',
-   'Antigua Aduana, San José', '2026-12-06 11:00:00-06', 'https://picsum.photos/seed/feria-navidena/800/400',
-   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
-  ('ee000000-0000-0000-0000-000000000004', 'Mercado de Diseño Costa Rica',
-   'Mercado multidisciplinario de diseño y artesanía: pintura, cuero, madera y más, con food trucks y música en vivo.',
-   'Antigua Estación al Pacífico, San José', '2026-10-18 10:00:00-06', 'https://picsum.photos/seed/mercado-diseno/800/400',
-   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
-  ('ee000000-0000-0000-0000-000000000005', 'Festival de Talladores y Ebanistas',
-   'Encuentro de talladores y ebanistas costarricenses, con demostraciones en vivo de tallado en madera.',
-   'Plaza de la Artesanía, Sarchí, Alajuela', '2026-11-08 09:30:00-06', 'https://picsum.photos/seed/festival-talladores/800/400',
-   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11')
+INSERT INTO events (
+    id,
+    title,
+    description,
+    location,
+    latitude,
+    longitude,
+    event_date,
+    cover_image_url,
+    created_by
+) VALUES
+(
+    'ee000000-0000-0000-0000-000000000001',
+    'Feria de Artesanía de Guadalupe',
+    'Encuentro de artesanos locales con venta directa, demostraciones de técnicas tradicionales y música en vivo.',
+    'Parque Central de Guadalupe, Goicoechea',
+    9.9486,
+    -84.0567,
+    '2026-08-15 09:00:00-06',
+    'https://picsum.photos/seed/feria-guadalupe/800/400',
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+),
+(
+    'ee000000-0000-0000-0000-000000000002',
+    'Expo Textiles de Sarchí',
+    'Exposición y venta de textiles tejidos a mano, con talleres abiertos al público sobre tinte natural.',
+    'Plaza de la Cultura, Sarchí, Alajuela',
+    10.0915,
+    -84.3455,
+    '2026-09-05 10:00:00-06',
+    'https://picsum.photos/seed/expo-sarchi/800/400',
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+),
+(
+    'ee000000-0000-0000-0000-000000000003',
+    'Feria Navideña de Artesanos',
+    'Feria de fin de año dedicada a piezas artesanales para regalar: cerámica, joyería y textiles.',
+    'Antigua Aduana, San José',
+    9.9347,
+    -84.0718,
+    '2026-12-06 11:00:00-06',
+    'https://picsum.photos/seed/feria-navidena/800/400',
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+),
+(
+    'ee000000-0000-0000-0000-000000000004',
+    'Mercado de Diseño Costa Rica',
+    'Mercado multidisciplinario de diseño y artesanía: pintura, cuero, madera y más, con food trucks y música en vivo.',
+    'Antigua Estación al Pacífico, San José',
+    9.9288,
+    -84.0879,
+    '2026-10-18 10:00:00-06',
+    'https://picsum.photos/seed/mercado-diseno/800/400',
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+),
+(
+    'ee000000-0000-0000-0000-000000000005',
+    'Festival de Talladores y Ebanistas',
+    'Encuentro de talladores y ebanistas costarricenses, con demostraciones en vivo de tallado en madera.',
+    'Plaza de la Artesanía, Sarchí, Alajuela',
+    10.0912,
+    -84.3458,
+    '2026-11-08 09:30:00-06',
+    'https://picsum.photos/seed/festival-talladores/800/400',
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+)
 ON CONFLICT (id) DO NOTHING;
 
 -- ── Event participants (store participation requests) ────────────────────────
