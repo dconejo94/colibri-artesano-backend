@@ -30,6 +30,16 @@ class SQLAlchemyOrderRepository(OrderRepository):
         )
         return result.scalars().first()
 
+    async def get_main_order_by_payment_reference(self, payment_reference: str):
+        result = await self.db.execute(
+            select(MainOrder)
+            .where(MainOrder.payment_reference == payment_reference)
+            .options(
+                selectinload(MainOrder.store_orders).selectinload(StoreOrder.items)
+            )
+        )
+        return result.scalars().first()
+
     async def get_cart_by_buyer(self, buyer_id: UUID):
         result = await self.db.execute(
             select(MainOrder)
