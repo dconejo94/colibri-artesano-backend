@@ -11,6 +11,8 @@ from app.domain.models.product_variant import ProductVariant
 from app.domain.models.store_order import StoreOrder
 from app.domain.models.order_item import OrderItem
 from app.services.store_order_service import StoreOrderService
+from app.services.order_service import OrderService
+from app.domain.schemas.order import StoreOrderStatusUpdateDTO
 from app.core.exceptions import NotFoundException, ConflictException
 
 
@@ -212,6 +214,60 @@ async def test_update_quantity_returns_signed_diff():
 
 
 # ── remove_line ───────────────────────────────────────────────────
+
+
+# ── update_store_order_status (authorization) ─────────────────────
+
+
+class _FakeOrderRepo:
+    def __init__(self, store_order):
+        self._store_order = store_order
+        self.updated = False
+
+    async def get_store_order_by_id(self, store_order_id):
+        return self._store_order
+
+    async def update_store_order_status(self, store_order):
+        self.updated = True
+
+
+def _order_service(store_order):
+    return OrderService(
+        order_repository=_FakeOrderRepo(store_order),
+        product_repository=None,
+        variant_repository=None,
+        notification_service=None,
+    )
+
+
+async def test_update_status_rejects_order_of_another_store():
+    store_order = _store_order()  # belongs to a random store
+    svc = _order_service(store_order)
+    other_store_id = uuid.uuid4()
+
+    # The vendor owns `other_store_id` (checked by the route dependency) but the
+    # order belongs to a different store — this must not be updatable.
+    with pytest.raises(NotFoundException):
+        await svc.update_store_order_status(
+            other_store_id,
+            store_order.id,
+            StoreOrderStatusUpdateDTO(seller_status="shipped"),
+        )
+    assert svc.order_repo.updated is False
+
+
+async def test_update_status_allows_owning_store():
+    store_order = _store_order()
+    svc = _order_service(store_order)
+
+    await svc.update_store_order_status(
+        store_order.store_id,
+        store_order.id,
+        StoreOrderStatusUpdateDTO(seller_status="shipped"),
+    )
+
+    assert store_order.seller_status == "shipped"
+    assert svc.order_repo.updated is True
 
 
 async def test_remove_line_returns_amount_and_updates_subtotal():

@@ -16,7 +16,7 @@ class RegisterDTO(BaseModel):
     @model_validator(mode="after")
     def _require_store_name_for_vendor(self) -> "RegisterDTO":
         if self.role == "vendor" and not self.store_name:
-            raise ValueError("store_name is required when role is 'vendor'")
+            raise ValueError("Se requiere el nombre de la tienda para vendedores.")
         return self
 
 

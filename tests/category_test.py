@@ -80,6 +80,7 @@ async def test_get_category_not_found(client):
     resp = await client.get(f"/api/v1/categories/{fake_id}")
 
     assert resp.status_code == 404
+    assert resp.json()["detail"] == "Categoría no encontrada."
 
 
 # ── Update ────────────────────────────────────────────────────────

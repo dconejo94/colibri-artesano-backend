@@ -7,7 +7,7 @@ from uuid import UUID
 
 import bcrypt
 import jwt
-from fastapi import Depends
+from fastapi import Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,8 +28,25 @@ _BCRYPT_MAX_BYTES = 72
 ACCESS_TOKEN_TYPE = "access"
 REFRESH_TOKEN_TYPE = "refresh"
 
+
+class _SpanishOAuth2PasswordBearer(OAuth2PasswordBearer):
+    """OAuth2 bearer scheme that returns the app's Spanish auth error.
+
+    The default scheme raises an English ``HTTPException(401, "Not
+    authenticated")`` when the Authorization header is missing, bypassing the
+    domain exception handlers. Translating it here keeps the auth surface
+    consistently Spanish.
+    """
+
+    async def __call__(self, request: Request) -> str | None:
+        try:
+            return await super().__call__(request)
+        except HTTPException:
+            raise UnauthorizedException() from None
+
+
 # Reads the bearer token from the Authorization header (tokenUrl is docs-only).
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
+oauth2_scheme = _SpanishOAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 oauth2_scheme_optional = OAuth2PasswordBearer(
     tokenUrl="api/v1/auth/login", auto_error=False
 )

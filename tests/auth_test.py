@@ -84,11 +84,19 @@ async def test_register_vendor_without_store_name_returns_422(client):
     payload = {"email": "v2@test.com", "password": "password123", "role": "vendor"}
     resp = await client.post(_REGISTER, json=payload)
     assert resp.status_code == 422
+    # The custom validator's message must survive (not collapse to a generic one).
+    messages = [d["msg"] for d in resp.json()["detail"]]
+    assert any("nombre de la tienda" in m for m in messages)
 
 
 async def test_register_short_password_returns_422(client):
     resp = await client.post(_REGISTER, json=_buyer(password="short"))
     assert resp.status_code == 422
+    # The min-length constraint must be communicated, not hidden behind "Valor inválido.".
+    password_errors = [
+        d["msg"] for d in resp.json()["detail"] if d["loc"][-1] == "password"
+    ]
+    assert password_errors and "8" in password_errors[0]
 
 
 async def test_register_invalid_email_returns_422(client):
@@ -151,6 +159,8 @@ async def test_refresh_invalid_token_returns_401(client):
 async def test_protected_route_without_token_returns_401(auth_client):
     resp = await auth_client.get("/api/v1/users/me")
     assert resp.status_code == 401
+    # The missing-header 401 must be localized, not the default English message.
+    assert resp.json()["detail"] == "No se pudo validar las credenciales."
 
 
 async def test_protected_route_with_token_succeeds(auth_client):
